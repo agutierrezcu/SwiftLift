@@ -2,13 +2,39 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34511.98
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Web", "src\SwiftLift.Web\SwiftLift.Web.csproj", "{B79FF2ED-A028-434D-8868-5CB08054CF5F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.ServiceDefaults", "src\SwiftLift.ServiceDefaults\SwiftLift.ServiceDefaults.csproj", "{F8F5EE47-9215-424B-B47F-6FFE10FDDEAC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.AppHost", "src\SwiftLift.AppHost\SwiftLift.AppHost.csproj", "{1C9501C0-DED0-4A74-BF50-F59517AADAF7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.ApiService", "src\SwiftLift.ApiService\SwiftLift.ApiService.csproj", "{7F18DF54-079E-4826-8137-4CE2F491AD04}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D205395C-311E-4E33-BE40-AAFB2B906B8F}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		coverage.cmd = coverage.cmd
+		Directory.Build.props = Directory.Build.props
+		.config\dotnet-tools.json = .config\dotnet-tools.json
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{FD6B7134-7A7E-4BAB-BECF-7A879CA20DF7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.SharedKernel", "src\SwiftLift.SharedKernel\SwiftLift.SharedKernel.csproj", "{6DF3A769-C9F2-4E8C-B0FA-F55AED11EDED}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BB18F88A-B78E-4E13-AFA4-DDB0B177D859}"
+	ProjectSection(SolutionItems) = preProject
+		tests\Directory.Packages.props = tests\Directory.Packages.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.SharedKernel.UnitTests", "tests\SwiftLift.SharedKernel.UnitTests\SwiftLift.SharedKernel.UnitTests.csproj", "{186333B2-97F3-446C-B301-04659A660CA2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{6CDBE436-5C12-4222-AB8E-4B2C83DF9AC7}"
+	ProjectSection(SolutionItems) = preProject
+		src\Services\Directory.Packages.props = src\Services\Directory.Packages.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Riders.Api", "src\Services\SwiftLift.Riders.Api\SwiftLift.Riders.Api.csproj", "{B0886171-E9E1-4F99-BA9F-58C307D53993}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwiftLift.Riders.Api.IntegrationTests", "tests\SwiftLift.Riders.Api.IntegrationTests\SwiftLift.Riders.Api.IntegrationTests.csproj", "{5E6B4089-F15C-4986-8590-6ACFFB53BB9A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,10 +42,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B79FF2ED-A028-434D-8868-5CB08054CF5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B79FF2ED-A028-434D-8868-5CB08054CF5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B79FF2ED-A028-434D-8868-5CB08054CF5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B79FF2ED-A028-434D-8868-5CB08054CF5F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F8F5EE47-9215-424B-B47F-6FFE10FDDEAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F8F5EE47-9215-424B-B47F-6FFE10FDDEAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8F5EE47-9215-424B-B47F-6FFE10FDDEAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -28,13 +50,31 @@ Global
 		{1C9501C0-DED0-4A74-BF50-F59517AADAF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C9501C0-DED0-4A74-BF50-F59517AADAF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C9501C0-DED0-4A74-BF50-F59517AADAF7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7F18DF54-079E-4826-8137-4CE2F491AD04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7F18DF54-079E-4826-8137-4CE2F491AD04}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7F18DF54-079E-4826-8137-4CE2F491AD04}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7F18DF54-079E-4826-8137-4CE2F491AD04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DF3A769-C9F2-4E8C-B0FA-F55AED11EDED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DF3A769-C9F2-4E8C-B0FA-F55AED11EDED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DF3A769-C9F2-4E8C-B0FA-F55AED11EDED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DF3A769-C9F2-4E8C-B0FA-F55AED11EDED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{186333B2-97F3-446C-B301-04659A660CA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{186333B2-97F3-446C-B301-04659A660CA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{186333B2-97F3-446C-B301-04659A660CA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{186333B2-97F3-446C-B301-04659A660CA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0886171-E9E1-4F99-BA9F-58C307D53993}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0886171-E9E1-4F99-BA9F-58C307D53993}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0886171-E9E1-4F99-BA9F-58C307D53993}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0886171-E9E1-4F99-BA9F-58C307D53993}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E6B4089-F15C-4986-8590-6ACFFB53BB9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E6B4089-F15C-4986-8590-6ACFFB53BB9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E6B4089-F15C-4986-8590-6ACFFB53BB9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E6B4089-F15C-4986-8590-6ACFFB53BB9A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6DF3A769-C9F2-4E8C-B0FA-F55AED11EDED} = {FD6B7134-7A7E-4BAB-BECF-7A879CA20DF7}
+		{186333B2-97F3-446C-B301-04659A660CA2} = {BB18F88A-B78E-4E13-AFA4-DDB0B177D859}
+		{B0886171-E9E1-4F99-BA9F-58C307D53993} = {6CDBE436-5C12-4222-AB8E-4B2C83DF9AC7}
+		{5E6B4089-F15C-4986-8590-6ACFFB53BB9A} = {BB18F88A-B78E-4E13-AFA4-DDB0B177D859}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8EFD1670-D674-4743-B0A0-28C80C3A7262}

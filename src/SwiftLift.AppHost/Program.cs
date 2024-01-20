@@ -1,8 +1,15 @@
+using SwiftLift.SharedKernel.ApplicationInsight;
+using SwiftLift.SharedKernel.Environment;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
-var apiService = builder.AddProject<Projects.SwiftLift_ApiService>("apiservice");
+var applicationInsightConnectionString = ApplicationInsightResource.Instance
+    .GetConnectionStringGuaranteed(EnvironmentService.Instance, builder.Configuration);
 
-builder.AddProject<Projects.SwiftLift_Web>("webfrontend")
-    .WithReference(apiService);
+builder.AddProject<Projects.SwiftLift_Riders_Api>("swiftlift.riders.api")
+    .WithEnvironment(
+        ApplicationInsightResourceDefaults.EnvironmentVariable,
+        applicationInsightConnectionString.Value);
 
-builder.Build().Run();
+await builder.Build().RunAsync()
+    .ConfigureAwait(false);

@@ -1,0 +1,34 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Oakton.Environment;
+using SwiftLift.SharedKernel.ConnectionString;
+using SwiftLift.SharedKernel.Environment;
+
+namespace SwiftLift.SharedKernel.ApplicationInsight;
+
+public sealed class ApplicationInsightEnvironmentCheck : IEnvironmentCheck
+{
+    public string Description
+        => "Application Insight connection is not being properly set.";
+
+    public Task Assert(IServiceProvider services, CancellationToken cancellation)
+    {
+        var applicationInsightResource = services.GetRequiredService<IApplicationInsightResource>();
+        var environmentService = services.GetRequiredService<IEnvironmentService>();
+        var configuration = services.GetRequiredService<IConfiguration>();
+
+        var connectionStringResource = applicationInsightResource
+            .GetConnectionStringGuaranteed(
+                environmentService, configuration);
+
+        if (!connectionStringResource?.TryGetSegmentValue("InstrumentationKey", out _) ?? true)
+        {
+            throw new InvalidConnectionStringException(
+                ApplicationInsightResourceDefaults.ResourceName,
+                "Application Insight connection string does not have required InstrumentationKey segment key.");
+        }
+
+        return Task.CompletedTask;
+    }
+}
+

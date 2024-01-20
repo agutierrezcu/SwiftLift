@@ -1,25 +1,39 @@
+using Ardalis.GuardClauses;
+using Azure.Identity;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using SwiftLift.SharedKernel.Application;
 
-namespace Microsoft.Extensions.Hosting;
+namespace SwiftLift.ServiceDefaults;
 
-public static class Extensions
+public static partial class Extensions
 {
-    public static IHostApplicationBuilder AddServiceDefaults(this IHostApplicationBuilder builder)
+    public static IHostApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder,
+        ApplicationInfo applicationInfo)
     {
-        builder.ConfigureOpenTelemetry();
+        Guard.Against.Null(builder);
+        Guard.Against.Null(applicationInfo);
+
+        builder.AddSharedServices();
+
+        builder.ConfigureOpenTelemetry(applicationInfo);
 
         builder.AddDefaultHealthChecks();
 
-        builder.Services.AddServiceDiscovery();
+        var services = builder.Services;
 
-        builder.Services.ConfigureHttpClientDefaults(http =>
+        services.AddServiceDiscovery();
+
+        services.ConfigureHttpClientDefaults(http =>
         {
             // Turn on resilience by default
             http.AddStandardResilienceHandler();
@@ -28,11 +42,17 @@ public static class Extensions
             http.UseServiceDiscovery();
         });
 
+        builder.AddEnvironmentChecks();
+
         return builder;
     }
 
-    public static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder)
+    public static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder,
+        ApplicationInfo applicationInfo)
     {
+        Guard.Against.Null(builder);
+        Guard.Against.Null(applicationInfo);
+
         builder.Logging.AddOpenTelemetry(logging =>
         {
             logging.IncludeFormattedMessage = true;
@@ -58,29 +78,57 @@ public static class Extensions
                        .AddHttpClientInstrumentation();
             });
 
-        builder.AddOpenTelemetryExporters();
+        builder.AddOpenTelemetryExporters(applicationInfo);
 
         return builder;
     }
 
-    private static IHostApplicationBuilder AddOpenTelemetryExporters(this IHostApplicationBuilder builder)
+    private static IHostApplicationBuilder AddOpenTelemetryExporters(this IHostApplicationBuilder builder,
+        ApplicationInfo applicationInfo)
     {
-        var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
+        Guard.Against.Null(builder);
+        Guard.Against.Null(applicationInfo);
+
+        var services = builder.Services;
+
+        var otlpExporterEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+
+        var useOtlpExporter = !string.IsNullOrWhiteSpace(otlpExporterEndpoint);
 
         if (useOtlpExporter)
         {
-            builder.Services.Configure<OpenTelemetryLoggerOptions>(logging => logging.AddOtlpExporter());
-            builder.Services.ConfigureOpenTelemetryMeterProvider(metrics => metrics.AddOtlpExporter());
-            builder.Services.ConfigureOpenTelemetryTracerProvider(tracing => tracing.AddOtlpExporter());
+            services.Configure<OpenTelemetryLoggerOptions>(logging => logging.AddOtlpExporter());
+            services.ConfigureOpenTelemetryMeterProvider(metrics => metrics.AddOtlpExporter());
+            services.ConfigureOpenTelemetryTracerProvider(tracing => tracing.AddOtlpExporter());
         }
 
         // Uncomment the following lines to enable the Prometheus exporter (requires the OpenTelemetry.Exporter.Prometheus.AspNetCore package)
         // builder.Services.AddOpenTelemetry()
         //    .WithMetrics(metrics => metrics.AddPrometheusExporter());
 
-        // Uncomment the following lines to enable the Azure Monitor exporter (requires the Azure.Monitor.OpenTelemetry.Exporter package)
-        // builder.Services.AddOpenTelemetry()
-        //    .UseAzureMonitor();
+        var resourceAttributes = new Dictionary<string, object> {
+            { "service.name", applicationInfo.Name },
+            { "service.namespace", applicationInfo.Namespace },
+            { "service.instance.id", applicationInfo.Id }
+        };
+
+        services.ConfigureOpenTelemetryTracerProvider(
+            builder => builder.ConfigureResource(
+                resourceBuilder => resourceBuilder.AddAttributes(resourceAttributes)));
+
+        // TODO: check this out later having into account the issue https://github.com/dotnet/aspire/issues/1562
+        services.AddOpenTelemetry()
+           .UseAzureMonitor(
+                opts =>
+                {
+                    opts.SamplingRatio = 0.05F;
+
+                    opts.Credential =
+                        builder.Environment.IsDevelopment()
+                        ? new DefaultAzureCredential()
+                        : new ManagedIdentityCredential();
+                }
+            );
 
         return builder;
     }
@@ -111,9 +159,11 @@ public static class Extensions
         return app;
     }
 
-    private static MeterProviderBuilder AddBuiltInMeters(this MeterProviderBuilder meterProviderBuilder) =>
-        meterProviderBuilder.AddMeter(
+    private static MeterProviderBuilder AddBuiltInMeters(this MeterProviderBuilder meterProviderBuilder)
+    {
+        return meterProviderBuilder.AddMeter(
             "Microsoft.AspNetCore.Hosting",
             "Microsoft.AspNetCore.Server.Kestrel",
             "System.Net.Http");
+    }
 }
