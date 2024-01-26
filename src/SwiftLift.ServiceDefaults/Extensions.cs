@@ -13,6 +13,7 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using SimpleInjector;
 using SwiftLift.SharedKernel.Application;
 using SwiftLift.SharedKernel.Build;
 
@@ -21,11 +22,12 @@ namespace SwiftLift.ServiceDefaults;
 public static partial class Extensions
 {
     public static IHostApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder,
-        ApplicationInfo applicationInfo, Assembly?[] assemblies)
+        ApplicationInfo applicationInfo, Assembly[] assemblies, Container container)
     {
         Guard.Against.Null(builder);
         Guard.Against.Null(applicationInfo);
         Guard.Against.NullOrEmpty(assemblies);
+        Guard.Against.Null(container);
 
         builder.AddSharedServices();
 
@@ -46,7 +48,7 @@ public static partial class Extensions
             http.UseServiceDiscovery();
         });
 
-        builder.AddEnvironmentChecks(assemblies);
+        builder.AddEnvironmentChecks(assemblies, container);
 
         return builder;
     }

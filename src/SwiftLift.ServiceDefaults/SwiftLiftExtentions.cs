@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Oakton;
 using Oakton.Environment;
+using Oakton.Resources;
+using SimpleInjector;
 using SwiftLift.SharedKernel.ApplicationInsight;
 using SwiftLift.SharedKernel.Build;
 using SwiftLift.SharedKernel.Environment;
@@ -31,23 +33,28 @@ public static partial class Extensions
     }
 
     public static WebApplicationBuilder AddEnvironmentChecks(this WebApplicationBuilder builder,
-        Assembly?[] assemblies)
+        Assembly[] assemblies, Container container)
     {
         Guard.Against.Null(builder);
         Guard.Against.NullOrEmpty(assemblies);
+        Guard.Against.Null(container);
 
         builder.Host.ApplyOaktonExtensions();
-        _ = builder.Services;
 
-        // TODO: Refactoring by SimpleInjector discovery feature
-        //services.AddSingleton<IEnvironmentCheck, ApplicationInsightEnvironmentCheck>();
+        container.Collection.Register(typeof(IEnvironmentCheck), assemblies, Lifestyle.Transient);
+        container.Collection.Register(typeof(IEnvironmentCheckFactory), assemblies, Lifestyle.Transient);
+        container.Collection.Register(typeof(IStatefulResource), assemblies, Lifestyle.Transient);
+        container.Collection.Register(typeof(IStatefulResourceSource), assemblies, Lifestyle.Transient);
 
         return builder;
     }
 
-    public static async Task RunAppAsync(this WebApplication app, string[] args)
+    public static async Task RunAppAsync(this WebApplication app, string[] args, Container container)
     {
-        var environmentCheckResults = await EnvironmentChecker.ExecuteAllEnvironmentChecks(app.Services)
+        Guard.Against.Null(app);
+        Guard.Against.Null(container);
+
+        var environmentCheckResults = await EnvironmentChecker.ExecuteAllEnvironmentChecks(container)
             .ConfigureAwait(false);
 
         if (!environmentCheckResults.Succeeded())

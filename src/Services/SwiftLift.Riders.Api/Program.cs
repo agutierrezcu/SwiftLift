@@ -1,3 +1,4 @@
+using SimpleInjector;
 using SwiftLift.ServiceDefaults;
 using SwiftLift.SharedKernel;
 using SwiftLift.SharedKernel.Application;
@@ -8,19 +9,27 @@ var applicationInfo = new ApplicationInfo("swiftlift.riders.api", "Riders.Api", 
 
 var builder = WebApplication.CreateBuilder(args);
 
+var services = builder.Services;
+
 var applicationInsightConnectionString = ApplicationInsightResource.Instance
     .GetConnectionStringGuaranteed(EnvironmentService.Instance, builder.Configuration);
 
-var assemblies = AppDomain.CurrentDomain.GetApplicationAssemblies(applicationInfo.Namespace);
+var assemblies = AppDomain.CurrentDomain
+    .GetApplicationAssemblies(applicationInfo.Namespace);
 
-builder.AddServiceDefaults(applicationInfo, assemblies);
+var container = new Container();
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+services.AddSimpleInjector(
+    container, opts => opts.AddAspNetCore());
+
+builder.AddServiceDefaults(applicationInfo, assemblies, container);
+
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.Services.UseSimpleInjector(container);
 
 app.MapDefaultEndpoints();
 
@@ -33,5 +42,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-await app.RunAppAsync(args)
+container.Verify();
+
+await app.RunAppAsync(args, container)
     .ConfigureAwait(false);

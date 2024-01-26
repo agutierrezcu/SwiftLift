@@ -7,7 +7,7 @@ namespace SwiftLift.SharedKernel.ApplicationInsight;
 internal sealed class ApplicationInsightEnvironmentCheck : IEnvironmentCheck
 {
     public string Description
-        => "Application Insight connection is not being properly set.";
+        => "Application Insight connection string must be properly set.";
 
     public Task Assert(IServiceProvider services, CancellationToken cancellation)
     {

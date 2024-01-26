@@ -1,8 +1,9 @@
 namespace SwiftLift.SharedKernel;
 
+[ExcludeFromCodeCoverage]
 public static class AppDomainExtensions
 {
-    public static Assembly?[] GetApplicationAssemblies(this AppDomain appDomain, string applicationId)
+    public static Assembly[] GetApplicationAssemblies(this AppDomain appDomain, string applicationId)
     {
         var assembliesSearchPattern = $"{applicationId}*.*.dll";
 
@@ -10,7 +11,7 @@ public static class AppDomainExtensions
 
         var entryAssemblyLocation = Assembly.GetEntryAssembly()?.Location;
 
-        var directoryName = Path.GetDirectoryName(entryAssemblyLocation);
+        var directoryName = Path.GetDirectoryName(entryAssemblyLocation)!;
 
         return currentAssemblies
             .Where(a => a.FullName?.StartsWith(applicationId, StringComparison.InvariantCultureIgnoreCase) ?? false)
@@ -22,6 +23,6 @@ public static class AppDomainExtensions
            .Union(new[] { Assembly.GetEntryAssembly() })
            .GroupBy(a => a?.FullName)
            .Select(a => a.First())
-           .ToArray();
+           .ToArray()!;
     }
 }
