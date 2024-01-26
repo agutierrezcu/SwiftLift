@@ -35,6 +35,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Riders.Api", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Riders.Api.IntegrationTests", "tests\SwiftLift.Riders.Api.IntegrationTests\SwiftLift.Riders.Api.IntegrationTests.csproj", "{5E6B4089-F15C-4986-8590-6ACFFB53BB9A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Infrastructure", "src\SwiftLift.Infrastructure\SwiftLift.Infrastructure.csproj", "{6746844E-B720-442B-BB73-C805AD538B19}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Infrastructure.UnitTests", "tests\SwiftLift.Infrastructure.UnitTests\SwiftLift.Infrastructure.UnitTests.csproj", "{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +69,14 @@ Global
 		{5E6B4089-F15C-4986-8590-6ACFFB53BB9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E6B4089-F15C-4986-8590-6ACFFB53BB9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E6B4089-F15C-4986-8590-6ACFFB53BB9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6746844E-B720-442B-BB73-C805AD538B19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6746844E-B720-442B-BB73-C805AD538B19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6746844E-B720-442B-BB73-C805AD538B19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6746844E-B720-442B-BB73-C805AD538B19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,6 +85,7 @@ Global
 		{186333B2-97F3-446C-B301-04659A660CA2} = {BB18F88A-B78E-4E13-AFA4-DDB0B177D859}
 		{B0886171-E9E1-4F99-BA9F-58C307D53993} = {6CDBE436-5C12-4222-AB8E-4B2C83DF9AC7}
 		{5E6B4089-F15C-4986-8590-6ACFFB53BB9A} = {BB18F88A-B78E-4E13-AFA4-DDB0B177D859}
+		{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69} = {BB18F88A-B78E-4E13-AFA4-DDB0B177D859}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8EFD1670-D674-4743-B0A0-28C80C3A7262}

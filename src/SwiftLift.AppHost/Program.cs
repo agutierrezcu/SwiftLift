@@ -1,5 +1,5 @@
-using SwiftLift.SharedKernel.ApplicationInsight;
-using SwiftLift.SharedKernel.Environment;
+using SwiftLift.Infrastructure.ApplicationInsight;
+using SwiftLift.Infrastructure.Environment;
 
 var builder = DistributedApplication.CreateBuilder(args);
 

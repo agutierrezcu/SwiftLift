@@ -14,20 +14,20 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using SwiftLift.SharedKernel.Application;
-using SwiftLift.SharedKernel.Build;
+using SwiftLift.Infrastructure.Build;
 
 namespace SwiftLift.ServiceDefaults;
 
 public static partial class Extensions
 {
     public static IHostApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder,
-        ApplicationInfo applicationInfo, Assembly?[] assemblies)
+        ApplicationInfo applicationInfo, Assembly[] assemblies)
     {
         Guard.Against.Null(builder);
         Guard.Against.Null(applicationInfo);
         Guard.Against.NullOrEmpty(assemblies);
 
-        builder.AddSharedServices();
+        builder.AddSharedServices(assemblies);
 
         builder.ConfigureOpenTelemetry(applicationInfo);
 
@@ -161,13 +161,15 @@ public static partial class Extensions
         });
 
         app.MapGet("/build-info",
-            async (IBuildInfoFileProvider buildInfoFileProvider, HttpResponse response) =>
+            async (IBuildInfoManager buildInfoManager, HttpResponse response, CancellationToken cancellation) =>
             {
                 var fileContent =
-                    await buildInfoFileProvider.GetContentAsync()
+                    await buildInfoManager.GetBuildInfoAsStringAsync(cancellation)
                         .ConfigureAwait(false);
 
-                await response.WriteAsync(fileContent)
+                response.ContentType = "application/json; charset=utf-8";
+
+                await response.WriteAsync(fileContent, cancellation)
                     .ConfigureAwait(false);
             });
 

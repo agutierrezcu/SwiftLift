@@ -1,3 +1,5 @@
+using Ardalis.GuardClauses;
+
 namespace SwiftLift.SharedKernel.Application;
 
 [ExcludeFromCodeCoverage]

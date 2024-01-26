@@ -499,3 +499,19 @@ dotnet_style_null_propagation = true:suggestion
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
 dotnet_style_prefer_auto_properties = true:silent
 dotnet_style_object_initializer = true:suggestion
+
+# Naming rules
+dotnet_naming_rule.suffix_async_should_be_asyncsuffix.severity = error #suggestion
+dotnet_naming_rule.suffix_async_should_be_asyncsuffix.symbols = suffix_async
+dotnet_naming_rule.suffix_async_should_be_asyncsuffix.style = asyncsuffix
+
+# Symbol specifications
+dotnet_naming_symbols.suffix_async.applicable_kinds = method
+dotnet_naming_symbols.suffix_async.applicable_accessibilities = *
+dotnet_naming_symbols.suffix_async.required_modifiers = async
+
+# Naming styles
+dotnet_naming_style.asyncsuffix.required_prefix = 
+dotnet_naming_style.asyncsuffix.required_suffix = Async
+dotnet_naming_style.asyncsuffix.word_separator = 
+dotnet_naming_style.asyncsuffix.capitalization = pascal_case
