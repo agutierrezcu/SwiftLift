@@ -1,6 +1,6 @@
 namespace SwiftLift.SharedKernel.ConnectionString;
 
-public static class ConnectionStringDefaults
+internal static class ConnectionStringDefaults
 {
     public const string SegmentSeparator = ";";
 

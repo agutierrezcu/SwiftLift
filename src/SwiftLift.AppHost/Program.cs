@@ -8,7 +8,7 @@ var applicationInsightConnectionString = ApplicationInsightResource.Instance
 
 builder.AddProject<Projects.SwiftLift_Riders_Api>("swiftlift.riders.api")
     .WithEnvironment(
-        ApplicationInsightResourceDefaults.EnvironmentVariable,
+        ApplicationInsightSettings.EnvironmentVariable,
         applicationInsightConnectionString.Value);
 
 await builder.Build().RunAsync()

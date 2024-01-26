@@ -1,16 +1,19 @@
 using SwiftLift.ServiceDefaults;
+using SwiftLift.SharedKernel;
 using SwiftLift.SharedKernel.Application;
 using SwiftLift.SharedKernel.ApplicationInsight;
 using SwiftLift.SharedKernel.Environment;
 
-var applicationInfo = new ApplicationInfo("swiftlift.riders.api", "Riders.Api", "Swiftlift");
+var applicationInfo = new ApplicationInfo("swiftlift.riders.api", "Riders.Api", "SwiftLift");
 
 var builder = WebApplication.CreateBuilder(args);
 
 var applicationInsightConnectionString = ApplicationInsightResource.Instance
     .GetConnectionStringGuaranteed(EnvironmentService.Instance, builder.Configuration);
 
-builder.AddServiceDefaults(applicationInfo);
+var assemblies = AppDomain.CurrentDomain.GetApplicationAssemblies(applicationInfo.Namespace);
+
+builder.AddServiceDefaults(applicationInfo, assemblies);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

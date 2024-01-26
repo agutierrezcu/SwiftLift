@@ -1,10 +1,8 @@
-using Ardalis.GuardClauses;
-
 namespace SwiftLift.SharedKernel.Environment;
 
 public sealed class EnvironmentService : IEnvironmentService
 {
-    public static EnvironmentService Instance = new();
+    public static readonly EnvironmentService Instance = new();
 
     private EnvironmentService()
     {

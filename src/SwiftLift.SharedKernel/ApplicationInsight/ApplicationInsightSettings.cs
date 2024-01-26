@@ -1,6 +1,6 @@
-﻿namespace SwiftLift.SharedKernel.ApplicationInsight;
+namespace SwiftLift.SharedKernel.ApplicationInsight;
 
-public static class ApplicationInsightResourceDefaults
+public static class ApplicationInsightSettings
 {
     public const string ResourceName = "ApplicationInsight";
 

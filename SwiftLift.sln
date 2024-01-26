@@ -12,11 +12,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		coverage.cmd = coverage.cmd
 		Directory.Build.props = Directory.Build.props
+		src\Directory.Packages.props = src\Directory.Packages.props
 		.config\dotnet-tools.json = .config\dotnet-tools.json
 		README.md = README.md
 	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{FD6B7134-7A7E-4BAB-BECF-7A879CA20DF7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.SharedKernel", "src\SwiftLift.SharedKernel\SwiftLift.SharedKernel.csproj", "{6DF3A769-C9F2-4E8C-B0FA-F55AED11EDED}"
 EndProject
@@ -34,7 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{6C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Riders.Api", "src\Services\SwiftLift.Riders.Api\SwiftLift.Riders.Api.csproj", "{B0886171-E9E1-4F99-BA9F-58C307D53993}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwiftLift.Riders.Api.IntegrationTests", "tests\SwiftLift.Riders.Api.IntegrationTests\SwiftLift.Riders.Api.IntegrationTests.csproj", "{5E6B4089-F15C-4986-8590-6ACFFB53BB9A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Riders.Api.IntegrationTests", "tests\SwiftLift.Riders.Api.IntegrationTests\SwiftLift.Riders.Api.IntegrationTests.csproj", "{5E6B4089-F15C-4986-8590-6ACFFB53BB9A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,7 +70,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{6DF3A769-C9F2-4E8C-B0FA-F55AED11EDED} = {FD6B7134-7A7E-4BAB-BECF-7A879CA20DF7}
 		{186333B2-97F3-446C-B301-04659A660CA2} = {BB18F88A-B78E-4E13-AFA4-DDB0B177D859}
 		{B0886171-E9E1-4F99-BA9F-58C307D53993} = {6CDBE436-5C12-4222-AB8E-4B2C83DF9AC7}
 		{5E6B4089-F15C-4986-8590-6ACFFB53BB9A} = {BB18F88A-B78E-4E13-AFA4-DDB0B177D859}

@@ -4,7 +4,7 @@ using SwiftLift.SharedKernel.ApplicationInsight;
 using SwiftLift.SharedKernel.ConnectionString;
 using SwiftLift.SharedKernel.Environment;
 
-using static SwiftLift.SharedKernel.ApplicationInsight.ApplicationInsightResourceDefaults;
+using static SwiftLift.SharedKernel.ApplicationInsight.ApplicationInsightSettings;
 
 namespace SwiftLift.SharedKernel.UnitTests.ApplicationInsight;
 

@@ -1,10 +1,9 @@
-using Ardalis.GuardClauses;
 using static System.StringComparison;
 using static SwiftLift.SharedKernel.ConnectionString.ConnectionStringDefaults;
 
 namespace SwiftLift.SharedKernel.ConnectionString;
 
-public static class ConnectionStringParser
+internal static class ConnectionStringParser
 {
     public static ConnectionStringResource Parse(
         string? resourceName,

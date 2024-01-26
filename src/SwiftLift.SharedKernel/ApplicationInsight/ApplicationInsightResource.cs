@@ -1,15 +1,13 @@
-using Ardalis.GuardClauses;
-using Microsoft.Extensions.Configuration;
 using SwiftLift.SharedKernel.ConnectionString;
 using SwiftLift.SharedKernel.Environment;
 
-using static SwiftLift.SharedKernel.ApplicationInsight.ApplicationInsightResourceDefaults;
+using static SwiftLift.SharedKernel.ApplicationInsight.ApplicationInsightSettings;
 
 namespace SwiftLift.SharedKernel.ApplicationInsight;
 
 public sealed class ApplicationInsightResource : IApplicationInsightResource
 {
-    public static ApplicationInsightResource Instance = new();
+    public static readonly ApplicationInsightResource Instance = new();
 
     private ApplicationInsightResource()
     {

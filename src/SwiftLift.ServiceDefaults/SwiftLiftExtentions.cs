@@ -1,10 +1,13 @@
-using System.Text;
+using System.Reflection;
+using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Oakton;
 using Oakton.Environment;
 using SwiftLift.SharedKernel.ApplicationInsight;
+using SwiftLift.SharedKernel.Build;
 using SwiftLift.SharedKernel.Environment;
+using SwiftLift.SharedKernel.Serialization;
 
 namespace SwiftLift.ServiceDefaults;
 
@@ -12,23 +15,32 @@ public static partial class Extensions
 {
     public static WebApplicationBuilder AddSharedServices(this WebApplicationBuilder builder)
     {
+        Guard.Against.Null(builder);
+
         var services = builder.Services;
 
-        services
-            .AddSingleton<IApplicationInsightResource>(_ => ApplicationInsightResource.Instance)
-            .AddSingleton<IEnvironmentService>(_ => EnvironmentService.Instance);
+        services.AddMemoryCache();
+
+        services.AddSingleton<IApplicationInsightResource>(_ => ApplicationInsightResource.Instance);
+        services.AddSingleton<IEnvironmentService>(_ => EnvironmentService.Instance);
+
+        services.AddBuildInfo();
+        services.AddSnakeSerialization();
 
         return builder;
     }
 
-    public static WebApplicationBuilder AddEnvironmentChecks(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder AddEnvironmentChecks(this WebApplicationBuilder builder,
+        Assembly?[] assemblies)
     {
-        builder.Host.ApplyOaktonExtensions();
+        Guard.Against.Null(builder);
+        Guard.Against.NullOrEmpty(assemblies);
 
-        var services = builder.Services;
+        builder.Host.ApplyOaktonExtensions();
+        _ = builder.Services;
 
         // TODO: Refactoring by SimpleInjector discovery feature
-        services.AddSingleton<IEnvironmentCheck, ApplicationInsightEnvironmentCheck>();
+        //services.AddSingleton<IEnvironmentCheck, ApplicationInsightEnvironmentCheck>();
 
         return builder;
     }

@@ -1,8 +1,10 @@
+using System.Reflection;
 using Ardalis.GuardClauses;
 using Azure.Identity;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
@@ -12,16 +14,18 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using SwiftLift.SharedKernel.Application;
+using SwiftLift.SharedKernel.Build;
 
 namespace SwiftLift.ServiceDefaults;
 
 public static partial class Extensions
 {
     public static IHostApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder,
-        ApplicationInfo applicationInfo)
+        ApplicationInfo applicationInfo, Assembly?[] assemblies)
     {
         Guard.Against.Null(builder);
         Guard.Against.Null(applicationInfo);
+        Guard.Against.NullOrEmpty(assemblies);
 
         builder.AddSharedServices();
 
@@ -42,7 +46,7 @@ public static partial class Extensions
             http.UseServiceDiscovery();
         });
 
-        builder.AddEnvironmentChecks();
+        builder.AddEnvironmentChecks(assemblies);
 
         return builder;
     }
@@ -155,6 +159,17 @@ public static partial class Extensions
         {
             Predicate = r => r.Tags.Contains("live")
         });
+
+        app.MapGet("/build-info",
+            async (IBuildInfoFileProvider buildInfoFileProvider, HttpResponse response) =>
+            {
+                var fileContent =
+                    await buildInfoFileProvider.GetContentAsync()
+                        .ConfigureAwait(false);
+
+                await response.WriteAsync(fileContent)
+                    .ConfigureAwait(false);
+            });
 
         return app;
     }

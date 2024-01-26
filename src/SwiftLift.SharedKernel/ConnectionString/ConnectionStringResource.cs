@@ -1,5 +1,3 @@
-using Ardalis.GuardClauses;
-
 namespace SwiftLift.SharedKernel.ConnectionString;
 
 public sealed record ConnectionStringResource
