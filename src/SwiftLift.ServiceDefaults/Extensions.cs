@@ -13,8 +13,8 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using SwiftLift.SharedKernel.Application;
 using SwiftLift.Infrastructure.Build;
+using SwiftLift.SharedKernel.Application;
 
 namespace SwiftLift.ServiceDefaults;
 

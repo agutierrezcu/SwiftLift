@@ -4,7 +4,7 @@ namespace SwiftLift.Infrastructure.Build;
 
 public class BuildInfoEnvironmentCheck : IEnvironmentCheck
 {
-    public string Description => $"Build info file {BuildInfoFileProvider.RelativePath} must be defined in CI.";
+    public string Description => $"Build info file {BuildInfoFilePathResolver.RelativePath} must be valid and defined as part of CI.";
 
     public async Task Assert(IServiceProvider services, CancellationToken cancellation)
     {

@@ -39,6 +39,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Infrastructure", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Infrastructure.UnitTests", "tests\SwiftLift.Infrastructure.UnitTests\SwiftLift.Infrastructure.UnitTests.csproj", "{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwiftLift.Architecture.Tests", "tests\SwiftLift.Architecture.Tests\SwiftLift.Architecture.Tests.csproj", "{9098C729-2B65-4EEE-8953-D78D77FF34C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9098C729-2B65-4EEE-8953-D78D77FF34C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9098C729-2B65-4EEE-8953-D78D77FF34C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9098C729-2B65-4EEE-8953-D78D77FF34C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9098C729-2B65-4EEE-8953-D78D77FF34C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,6 +92,7 @@ Global
 		{B0886171-E9E1-4F99-BA9F-58C307D53993} = {6CDBE436-5C12-4222-AB8E-4B2C83DF9AC7}
 		{5E6B4089-F15C-4986-8590-6ACFFB53BB9A} = {BB18F88A-B78E-4E13-AFA4-DDB0B177D859}
 		{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69} = {BB18F88A-B78E-4E13-AFA4-DDB0B177D859}
+		{9098C729-2B65-4EEE-8953-D78D77FF34C7} = {BB18F88A-B78E-4E13-AFA4-DDB0B177D859}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8EFD1670-D674-4743-B0A0-28C80C3A7262}

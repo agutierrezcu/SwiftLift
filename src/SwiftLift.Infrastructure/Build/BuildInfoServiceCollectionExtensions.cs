@@ -6,6 +6,7 @@ public static class BuildInfoServiceCollectionExtensions
     {
         Guard.Against.Null(services);
 
+        services.AddSingleton<IBuildInfoFilePathResolver, BuildInfoFilePathResolver>();
         services.AddSingleton<IBuildInfoFileProvider, BuildInfoFileProvider>();
         services.AddSingleton<IBuildInfoManager, BuildInfoManager>();
 

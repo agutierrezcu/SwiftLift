@@ -1,8 +1,8 @@
-using SwiftLift.ServiceDefaults;
 using SwiftLift.Infrastructure;
-using SwiftLift.SharedKernel.Application;
 using SwiftLift.Infrastructure.ApplicationInsight;
 using SwiftLift.Infrastructure.Environment;
+using SwiftLift.ServiceDefaults;
+using SwiftLift.SharedKernel.Application;
 
 var applicationInfo = new ApplicationInfo("swiftlift.riders.api", "Riders.Api", "SwiftLift");
 

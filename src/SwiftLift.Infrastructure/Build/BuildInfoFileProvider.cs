@@ -1,17 +1,21 @@
 namespace SwiftLift.Infrastructure.Build;
 
-internal sealed class BuildInfoFileProvider(IHostEnvironment hostEnvironment)
-    : IBuildInfoFileProvider
+internal sealed class BuildInfoFileProvider(
+    IHostEnvironment hostEnvironment, IBuildInfoFilePathResolver buildInfoFilePathResolver)
+        : IBuildInfoFileProvider
 {
-    internal const string RelativePath = "/build-info.json";
-
     private readonly IHostEnvironment _hostEnvironment = hostEnvironment
         ?? throw new ArgumentNullException(nameof(hostEnvironment));
 
+    private readonly IBuildInfoFilePathResolver _buildInfoFilePathResolver = buildInfoFilePathResolver
+        ?? throw new ArgumentNullException(nameof(buildInfoFilePathResolver));
+
     public async Task<string> GetContentAsync(CancellationToken cancellation)
     {
+        var relativePath = _buildInfoFilePathResolver.GetRelativeToContentRoot();
+
         var fileInfo = _hostEnvironment.ContentRootFileProvider
-            .GetFileInfo(RelativePath);
+            .GetFileInfo(relativePath);
 
         var fileContent = await ReadAllContentAsync(fileInfo, cancellation)
             .ConfigureAwait(false);

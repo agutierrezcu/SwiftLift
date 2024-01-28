@@ -3,6 +3,8 @@ namespace SwiftLift.Infrastructure.Serialization;
 [ExcludeFromCodeCoverage]
 internal sealed class JsonTextSnakeSerialization : IJsonSnakeSerializer, IJsonSnakeDeserializer
 {
+    public static readonly JsonTextSnakeSerialization Instance = new();
+
     private static readonly JsonSerializerOptions s_serializerOptions = new();
 
     static JsonTextSnakeSerialization()
