@@ -2,7 +2,7 @@ using SwiftLift.Infrastructure.Serialization;
 
 namespace SwiftLift.Infrastructure.Build;
 
-public class BuildInfoEnvironmentCheck : IEnvironmentCheck
+internal sealed class BuildInfoEnvironmentCheck : IEnvironmentCheck
 {
     public string Description => $"Build info file {BuildInfoFilePathResolver.RelativePath} must be valid and defined as part of CI.";
 

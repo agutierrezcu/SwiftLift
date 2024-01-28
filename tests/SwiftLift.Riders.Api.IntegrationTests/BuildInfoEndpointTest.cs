@@ -7,14 +7,11 @@ namespace SwiftLift.Riders.Api.IntegrationTests;
 public class BuildInfoEndpointIntegrationTests(RidersApiWebApplicationFactory factory)
     : IClassFixture<RidersApiWebApplicationFactory>
 {
-    private readonly RidersApiWebApplicationFactory _factory = factory
-        ?? throw new ArgumentNullException(nameof(factory));
-
     [Fact]
     public async Task Given_Build_Info_File_When_Content_Is_Valid_Then_Return_As_Json()
     {
         // Arrange
-        var client = _factory.CreateClient();
+        var client = factory.CreateClient();
 
         // Act
         var response = await client.GetAsync("/build-info")
@@ -44,6 +41,6 @@ public class BuildInfoEndpointIntegrationTests(RidersApiWebApplicationFactory fa
             .NotThrowAsync()
                 .ConfigureAwait(true);
 
-        buildInfo.Should().Be(_factory.BuildInfo);
+        buildInfo.Should().Be(factory.BuildInfo);
     }
 }

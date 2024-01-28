@@ -1,0 +1,63 @@
+using System.Diagnostics;
+using System.Reflection.Emit;
+using SwiftLift.Infrastructure;
+using Xunit.Abstractions;
+
+namespace SwiftLift.Architecture.Tests.Infrastructure;
+
+public sealed class InfrastructureProjectTests(ITestOutputHelper output)
+{
+    private static readonly Types s_infrastructureTypes = Types.InAssembly(typeof(AppDomainExtensions).Assembly);
+
+    [Fact]
+    public void Implementation_Classes_Should_Be_Internal_And_Sealed()
+    {
+        // Act
+        var result = s_infrastructureTypes
+            .That()
+            .AreClasses()
+            .Should()
+            .BeStatic()
+            .Or()
+        .BeSealed()
+        .GetResult();
+
+        PrintOutIfFail(output, result);
+
+        // Assert
+        result.IsSuccessful.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Project_Should_Not_Have_Any_Dependency()
+    {
+        // Act
+        var result = s_infrastructureTypes
+            .Should()
+            .OnlyHaveDependencyOn("System", "Microsoft", "Oakton", "FluentValidation", "Ardalis", "SwiftLift.Infrastructure")
+            .GetResult();
+
+        PrintOutIfFail(output, result);
+
+        // Assert   
+        result.IsSuccessful.Should().BeTrue();
+    }
+
+    private static void PrintOutIfFail(ITestOutputHelper output, TestResult result)
+    {
+        if (result.IsSuccessful)
+        {
+            return;
+        }
+
+        output.WriteLine("Total types: {0}", result.LoadedTypes.Count);
+        output.WriteLine("Total failed types {0}", result.FailingTypes.Count);
+        output.WriteLine(string.Empty);
+        output.WriteLine("Rules failed for types:");
+
+        foreach (var failingType in result.FailingTypes)
+        {
+            output.WriteLine("Type: {0} Explanation: {1}", failingType.FullName, failingType.Explanation);
+        }
+    }
+}

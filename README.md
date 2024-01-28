@@ -12,30 +12,40 @@ Architectural / Design  / Implementation considerations
 
 - Aspire as startup project template
 
-- Add .editorconfig rules (same as Aspire)
+- Add .editorconfig using the one from Aspire as starting point
 
-- Add code coverage and reporting generator
-    - Use local dotnet tools
+- Use dotnet tools locally
 
-- Manage packages versions centrally for
-    - Services and shared projects
-    - And unit tests projects
+- Manage packages versions centrally for most of the project
 
 - Integrate with application insight
     - Enable Azure Monitor  
 	- Add connection string environment checker
 
- - Add Scrutor package
-   - Handle auto dependencies registration by assemblies scanning
-   - Apply decorators
-
  - Add snake json serializer / deserializer abstractions
     - And their implementations base on System.Text.Json
 
- - Add FluentValidation package to perform validations
+ - Add several popular packages for different purposes
+    - For development
+        - Scrutor for handling dependencies discovery registration by scanning assemblies and defining decorators
+        - Ardalis.GuardClauses for failing fast
+        - Oakton parsing and Utilities for command Line
+        - Swashbuckle and OpenApi
+        - Evaluating
+            - FastEndpoints 
+            - Wolverine as mediator
+            - Marten as transactional document DB and event store
+    - For testing
+        - NetArchTest.eNhancedEdition for architecture conventions
+        - Microsoft.AspNetCore.Mvc.Testing for integration testing
+        - AutoBogus.Conventions for fake data generation
+        - FluentAssertions for assertion evaluation
+        - NSubstitute for mocking
+        - xUnit as tests runner
+        - Coverlet and reportgenerator tool for code coverage and reporting
 
 
-- VS2022 IDE Extensions
+#### VS2022 IDE Extensions
 
-Fine Code Coverage
-Code Clean Up on Save
+- Fine Code Coverage
+- Code Clean Up on Save
