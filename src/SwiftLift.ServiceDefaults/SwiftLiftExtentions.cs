@@ -39,12 +39,9 @@ public static partial class Extensions
         Guard.Against.Null(services);
         Guard.Against.NullOrEmpty(assemblies);
 
-        services
-            .Scan(scan => scan
-                .FromAssemblies(assemblies)
-                .AddClasses(classes => classes.AssignableTo(typeof(IValidator<>)), false)
-                .AsImplementedInterfaces()
-                .WithSingletonLifetime());
+        services.AddValidatorsFromAssemblies(assemblies,
+            lifetime: ServiceLifetime.Singleton,
+            includeInternalTypes: true);
 
         return services;
     }

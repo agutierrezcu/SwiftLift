@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Reflection.Emit;
 using SwiftLift.Infrastructure;
 using Xunit.Abstractions;
 
@@ -10,7 +8,26 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
     private static readonly Types s_infrastructureTypes = Types.InAssembly(typeof(AppDomainExtensions).Assembly);
 
     [Fact]
-    public void Implementation_Classes_Should_Be_Internal_And_Sealed()
+    public void All_Classes_Should_Be_Reside_Infrastructure_Namespace_And_Match_Source_File_Name()
+    {
+        // Act
+        var result = s_infrastructureTypes
+            .That()
+            .AreClasses()
+            .Should()
+            .ResideInNamespaceMatching("SwiftLift.Infrastructure")
+            .And()
+            .HaveSourceFileNameMatchingName()
+            .GetResult();
+
+        PrintOutIfFail(output, result);
+
+        // Assert
+        result.IsSuccessful.Should().BeTrue();
+    }
+
+    [Fact]
+    public void All_Classes_Should_Be_Internal_Or_Sealed()
     {
         // Act
         var result = s_infrastructureTypes
@@ -19,8 +36,8 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
             .Should()
             .BeStatic()
             .Or()
-        .BeSealed()
-        .GetResult();
+            .BeSealed()
+            .GetResult();
 
         PrintOutIfFail(output, result);
 

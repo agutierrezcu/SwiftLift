@@ -41,6 +41,6 @@ public class BuildInfoEndpointIntegrationTests(RidersApiWebApplicationFactory fa
             .NotThrowAsync()
                 .ConfigureAwait(true);
 
-        buildInfo.Should().Be(factory.BuildInfo);
+        buildInfo.Should().Be(factory.BuildInfoTest);
     }
 }
