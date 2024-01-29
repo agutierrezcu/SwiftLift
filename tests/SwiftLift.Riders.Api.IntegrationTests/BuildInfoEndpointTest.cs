@@ -1,14 +1,15 @@
+using System.Net.Mime;
 using FluentValidation;
-using SwiftLift.Infrastructure.Build;
+using SwiftLift.Infrastructure.BuildInfo;
 using SwiftLift.Infrastructure.Serialization;
 
 namespace SwiftLift.Riders.Api.IntegrationTests;
 
-public class BuildInfoEndpointIntegrationTests(RidersApiWebApplicationFactory factory)
+public class BuildEndpointIntegrationTests(RidersApiWebApplicationFactory factory)
     : IClassFixture<RidersApiWebApplicationFactory>
 {
     [Fact]
-    public async Task Given_Build_Info_File_When_Content_Is_Valid_Then_Return_As_Json()
+    public async Task Given_Build_File_When_Content_Is_Valid_Then_Return_As_Json()
     {
         // Arrange
         var client = factory.CreateClient();
@@ -21,26 +22,26 @@ public class BuildInfoEndpointIntegrationTests(RidersApiWebApplicationFactory fa
         response.EnsureSuccessStatusCode(); // Status Code 200-299
 
         response.Content.Headers?.ContentType?.ToString()
-            .Should().Be("application/json; charset=utf-8");
+            .Should().Be(MediaTypeNames.Application.Json);
 
-        var buildInfoContent = await response.Content.ReadAsStringAsync()
+        var buildContent = await response.Content.ReadAsStringAsync()
             .ConfigureAwait(true);
 
-        buildInfoContent.Should().NotBeNullOrEmpty();
+        buildContent.Should().NotBeNullOrEmpty();
 
-        var buildInfo = JsonTextSnakeSerialization.Instance
-            .Deserialize<BuildInfo>(buildInfoContent);
+        var build = JsonTextSnakeSerialization.Instance
+            .Deserialize<Build>(buildContent);
 
-        var buildInfoValidator = new BuildInfoValidator();
+        var buildValidator = new BuildValidator();
 
-        await buildInfoValidator
+        await buildValidator
             .Invoking(
-                async validator => await validator!.ValidateAndThrowAsync(buildInfo)
+                async validator => await validator!.ValidateAndThrowAsync(build)
                     .ConfigureAwait(true))
             .Should()
             .NotThrowAsync()
                 .ConfigureAwait(true);
 
-        buildInfo.Should().Be(factory.BuildInfoTest);
+        build.Should().Be(factory.BuildTest);
     }
 }

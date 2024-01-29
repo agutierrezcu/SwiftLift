@@ -1,7 +1,7 @@
-namespace SwiftLift.Infrastructure.Build;
+namespace SwiftLift.Infrastructure.BuildInfo;
 
 [ExcludeFromCodeCoverage]
-public sealed record BuildInfo
+public sealed record Build
 {
     public required string Id { get; init; }
 
@@ -13,4 +13,3 @@ public sealed record BuildInfo
 
     public required string Url { get; init; }
 }
-

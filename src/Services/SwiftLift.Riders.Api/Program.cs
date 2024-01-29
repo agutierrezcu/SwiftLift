@@ -1,38 +1,63 @@
+using Serilog;
 using SwiftLift.Infrastructure;
 using SwiftLift.Infrastructure.ApplicationInsight;
 using SwiftLift.Infrastructure.Environment;
+using SwiftLift.Infrastructure.Logging;
 using SwiftLift.ServiceDefaults;
 using SwiftLift.SharedKernel.Application;
 
-var applicationInfo = new ApplicationInfo("swiftlift.riders.api", "Riders.Api", "SwiftLift");
-
 var builder = WebApplication.CreateBuilder(args);
 
-var services = builder.Services;
+var applicationInfo = new ApplicationInfo("swiftlift.riders.api", "Riders.Api", "SwiftLift");
 
 var applicationInsightConnectionString = ApplicationInsightResource.Instance
     .GetConnectionStringGuaranteed(EnvironmentService.Instance, builder.Configuration);
 
-var assemblies = AppDomain.CurrentDomain
-    .GetApplicationAssemblies(applicationInfo.Namespace);
+Log.Logger = builder.CreateBootstrapLogger(applicationInfo.Id,
+    applicationInsightConnectionString);
 
-builder.AddServiceDefaults(applicationInfo, assemblies);
+Log.Logger.Information("Logger created.");
 
-services.AddEndpointsApiExplorer();
-services.AddSwaggerGen();
-
-var app = builder.Build();
-
-app.MapDefaultEndpoints();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+try
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var assemblies = AppDomain.CurrentDomain
+        .GetApplicationAssemblies(applicationInfo.Namespace);
+
+    builder.AddServiceDefaults(applicationInfo, assemblies);
+
+    var services = builder.Services;
+
+    services.AddEndpointsApiExplorer();
+    services.AddSwaggerGen();
+
+    var app = builder.Build();
+
+    app.Lifetime.ApplicationStarted.Register(() => Log.Logger.Information("Application started."));
+    app.Lifetime.ApplicationStopping.Register(() => Log.Logger.Information("Application stopping."));
+    app.Lifetime.ApplicationStopped.Register(() => Log.Logger.Information("Application stopped."));
+
+    app.MapDefaultEndpoints();
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseHttpsRedirection();
+
+    await app.RunAppAsync(args, Log.Logger)
+        .ConfigureAwait(false);
 }
+catch (Exception ex)
+    when (ex.GetType().Name is not "StopTheHostException" and not "HostAbortedException")
+{
+    Log.Logger.Fatal(ex, "Host terminated unexpectedly");
+}
+finally
+{
+    Log.Logger.Information("Shut down complete.");
 
-app.UseHttpsRedirection();
-
-await app.RunAppAsync(args)
-    .ConfigureAwait(false);
+    Log.CloseAndFlush();
+}

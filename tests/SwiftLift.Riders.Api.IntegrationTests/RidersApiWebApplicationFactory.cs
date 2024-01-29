@@ -1,18 +1,18 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using SwiftLift.Infrastructure.ApplicationInsight;
-using SwiftLift.Infrastructure.Build;
+using SwiftLift.Infrastructure.BuildInfo;
 using SwiftLift.Infrastructure.Serialization;
 
 namespace SwiftLift.Riders.Api.IntegrationTests;
 
 public sealed class RidersApiWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private const string BuildInfoTestFileRelativePath = "/build-info-test.json";
+    private const string BuildTestFileRelativePath = "/build-info-test.json";
 
-    private string _buildInfoPath = string.Empty;
+    private string _buildPath = string.Empty;
 
-    public BuildInfo? BuildInfoTest { get; private set; }
+    public Build? BuildTest { get; private set; }
 
     static RidersApiWebApplicationFactory()
     {
@@ -28,36 +28,36 @@ public sealed class RidersApiWebApplicationFactory : WebApplicationFactory<Progr
     {
         builder.ConfigureServices((context, services) =>
         {
-            ArrangeBuildInfoEndpointTest(context, services);
+            ArrangeBuildEndpointTest(context, services);
         });
     }
 
-    private void ArrangeBuildInfoEndpointTest(WebHostBuilderContext context, IServiceCollection services)
+    private void ArrangeBuildEndpointTest(WebHostBuilderContext context, IServiceCollection services)
     {
-        var buildInfoPath = context.HostingEnvironment.ContentRootPath + BuildInfoFilePathResolver.RelativePath;
-        if (File.Exists(buildInfoPath))
+        var buildPath = context.HostingEnvironment.ContentRootPath + BuildFilePathResolver.RelativePath;
+        if (File.Exists(buildPath))
         {
-            _buildInfoPath = buildInfoPath;
+            _buildPath = buildPath;
 
-            InitializeBuildInfo(context, BuildInfoFilePathResolver.RelativePath);
+            InitializeBuild(context, BuildFilePathResolver.RelativePath);
         }
         else
         {
-            _buildInfoPath = context.HostingEnvironment.ContentRootPath + BuildInfoTestFileRelativePath;
+            _buildPath = context.HostingEnvironment.ContentRootPath + BuildTestFileRelativePath;
 
-            ReplaceBuildInfoFilePathResolver(services);
+            ReplaceBuildFilePathResolver(services);
 
-            CreateBuildInfoFileTest();
+            CreateBuildFileTest();
         }
     }
 
-    private void InitializeBuildInfo(WebHostBuilderContext context, string relativePath)
+    private void InitializeBuild(WebHostBuilderContext context, string relativePath)
     {
         var fileInfo = context.HostingEnvironment.ContentRootFileProvider.GetFileInfo(relativePath);
 
         var contentFile = ReadAllContent(fileInfo);
 
-        BuildInfoTest = JsonTextSnakeSerialization.Instance.Deserialize<BuildInfo>(contentFile);
+        BuildTest = JsonTextSnakeSerialization.Instance.Deserialize<Build>(contentFile);
     }
 
     private static string ReadAllContent(IFileInfo fileInfo)
@@ -67,30 +67,30 @@ public sealed class RidersApiWebApplicationFactory : WebApplicationFactory<Progr
         return reader.ReadToEnd();
     }
 
-    private static void ReplaceBuildInfoFilePathResolver(IServiceCollection services)
+    private static void ReplaceBuildFilePathResolver(IServiceCollection services)
     {
-        var buildInfoFilePathResolverDescriptor = services.Single(
-            d => d.ServiceType == typeof(IBuildInfoFilePathResolver));
+        var buildFilePathResolverDescriptor = services.Single(
+            d => d.ServiceType == typeof(IBuildFilePathResolver));
 
-        services.Remove(buildInfoFilePathResolverDescriptor);
+        services.Remove(buildFilePathResolverDescriptor);
 
-        var buildInfoFilePathResolverMock = Substitute.For<IBuildInfoFilePathResolver>();
+        var buildFilePathResolverMock = Substitute.For<IBuildFilePathResolver>();
 
-        buildInfoFilePathResolverMock.GetRelativeToContentRoot()
-            .Returns(BuildInfoTestFileRelativePath);
+        buildFilePathResolverMock.GetRelativeToContentRoot()
+            .Returns(BuildTestFileRelativePath);
 
-        services.AddSingleton(_ => buildInfoFilePathResolverMock);
+        services.AddSingleton(_ => buildFilePathResolverMock);
     }
 
-    private void CreateBuildInfoFileTest()
+    private void CreateBuildFileTest()
     {
-        BuildInfoTest = BuildInfoFaker.Instance.Generate();
+        BuildTest = BuildFaker.Instance.Generate();
 
-        var buildInfoAsJson = JsonTextSnakeSerialization.Instance.Serialize(BuildInfoTest);
+        var buildAsJson = JsonTextSnakeSerialization.Instance.Serialize(BuildTest);
 
-        using var sw = File.CreateText(_buildInfoPath);
+        using var sw = File.CreateText(_buildPath);
 
-        sw.Write(buildInfoAsJson);
+        sw.Write(buildAsJson);
     }
 
     public Task InitializeAsync()
@@ -105,9 +105,9 @@ public sealed class RidersApiWebApplicationFactory : WebApplicationFactory<Progr
 
     Task IAsyncLifetime.DisposeAsync()
     {
-        if (_buildInfoPath.EndsWith(BuildInfoTestFileRelativePath))
+        if (_buildPath.EndsWith(BuildTestFileRelativePath))
         {
-            File.Delete(_buildInfoPath);
+            File.Delete(_buildPath);
         }
 
         return Task.CompletedTask;

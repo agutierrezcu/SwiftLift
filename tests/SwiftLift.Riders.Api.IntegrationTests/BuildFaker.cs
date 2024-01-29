@@ -1,14 +1,14 @@
 using System.Globalization;
 using Bogus;
-using SwiftLift.Infrastructure.Build;
+using SwiftLift.Infrastructure.BuildInfo;
 
 namespace SwiftLift.Riders.Api.IntegrationTests;
 
-public class BuildInfoFaker : AutoFaker<BuildInfo>
+public class BuildFaker : AutoFaker<Build>
 {
-    public static readonly BuildInfoFaker Instance = new();
+    public static readonly BuildFaker Instance = new();
 
-    private BuildInfoFaker()
+    private BuildFaker()
     {
         base.RuleFor(fake => fake.Id, PickRandomInt);
         RuleFor(fake => fake.Number, PickRandomInt);

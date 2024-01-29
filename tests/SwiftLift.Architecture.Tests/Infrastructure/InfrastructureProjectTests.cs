@@ -51,7 +51,8 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
         // Act
         var result = s_infrastructureTypes
             .Should()
-            .OnlyHaveDependencyOn("System", "Microsoft", "Oakton", "FluentValidation", "Ardalis", "SwiftLift.Infrastructure")
+            .OnlyHaveDependencyOn("System", "Microsoft", "Oakton", "Serilog",
+                "FluentValidation", "Ardalis", "SwiftLift.Infrastructure")
             .GetResult();
 
         PrintOutIfFail(output, result);

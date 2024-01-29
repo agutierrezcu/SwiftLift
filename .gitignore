@@ -145,3 +145,5 @@ coverage*.info
 coveragereport/**
 tests/coverage/**
 **/build-info.json
+**/LogFiles
+**/publish*

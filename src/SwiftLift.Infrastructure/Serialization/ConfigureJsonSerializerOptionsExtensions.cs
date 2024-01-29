@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace SwiftLift.Infrastructure.Serialization;
 
+[ExcludeFromCodeCoverage]
 public static class ConfigureJsonSerializerOptionsExtensions
 {
     public static JsonSerializerOptions Configure(this JsonSerializerOptions serializerOptions)

@@ -1,6 +1,7 @@
 @SwiftLift.Riders.Api_HostAddress = http://localhost:5067
+###
 
-GET {{SwiftLift.Riders.Api_HostAddress}}/weatherforecast/
+GET {{SwiftLift.Riders.Api_HostAddress}}/build-info
 Accept: application/json
 
 ###

@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using System.Reflection;
 using Ardalis.GuardClauses;
 using Azure.Identity;
@@ -13,7 +14,8 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using SwiftLift.Infrastructure.Build;
+using SwiftLift.Infrastructure.BuildInfo;
+using SwiftLift.Infrastructure.Serialization;
 using SwiftLift.SharedKernel.Application;
 
 namespace SwiftLift.ServiceDefaults;
@@ -27,13 +29,23 @@ public static partial class Extensions
         Guard.Against.Null(applicationInfo);
         Guard.Against.NullOrEmpty(assemblies);
 
-        builder.AddSharedServices(assemblies);
+        builder.AddSerilogLogging();
 
         builder.ConfigureOpenTelemetry(applicationInfo);
 
         builder.AddDefaultHealthChecks();
 
+        builder.AddEnvironmentChecks(assemblies);
+
         var services = builder.Services;
+
+        services.AddMemoryCache();
+
+        services.AddBuildInfo();
+
+        services.AddSnakeSerialization();
+
+        services.AddValidators(assemblies);
 
         services.AddServiceDiscovery();
 
@@ -45,8 +57,6 @@ public static partial class Extensions
             // Turn on service discovery by default
             http.UseServiceDiscovery();
         });
-
-        builder.AddEnvironmentChecks(assemblies);
 
         return builder;
     }
@@ -161,13 +171,13 @@ public static partial class Extensions
         });
 
         app.MapGet("/build-info",
-            async (IBuildInfoManager buildInfoManager, HttpResponse response, CancellationToken cancellation) =>
+            async (IBuildManager buildManager, HttpResponse response, CancellationToken cancellation) =>
             {
                 var fileContent =
-                    await buildInfoManager.GetBuildInfoAsStringAsync(cancellation)
+                    await buildManager.GetBuildAsJsonAsync(cancellation)
                         .ConfigureAwait(false);
 
-                response.ContentType = "application/json; charset=utf-8";
+                response.ContentType = MediaTypeNames.Application.Json;
 
                 await response.WriteAsync(fileContent, cancellation)
                     .ConfigureAwait(false);
