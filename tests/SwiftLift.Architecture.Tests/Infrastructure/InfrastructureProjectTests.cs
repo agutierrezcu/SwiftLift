@@ -52,7 +52,7 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
         var result = s_infrastructureTypes
             .Should()
             .OnlyHaveDependencyOn("System", "Microsoft", "Oakton", "Serilog",
-                "FluentValidation", "Ardalis", "SwiftLift.Infrastructure")
+                "FluentValidation", "Ardalis", "SwiftLift.Infrastructure", "Murmur")
             .GetResult();
 
         PrintOutIfFail(output, result);

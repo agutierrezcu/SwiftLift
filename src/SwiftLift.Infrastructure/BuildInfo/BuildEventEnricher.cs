@@ -6,13 +6,14 @@ namespace SwiftLift.Infrastructure.BuildInfo;
 internal sealed class BuildEventEnricher(IServiceProvider serviceProvider)
     : ILogEventEnricher
 {
-    private static List<LogEventProperty>? s_buildProperties;
+    private Lazy<List<LogEventProperty>>? _cachedBuildProperties;
 
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
-        s_buildProperties ??= CreateEventProperties(propertyFactory).ToList();
+        _cachedBuildProperties ??= new Lazy<List<LogEventProperty>>(
+            () => CreateEventProperties(propertyFactory).ToList());
 
-        foreach (var property in s_buildProperties)
+        foreach (var property in _cachedBuildProperties.Value)
         {
             logEvent.AddPropertyIfAbsent(property);
         }

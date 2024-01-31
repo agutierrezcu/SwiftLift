@@ -14,7 +14,13 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using SwiftLift.Infrastructure.ApplicationInsight;
 using SwiftLift.Infrastructure.BuildInfo;
+using SwiftLift.Infrastructure.ConnectionString;
+using SwiftLift.Infrastructure.Correlation;
+using SwiftLift.Infrastructure.Environment;
+using SwiftLift.Infrastructure.EventTypes;
+using SwiftLift.Infrastructure.Logging;
 using SwiftLift.Infrastructure.Serialization;
 using SwiftLift.SharedKernel.Application;
 
@@ -23,13 +29,16 @@ namespace SwiftLift.ServiceDefaults;
 public static partial class Extensions
 {
     public static IHostApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder,
-        ApplicationInfo applicationInfo, Assembly[] assemblies)
+        ApplicationInfo applicationInfo,
+        ConnectionStringResource applicationInsightConnectionString,
+        Assembly[] assemblies)
     {
         Guard.Against.Null(builder);
         Guard.Against.Null(applicationInfo);
+        Guard.Against.Null(applicationInsightConnectionString);
         Guard.Against.NullOrEmpty(assemblies);
 
-        builder.AddSerilogLogging();
+        builder.AddSerilog(applicationInfo.Id, applicationInsightConnectionString);
 
         builder.ConfigureOpenTelemetry(applicationInfo);
 
@@ -40,12 +49,17 @@ public static partial class Extensions
         var services = builder.Services;
 
         services.AddMemoryCache();
+        services.AddHttpContextAccessor();
 
         services.AddBuildInfo();
 
         services.AddSnakeSerialization();
 
         services.AddValidators(assemblies);
+
+        services.AddEventTypes();
+
+        services.AddCorrelationId();
 
         services.AddServiceDiscovery();
 
@@ -56,7 +70,13 @@ public static partial class Extensions
 
             // Turn on service discovery by default
             http.UseServiceDiscovery();
+
+            http.AddHeaderPropagation(
+                opts => opts.Headers.Add(CorrelationIdHeader.Name));
         });
+
+        services.AddSingleton<IApplicationInsightResource>(_ => ApplicationInsightResource.Instance);
+        services.AddSingleton<IEnvironmentService>(_ => EnvironmentService.Instance);
 
         return builder;
     }

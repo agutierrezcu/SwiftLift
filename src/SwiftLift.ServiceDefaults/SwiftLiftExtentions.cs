@@ -1,14 +1,11 @@
 using System.Reflection;
 using Ardalis.GuardClauses;
 using FluentValidation;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Oakton;
 using Oakton.Environment;
-using SwiftLift.Infrastructure.ApplicationInsight;
-using SwiftLift.Infrastructure.Environment;
+using Serilog;
 using SwiftLift.Infrastructure.Logging;
 
 namespace SwiftLift.ServiceDefaults;
@@ -49,33 +46,13 @@ public static partial class Extensions
         return builder;
     }
 
-    public static WebApplicationBuilder AddSerilogLogging(this WebApplicationBuilder builder)
-    {
-        Guard.Against.Null(builder);
-
-        builder.Logging
-            .ClearProviders()
-            // To use Azure Log Stream.
-            .AddAzureWebAppDiagnostics();
-
-        builder.UseSerilogLogger();
-
-        var services = builder.Services;
-
-        services.AddSingleton<IApplicationInsightResource>(_ => ApplicationInsightResource.Instance);
-        services.AddSingleton<IEnvironmentService>(_ => EnvironmentService.Instance);
-
-        // TODO: Make sure if the line below is needed to avoid collision between application insights and OPTL
-        services.Configure<TelemetryConfiguration>(opts => opts.DisableTelemetry = true);
-
-        return builder;
-    }
-
     public static async Task RunAppAsync(this WebApplication app, string[] args,
-        Serilog.ILogger logger)
+        ILogger logger)
     {
         Guard.Against.Null(app);
         Guard.Against.Null(logger);
+
+        app.AddApplicationLifetimeEvents(logger);
 
         var checkResults = await EnvironmentChecker
             .ExecuteAllEnvironmentChecks(app.Services)
@@ -91,6 +68,20 @@ public static partial class Extensions
 
         await app.RunOaktonCommands(args)
             .ConfigureAwait(false);
+    }
+
+    private static void AddApplicationLifetimeEvents(this WebApplication app, ILogger logger)
+    {
+        Guard.Against.Null(app);
+        Guard.Against.Null(logger);
+
+        var lifetime = app.Lifetime;
+
+        lifetime.ApplicationStarted.Register(
+            () => logger.Information("{@EventId} Application started.", LoggingEvent.ApplicationStarted));
+
+        lifetime.ApplicationStopping.Register(() => logger.Information("Application stopping."));
+        lifetime.ApplicationStopped.Register(() => logger.Information("Application stopped."));
     }
 
     private static string GetResultsSummary(EnvironmentCheckResults checkResults)

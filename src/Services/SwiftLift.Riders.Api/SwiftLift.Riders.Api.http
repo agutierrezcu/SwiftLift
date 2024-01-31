@@ -5,3 +5,14 @@ GET {{SwiftLift.Riders.Api_HostAddress}}/build-info
 Accept: application/json
 
 ###
+
+GET {{SwiftLift.Riders.Api_HostAddress}}/health
+Accept: application/json
+
+###
+
+
+GET {{SwiftLift.Riders.Api_HostAddress}}/alive
+Accept: application/json
+
+###

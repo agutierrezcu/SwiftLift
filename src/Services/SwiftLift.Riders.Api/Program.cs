@@ -23,29 +23,40 @@ try
     var assemblies = AppDomain.CurrentDomain
         .GetApplicationAssemblies(applicationInfo.Namespace);
 
-    builder.AddServiceDefaults(applicationInfo, assemblies);
+    builder.AddServiceDefaults(
+        applicationInfo,
+        applicationInsightConnectionString,
+        assemblies);
 
     var services = builder.Services;
 
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
 
+    services.AddAuthentication();
+    services.AddAuthorization();
+
     var app = builder.Build();
 
-    app.Lifetime.ApplicationStarted.Register(() => Log.Logger.Information("Application started."));
-    app.Lifetime.ApplicationStopping.Register(() => Log.Logger.Information("Application stopping."));
-    app.Lifetime.ApplicationStopped.Register(() => Log.Logger.Information("Application stopped."));
-
-    app.MapDefaultEndpoints();
-
-    // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
     {
+        app.UseDeveloperExceptionPage();
+
         app.UseSwagger();
         app.UseSwaggerUI();
     }
 
     app.UseHttpsRedirection();
+
+    app.UseHeaderPropagation();
+
+    app.UseSerilogRequestLogging();
+
+    app.UseRouting();
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.MapDefaultEndpoints();
 
     await app.RunAppAsync(args, Log.Logger)
         .ConfigureAwait(false);
@@ -53,11 +64,12 @@ try
 catch (Exception ex)
     when (ex.GetType().Name is not "StopTheHostException" and not "HostAbortedException")
 {
-    Log.Logger.Fatal(ex, "Host terminated unexpectedly");
+    Log.Fatal(ex, "Host terminated unexpectedly");
 }
 finally
 {
-    Log.Logger.Information("Shut down complete.");
+    Log.Information("Shut down complete.");
 
     Log.CloseAndFlush();
 }
+
