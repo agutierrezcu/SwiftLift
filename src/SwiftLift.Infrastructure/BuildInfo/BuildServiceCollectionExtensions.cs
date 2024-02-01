@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog.Core;
 
 namespace SwiftLift.Infrastructure.BuildInfo;
@@ -10,7 +11,7 @@ public static class BuildServiceCollectionExtensions
 
         services.AddSingleton<IBuildFilePathResolver, BuildFilePathResolver>();
         services.AddSingleton<IBuildFileProvider, BuildFileProvider>();
-        services.AddSingleton<IBuildManager, BuildManager>();
+        services.TryAddSingleton<IBuildManager, BuildManager>();
         services.AddSingleton<ILogEventEnricher, BuildEventEnricher>();
 
         return services;

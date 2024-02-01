@@ -1,6 +1,6 @@
 ﻿namespace SwiftLift.Infrastructure.Serialization;
 
-public interface IJsonSnakeSerializer
+public interface ISnakeJsonSerializer
 {
     string Serialize<T>(T instance);
 }

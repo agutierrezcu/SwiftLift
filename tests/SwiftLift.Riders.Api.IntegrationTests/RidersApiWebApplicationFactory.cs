@@ -57,7 +57,7 @@ public sealed class RidersApiWebApplicationFactory : WebApplicationFactory<Progr
 
         var contentFile = ReadAllContent(fileInfo);
 
-        BuildTest = JsonTextSnakeSerialization.Instance.Deserialize<Build>(contentFile);
+        BuildTest = SnakeJsonSerialization.Instance.Deserialize<Build>(contentFile);
     }
 
     private static string ReadAllContent(IFileInfo fileInfo)
@@ -86,7 +86,7 @@ public sealed class RidersApiWebApplicationFactory : WebApplicationFactory<Progr
     {
         BuildTest = BuildFaker.Instance.Generate();
 
-        var buildAsJson = JsonTextSnakeSerialization.Instance.Serialize(BuildTest);
+        var buildAsJson = SnakeJsonSerialization.Instance.Serialize(BuildTest);
 
         using var sw = File.CreateText(_buildPath);
 

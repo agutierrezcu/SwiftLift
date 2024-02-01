@@ -8,8 +8,8 @@ public static class SerializationServiceCollectionExtensions
     {
         Guard.Against.Null(services);
 
-        services.TryAddSingleton<IJsonSnakeSerializer, JsonTextSnakeSerialization>();
-        services.TryAddSingleton<IJsonSnakeDeserializer, JsonTextSnakeSerialization>();
+        services.TryAddSingleton<ISnakeJsonSerializer, SnakeJsonSerialization>();
+        services.TryAddSingleton<ISnakeJsonDeserializer, SnakeJsonSerialization>();
 
         return services;
     }

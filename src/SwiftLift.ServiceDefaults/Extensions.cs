@@ -10,12 +10,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.FeatureManagement;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using SwiftLift.Infrastructure.ApplicationInsight;
 using SwiftLift.Infrastructure.BuildInfo;
+using SwiftLift.Infrastructure.Checks;
 using SwiftLift.Infrastructure.ConnectionString;
 using SwiftLift.Infrastructure.Correlation;
 using SwiftLift.Infrastructure.Environment;
@@ -50,6 +52,7 @@ public static partial class Extensions
 
         services.AddMemoryCache();
         services.AddHttpContextAccessor();
+        services.AddFeatureManagement();
 
         services.AddBuildInfo();
 

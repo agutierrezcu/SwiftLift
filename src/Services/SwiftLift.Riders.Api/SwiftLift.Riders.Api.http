@@ -3,6 +3,7 @@
 
 GET {{SwiftLift.Riders.Api_HostAddress}}/build-info
 Accept: application/json
+x-correlation-id: my-correlation-id
 
 ###
 

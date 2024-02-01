@@ -8,7 +8,7 @@ namespace SwiftLift.Infrastructure.BuildInfo;
 
 internal sealed class BuildManager
     (IBuildFileProvider buildFileProvider,
-    IJsonSnakeDeserializer jsonSnakeDeserializer,
+    ISnakeJsonDeserializer jsonSnakeDeserializer,
     IValidator<Build> buildValidator,
     ILogger<BuildManager> logger)
         : IBuildManager

@@ -9,6 +9,7 @@
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="Microsoft.AspNetCore.HeaderPropagation" />
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" />
+    <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" />
     <PackageReference Include="murmurhash" />
     <PackageReference Include="NewId" />
     <PackageReference Include="Oakton" />
@@ -22,6 +23,10 @@
     <PackageReference Include="Serilog.Sinks.Async" />
     <PackageReference Include="Serilog.Sinks.Seq" />
     <PackageReference Include="SerilogAnalyzer" />
+    <PackageReference Include="Scrutor" />
+    <PackageReference Include="StronglyTypedId" />
+    <PackageReference Include="System.Net.Http" />
+    <PackageReference Include="System.Text.RegularExpressions" />
   </ItemGroup>
   
 </Project>

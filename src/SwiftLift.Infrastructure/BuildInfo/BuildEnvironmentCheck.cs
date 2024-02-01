@@ -9,7 +9,7 @@ internal sealed class BuildEnvironmentCheck : IEnvironmentCheck
     public async Task Assert(IServiceProvider services, CancellationToken cancellation)
     {
         var buildFileProvider = services.GetRequiredService<IBuildFileProvider>();
-        var jsonSnakeDeserializer = services.GetRequiredService<IJsonSnakeDeserializer>();
+        var jsonSnakeDeserializer = services.GetRequiredService<ISnakeJsonDeserializer>();
         var buildValidator = services.GetRequiredService<IValidator<Build>>();
 
         var fileContent = await buildFileProvider.GetContentAsync(cancellation)

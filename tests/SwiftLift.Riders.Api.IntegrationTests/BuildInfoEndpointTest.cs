@@ -29,7 +29,7 @@ public class BuildEndpointIntegrationTests(RidersApiWebApplicationFactory factor
 
         buildContent.Should().NotBeNullOrEmpty();
 
-        var build = JsonTextSnakeSerialization.Instance
+        var build = SnakeJsonSerialization.Instance
             .Deserialize<Build>(buildContent);
 
         var buildValidator = new BuildValidator();

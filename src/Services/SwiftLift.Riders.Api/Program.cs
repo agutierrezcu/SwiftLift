@@ -41,9 +41,6 @@ try
     if (app.Environment.IsDevelopment())
     {
         app.UseDeveloperExceptionPage();
-
-        app.UseSwagger();
-        app.UseSwaggerUI();
     }
 
     app.UseHttpsRedirection();
@@ -57,6 +54,12 @@ try
     app.UseAuthorization();
 
     app.MapDefaultEndpoints();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
 
     await app.RunAppAsync(args, Log.Logger)
         .ConfigureAwait(false);
