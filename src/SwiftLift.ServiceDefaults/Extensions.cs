@@ -33,14 +33,19 @@ public static partial class Extensions
     public static IHostApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder,
         ApplicationInfo applicationInfo,
         ConnectionStringResource applicationInsightConnectionString,
-        Assembly[] assemblies)
+        Assembly[] assemblies,
+        string azureFileLoggingOptionsConfigurationKey)
     {
         Guard.Against.Null(builder);
         Guard.Against.Null(applicationInfo);
         Guard.Against.Null(applicationInsightConnectionString);
         Guard.Against.NullOrEmpty(assemblies);
+        Guard.Against.NullOrWhiteSpace(azureFileLoggingOptionsConfigurationKey);
 
-        builder.AddSerilog(applicationInfo.Id, applicationInsightConnectionString);
+        builder.AddLogging(
+            applicationInfo.Id,
+            applicationInsightConnectionString,
+            azureFileLoggingOptionsConfigurationKey);
 
         builder.ConfigureOpenTelemetry(applicationInfo);
 
@@ -204,7 +209,9 @@ public static partial class Extensions
 
                 await response.WriteAsync(fileContent, cancellation)
                     .ConfigureAwait(false);
-            });
+            })
+            .WithDisplayName("Build info")
+            .ExcludeFromDescription();
 
         return app;
     }

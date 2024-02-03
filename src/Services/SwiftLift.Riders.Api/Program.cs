@@ -26,7 +26,8 @@ try
     builder.AddServiceDefaults(
         applicationInfo,
         applicationInsightConnectionString,
-        assemblies);
+        assemblies,
+        "AzureFileLoggingOptions");
 
     var services = builder.Services;
 
@@ -42,12 +43,17 @@ try
     {
         app.UseDeveloperExceptionPage();
     }
+    else
+    {
+        app.UseHsts();
+    }
 
     app.UseHttpsRedirection();
 
     app.UseHeaderPropagation();
 
-    app.UseSerilogRequestLogging();
+    app.UseSerilogRequestLogging(
+        SerilogRequestLoggingOptions.Configure);
 
     app.UseRouting();
     app.UseAuthentication();

@@ -32,11 +32,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Riders.Api", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Riders.Api.IntegrationTests", "tests\SwiftLift.Riders.Api.IntegrationTests\SwiftLift.Riders.Api.IntegrationTests.csproj", "{5E6B4089-F15C-4986-8590-6ACFFB53BB9A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Infrastructure", "src\SwiftLift.Infrastructure\SwiftLift.Infrastructure.csproj", "{6746844E-B720-442B-BB73-C805AD538B19}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Infrastructure.UnitTests", "tests\SwiftLift.Infrastructure.UnitTests\SwiftLift.Infrastructure.UnitTests.csproj", "{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Architecture.Tests", "tests\SwiftLift.Architecture.Tests\SwiftLift.Architecture.Tests.csproj", "{9098C729-2B65-4EEE-8953-D78D77FF34C7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Infrastructure", "src\SwiftLift.Infrastructure\SwiftLift.Infrastructure.csproj", "{F119DCF4-416A-4C90-8F2A-B3E8D87C6985}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,10 +68,6 @@ Global
 		{5E6B4089-F15C-4986-8590-6ACFFB53BB9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E6B4089-F15C-4986-8590-6ACFFB53BB9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E6B4089-F15C-4986-8590-6ACFFB53BB9A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6746844E-B720-442B-BB73-C805AD538B19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6746844E-B720-442B-BB73-C805AD538B19}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6746844E-B720-442B-BB73-C805AD538B19}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6746844E-B720-442B-BB73-C805AD538B19}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -80,6 +76,10 @@ Global
 		{9098C729-2B65-4EEE-8953-D78D77FF34C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9098C729-2B65-4EEE-8953-D78D77FF34C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9098C729-2B65-4EEE-8953-D78D77FF34C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F119DCF4-416A-4C90-8F2A-B3E8D87C6985}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F119DCF4-416A-4C90-8F2A-B3E8D87C6985}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F119DCF4-416A-4C90-8F2A-B3E8D87C6985}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F119DCF4-416A-4C90-8F2A-B3E8D87C6985}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,10 +7,10 @@ using static System.Environment;
 namespace SwiftLift.Infrastructure.BuildInfo;
 
 internal sealed class BuildManager
-    (IBuildFileProvider buildFileProvider,
-    ISnakeJsonDeserializer jsonSnakeDeserializer,
-    IValidator<Build> buildValidator,
-    ILogger<BuildManager> logger)
+    (IBuildFileProvider _buildFileProvider,
+    ISnakeJsonDeserializer _jsonSnakeDeserializer,
+    IValidator<Build> _validator,
+    ILogger<BuildManager> _logger)
         : IBuildManager
 {
     private Task<(Build?, string)>? _loadBuildTask;
@@ -42,13 +42,13 @@ internal sealed class BuildManager
 
         try
         {
-            buildAsString = await buildFileProvider.GetContentAsync(cancellation)
+            buildAsString = await _buildFileProvider.GetContentAsync(cancellation)
                 .ConfigureAwait(false);
 
-            var build = jsonSnakeDeserializer.Deserialize<Build>(buildAsString)!;
+            var build = _jsonSnakeDeserializer.Deserialize<Build>(buildAsString)!;
 
             var validationResult =
-                await buildValidator.ValidateAsync(build, cancellation)
+                await _validator.ValidateAsync(build, cancellation)
                     .ConfigureAwait(false);
 
             if (!validationResult.IsValid)
@@ -68,7 +68,7 @@ internal sealed class BuildManager
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unexpected error retrieving and validation build info from file.");
+            _logger.LogError(ex, "Unexpected error retrieving and validation build info from file.");
 
             var sb = new StringBuilder(buildAsString)
                 .AppendLine()

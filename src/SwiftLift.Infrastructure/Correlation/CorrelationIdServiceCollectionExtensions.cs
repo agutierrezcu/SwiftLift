@@ -1,4 +1,3 @@
-using MassTransit;
 using Microsoft.AspNetCore.HeaderPropagation;
 using Microsoft.AspNetCore.Hosting;
 using Serilog.Core;

@@ -12,6 +12,8 @@ using Serilog.Exceptions.Core;
 using Serilog.Exceptions.Refit.Destructurers;
 using Serilog.Sinks.SystemConsole.Themes;
 using SwiftLift.Infrastructure.ConnectionString;
+using SwiftLift.Infrastructure.Options;
+
 using static System.Globalization.CultureInfo;
 
 namespace SwiftLift.Infrastructure.Logging;
@@ -31,33 +33,42 @@ public static class SerilogWebApplicationBuilderExtensions
 
         return new LoggerConfiguration()
             .MinimumLevel.Information()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+            .MinimumLevel.Override("System", LogEventLevel.Warning)
             .Enrich.WithProperty("Bootstrapping", true)
             .Enrich.WithProperty("ApplicationId", applicationId)
             .Enrich.WithExceptionDetails(
                 new DestructuringOptionsBuilder()
                     .WithDefaultDestructurers())
             .WriteToApplicationInsights(applicationInsightConnectionString)
-            .WriteToLogStreamFile(builder.Environment)
+            .WriteToLogStreamFile(builder.Environment, new AzureFileLoggingOptions())
             .WriteToConsoleIfDevelopment(builder.Environment)
             .CreateBootstrapLogger();
     }
 
-    public static void AddSerilog(this WebApplicationBuilder builder,
+    public static void AddLogging(this WebApplicationBuilder builder,
         string applicationId,
-        ConnectionStringResource applicationInsightConnectionString)
+        ConnectionStringResource applicationInsightConnectionString,
+        string azureFileLoggingOptionsConfigurationKey)
     {
         Guard.Against.Null(builder);
         Guard.Against.NullOrWhiteSpace(applicationId);
         Guard.Against.Null(applicationInsightConnectionString);
+        Guard.Against.NullOrWhiteSpace(azureFileLoggingOptionsConfigurationKey);
 
         builder.Logging
-            .ClearProviders()
-            // To use Azure Log Stream.
-            .AddAzureWebAppDiagnostics();
+            .ClearProviders();
+
+        builder.Services
+            .ConfigureOptions<AzureFileLoggingOptions, AzureFileLoggingOptionsValidator>(
+                azureFileLoggingOptionsConfigurationKey,
+                opts => opts.RegisterAsSingleton = true);
 
         builder.Host.UseSerilog(
             (context, serviceProvider, loggerConfiguration) =>
             {
+                var azureFileOptions = serviceProvider.GetRequiredService<AzureFileLoggingOptions>();
+
                 loggerConfiguration
                     .ReadFrom.Configuration(context.Configuration)
                     .ReadFrom.Services(serviceProvider)
@@ -75,7 +86,7 @@ public static class SerilogWebApplicationBuilderExtensions
                                 new ApiExceptionDestructurer()
                             }))
                     .WriteToApplicationInsights(applicationInsightConnectionString)
-                    .WriteToLogStreamFile(context.HostingEnvironment)
+                    .WriteToLogStreamFile(context.HostingEnvironment, azureFileOptions)
                     .WriteToConsoleIfDevelopment(context.HostingEnvironment);
             });
     }
@@ -120,23 +131,28 @@ public static class SerilogWebApplicationBuilderExtensions
 
     private static LoggerConfiguration WriteToLogStreamFile(
        this LoggerConfiguration loggerConfiguration,
-       IHostEnvironment environment)
+       IHostEnvironment environment,
+       AzureFileLoggingOptions loggingConfigOptions)
     {
         Guard.Against.Null(loggerConfiguration);
         Guard.Against.Null(environment);
+        Guard.Against.Null(loggingConfigOptions);
+
+        if (!loggingConfigOptions.Enabled)
+        {
+            return loggerConfiguration;
+        }
 
         var rootLocation = environment.IsDevelopment() ? "C" : "D";
-
-        var options = new LoggingConfigOptions();
 
         return loggerConfiguration
             .WriteTo.Async(
                 x => x.File(
                     $@"{rootLocation}:\home\LogFiles\Application\{environment.ApplicationName}.txt",
-                    fileSizeLimitBytes: options.AzureFileSizeLimit,
-                    rollOnFileSizeLimit: options.AzureRollOnSizeLimit,
-                    retainedFileCountLimit: options.AzureRetainedFileCount,
-                    retainedFileTimeLimit: options.AzureRetainTimeLimit,
+                    fileSizeLimitBytes: loggingConfigOptions.FileSizeLimit,
+                    rollOnFileSizeLimit: loggingConfigOptions.RollOnSizeLimit,
+                    retainedFileCountLimit: loggingConfigOptions.RetainedFileCount,
+                    retainedFileTimeLimit: loggingConfigOptions.RetainTimeLimit,
                     shared: true,
                     flushToDiskInterval: TimeSpan.FromSeconds(1),
                     formatProvider: InvariantCulture,

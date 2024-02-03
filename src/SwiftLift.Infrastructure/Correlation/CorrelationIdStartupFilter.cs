@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace SwiftLift.Infrastructure.Correlation;
 
-internal class CorrelationIdStartupFilter : IStartupFilter
+internal sealed class CorrelationIdStartupFilter : IStartupFilter
 {
     public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
     {

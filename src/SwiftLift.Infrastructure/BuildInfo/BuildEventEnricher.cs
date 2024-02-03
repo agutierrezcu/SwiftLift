@@ -3,7 +3,7 @@ using Serilog.Events;
 
 namespace SwiftLift.Infrastructure.BuildInfo;
 
-internal sealed class BuildEventEnricher(IServiceProvider serviceProvider)
+internal sealed class BuildEventEnricher(IServiceProvider _serviceProvider)
     : ILogEventEnricher
 {
     private Lazy<List<LogEventProperty>>? _cachedBuildProperties;
@@ -21,7 +21,7 @@ internal sealed class BuildEventEnricher(IServiceProvider serviceProvider)
 
     private IEnumerable<LogEventProperty> CreateEventProperties(ILogEventPropertyFactory propertyFactory)
     {
-        var buildManager = serviceProvider.GetRequiredService<IBuildManager>();
+        var buildManager = _serviceProvider.GetRequiredService<IBuildManager>();
 
         var buildTask = buildManager.GetBuildAsync(default);
 

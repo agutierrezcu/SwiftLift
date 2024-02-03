@@ -1,14 +1,15 @@
 namespace SwiftLift.Infrastructure.BuildInfo;
 
 internal sealed class BuildFileProvider(
-    IHostEnvironment hostEnvironment, IBuildFilePathResolver buildFilePathResolver)
+    IHostEnvironment _hostEnvironment,
+    IBuildFilePathResolver _buildFilePathResolver)
         : IBuildFileProvider
 {
     public async Task<string> GetContentAsync(CancellationToken cancellation)
     {
-        var relativePath = buildFilePathResolver.GetRelativeToContentRoot();
+        var relativePath = _buildFilePathResolver.GetRelativeToContentRoot();
 
-        var fileInfo = hostEnvironment.ContentRootFileProvider
+        var fileInfo = _hostEnvironment.ContentRootFileProvider
             .GetFileInfo(relativePath);
 
         var fileContent = await ReadAllContentAsync(fileInfo, cancellation)

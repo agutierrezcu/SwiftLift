@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace SwiftLift.Infrastructure.Checks;
 
-internal class EnvironmentCheckStartupFilter : IStartupFilter
+internal sealed class EnvironmentCheckStartupFilter : IStartupFilter
 {
     public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
     {

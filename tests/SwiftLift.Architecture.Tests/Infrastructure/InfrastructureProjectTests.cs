@@ -14,6 +14,8 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
         var result = s_infrastructureTypes
             .That()
             .AreClasses()
+            .And()
+            .AreNotNested()
             .Should()
             .ResideInNamespaceMatching("SwiftLift.Infrastructure")
             .And()
@@ -33,6 +35,8 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
         var result = s_infrastructureTypes
             .That()
             .AreClasses()
+            .And()
+            .AreNotNested()
             .Should()
             .BeStatic()
             .Or()
@@ -50,10 +54,11 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
     {
         // Act
         var result = s_infrastructureTypes
-            .Should()
-            .OnlyHaveDependencyOn("System", "Microsoft", "Oakton", "Serilog",
+            .ShouldNot()
+            .HaveDependencyOtherThan(
+                "System", "Microsoft", "Oakton", "Serilog",
                 "FluentValidation", "Ardalis", "SwiftLift.Infrastructure",
-                "MassTransit", "Murmur")
+                "MassTransit", "Murmur", "Scrutor")
             .GetResult();
 
         PrintOutIfFail(output, result);

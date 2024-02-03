@@ -5,21 +5,24 @@ using Microsoft.FeatureManagement;
 namespace SwiftLift.Infrastructure.Correlation;
 
 internal sealed class CorrelationIdResponseMiddleware(
-    ICorrelationIdResolver correlationIdResolver,
-    IFeatureManagerSnapshot featureManager)
+    ICorrelationIdResolver _correlationIdResolver,
+    IFeatureManagerSnapshot _featureManager)
         : IMiddleware
 {
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         var isAddCorrelationIdToResponseEnabled =
-               featureManager.IsEnabledAsync("AddCorrelationIdToResponse")
+               _featureManager.IsEnabledAsync("AddCorrelationIdToResponse")
                    .GetAwaiter().GetResult();
 
         if (isAddCorrelationIdToResponseEnabled)
         {
             context.Response.OnStarting(() =>
             {
-                _ = correlationIdResolver.TryGet(out var correlationId);
+                if (!_correlationIdResolver.TryGet(out var correlationId))
+                {
+                    return Task.CompletedTask;
+                }
 
                 var headerValue = new StringValues(correlationId.ToString() ?? "No set");
 

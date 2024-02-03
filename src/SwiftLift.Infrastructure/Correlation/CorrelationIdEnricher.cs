@@ -5,7 +5,7 @@ using Serilog.Events;
 namespace SwiftLift.Infrastructure.Correlation;
 
 internal sealed class CorrelationIdEnricher(
-    HeaderPropagationValues headerPropagationValues)
+    HeaderPropagationValues _headerPropagationValues)
         : ILogEventEnricher,
             ICorrelationIdResolver
 {
@@ -27,13 +27,13 @@ internal sealed class CorrelationIdEnricher(
 
     public bool TryGet(out CorrelationId? correlationId)
     {
-        if (headerPropagationValues.Headers is null)
+        if (_headerPropagationValues.Headers is null)
         {
             correlationId = null;
             return false;
         }
 
-        if (!headerPropagationValues.Headers.TryGetValue(
+        if (!_headerPropagationValues.Headers.TryGetValue(
                 CorrelationIdHeader.Name, out var correlationIdHeader))
         {
             correlationId = null;
