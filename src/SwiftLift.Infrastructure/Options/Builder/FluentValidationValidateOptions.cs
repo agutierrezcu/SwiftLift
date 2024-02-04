@@ -1,7 +1,7 @@
 using System.Globalization;
 using Microsoft.Extensions.Options;
 
-namespace SwiftLift.Infrastructure.Options.Validation;
+namespace SwiftLift.Infrastructure.Options.Builder;
 
 internal sealed class FluentValidationValidateOptions<TOptions>(
     IValidator<TOptions> _validator,

@@ -100,6 +100,11 @@ public sealed class RidersApiWebApplicationFactory : WebApplicationFactory<Progr
             "InstrumentationKey=00000000-0000-0000-0000-000000000000",
             EnvironmentVariableTarget.Process);
 
+        Environment.SetEnvironmentVariable(
+           "ASPNETCORE_ENVIRONMENT",
+           "Production",
+           EnvironmentVariableTarget.Process);
+
         return Task.CompletedTask;
     }
 

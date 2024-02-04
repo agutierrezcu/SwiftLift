@@ -4,7 +4,7 @@ using Serilog.Events;
 
 namespace SwiftLift.Infrastructure.Correlation;
 
-internal sealed class CorrelationIdEnricher(
+internal sealed class CorrelationIdManager(
     HeaderPropagationValues _headerPropagationValues)
         : ILogEventEnricher,
             ICorrelationIdResolver
@@ -19,8 +19,8 @@ internal sealed class CorrelationIdEnricher(
             return;
         }
 
-        var correlationIdProperty =
-            propertyFactory.CreateProperty("CorrelationId", correlationId);
+        var correlationIdProperty = propertyFactory.CreateProperty(
+            "CorrelationId", new ScalarValue(correlationId));
 
         logEvent.AddPropertyIfAbsent(correlationIdProperty!);
     }

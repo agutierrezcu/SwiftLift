@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using SwiftLift.Infrastructure.Options.Validation;
+using SwiftLift.Infrastructure.Options.Builder;
 
 namespace SwiftLift.Infrastructure.Options;
 

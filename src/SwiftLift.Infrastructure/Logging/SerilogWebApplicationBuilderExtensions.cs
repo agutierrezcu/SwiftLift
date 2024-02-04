@@ -1,10 +1,8 @@
-using System.Diagnostics;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using Serilog.Debugging;
 using Serilog.Enrichers.Sensitive;
 using Serilog.Events;
 using Serilog.Exceptions;
@@ -12,40 +10,15 @@ using Serilog.Exceptions.Core;
 using Serilog.Exceptions.Refit.Destructurers;
 using Serilog.Sinks.SystemConsole.Themes;
 using SwiftLift.Infrastructure.ConnectionString;
+using SwiftLift.Infrastructure.Environment;
 using SwiftLift.Infrastructure.Options;
 
 using static System.Globalization.CultureInfo;
 
 namespace SwiftLift.Infrastructure.Logging;
 
-[ExcludeFromCodeCoverage]
 public static class SerilogWebApplicationBuilderExtensions
 {
-    public static Serilog.ILogger CreateBootstrapLogger(this WebApplicationBuilder builder,
-        string applicationId,
-        ConnectionStringResource applicationInsightConnectionString)
-    {
-        Guard.Against.Null(builder);
-        Guard.Against.NullOrWhiteSpace(applicationId);
-        Guard.Against.Null(applicationInsightConnectionString);
-
-        SerilogSelfLogging();
-
-        return new LoggerConfiguration()
-            .MinimumLevel.Information()
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-            .MinimumLevel.Override("System", LogEventLevel.Warning)
-            .Enrich.WithProperty("Bootstrapping", true)
-            .Enrich.WithProperty("ApplicationId", applicationId)
-            .Enrich.WithExceptionDetails(
-                new DestructuringOptionsBuilder()
-                    .WithDefaultDestructurers())
-            .WriteToApplicationInsights(applicationInsightConnectionString)
-            .WriteToLogStreamFile(builder.Environment, new AzureFileLoggingOptions())
-            .WriteToConsoleIfDevelopment(builder.Environment)
-            .CreateBootstrapLogger();
-    }
-
     public static void AddLogging(this WebApplicationBuilder builder,
         string applicationId,
         ConnectionStringResource applicationInsightConnectionString,
@@ -68,6 +41,7 @@ public static class SerilogWebApplicationBuilderExtensions
             (context, serviceProvider, loggerConfiguration) =>
             {
                 var azureFileOptions = serviceProvider.GetRequiredService<AzureFileLoggingOptions>();
+                var environmentService = serviceProvider.GetRequiredService<IEnvironmentService>();
 
                 loggerConfiguration
                     .ReadFrom.Configuration(context.Configuration)
@@ -75,7 +49,9 @@ public static class SerilogWebApplicationBuilderExtensions
                     .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                     .Enrich.FromLogContext()
                     .Enrich.WithMachineName()
+                    .Enrich.WithEnvironmentName()
                     .Enrich.WithThreadId()
+                    .Enrich.WithRequestUserId()
                     .Enrich.WithProperty("ApplicationId", applicationId)
                     .Enrich.WithSensitiveDataMasking(opts => opts.Mode = MaskingMode.InArea)
                     .Enrich.WithExceptionDetails(
@@ -86,20 +62,16 @@ public static class SerilogWebApplicationBuilderExtensions
                                 new ApiExceptionDestructurer()
                             }))
                     .WriteToApplicationInsights(applicationInsightConnectionString)
-                    .WriteToLogStreamFile(context.HostingEnvironment, azureFileOptions)
-                    .WriteToConsoleIfDevelopment(context.HostingEnvironment);
+                    .WriteToLogStreamFileIf(
+                        () => azureFileOptions.Enabled, context.HostingEnvironment, azureFileOptions)
+                    .WriteToForDevelopmentIf(
+                        () => builder.Environment.IsDevelopment(), environmentService);
             });
-    }
-
-    [Conditional("DEBUG")]
-    private static void SerilogSelfLogging()
-    {
-        SelfLog.Enable(Console.WriteLine);
     }
 
     private static TelemetryConfiguration? s_telemetryConfiguration;
 
-    private static LoggerConfiguration WriteToApplicationInsights(
+    internal static LoggerConfiguration WriteToApplicationInsights(
        this LoggerConfiguration loggerConfiguration,
        ConnectionStringResource applicationInsightConnectionString)
     {
@@ -129,30 +101,36 @@ public static class SerilogWebApplicationBuilderExtensions
     private const string TextBasedOutputTemplate =
         "[{Timestamp:yyyy-MM-dd HH:mm:ss}] [{EventId}] [{EventName}] [{EventType:x8} {Level:u3}] {Message:lj}{NewLine}{Exception}";
 
-    private static LoggerConfiguration WriteToLogStreamFile(
+    internal static LoggerConfiguration WriteToLogStreamFileIf(
        this LoggerConfiguration loggerConfiguration,
+       Func<bool> requiredCondition,
        IHostEnvironment environment,
-       AzureFileLoggingOptions loggingConfigOptions)
+       AzureFileLoggingOptions azureFileOptions)
     {
+        Guard.Against.Null(requiredCondition);
         Guard.Against.Null(loggerConfiguration);
         Guard.Against.Null(environment);
-        Guard.Against.Null(loggingConfigOptions);
+        Guard.Against.Null(azureFileOptions);
 
-        if (!loggingConfigOptions.Enabled)
+        if (!requiredCondition())
         {
             return loggerConfiguration;
         }
 
-        var rootLocation = environment.IsDevelopment() ? "C" : "D";
+        if (!requiredCondition())
+        {
+            return loggerConfiguration;
+        }
 
         return loggerConfiguration
             .WriteTo.Async(
-                x => x.File(
-                    $@"{rootLocation}:\home\LogFiles\Application\{environment.ApplicationName}.txt",
-                    fileSizeLimitBytes: loggingConfigOptions.FileSizeLimit,
-                    rollOnFileSizeLimit: loggingConfigOptions.RollOnSizeLimit,
-                    retainedFileCountLimit: loggingConfigOptions.RetainedFileCount,
-                    retainedFileTimeLimit: loggingConfigOptions.RetainTimeLimit,
+                sync => sync.File(
+                    path: string.Format(InvariantCulture,
+                        azureFileOptions.PathTemplate!, environment.ApplicationName),
+                    fileSizeLimitBytes: azureFileOptions.FileSizeLimit,
+                    rollOnFileSizeLimit: azureFileOptions.RollOnSizeLimit,
+                    retainedFileCountLimit: azureFileOptions.RetainedFileCount,
+                    retainedFileTimeLimit: azureFileOptions.RetainTimeLimit,
                     shared: true,
                     flushToDiskInterval: TimeSpan.FromSeconds(1),
                     formatProvider: InvariantCulture,
@@ -160,23 +138,27 @@ public static class SerilogWebApplicationBuilderExtensions
                 ));
     }
 
-    private static LoggerConfiguration WriteToConsoleIfDevelopment(
+    internal static LoggerConfiguration WriteToForDevelopmentIf(
        this LoggerConfiguration loggerConfiguration,
-       IHostEnvironment environment)
+       Func<bool> requiredCondition,
+       IEnvironmentService environmentService)
     {
+        Guard.Against.Null(requiredCondition);
         Guard.Against.Null(loggerConfiguration);
-        Guard.Against.Null(environment);
+        Guard.Against.Null(environmentService);
 
-        if (!environment.IsDevelopment())
+        if (!requiredCondition())
         {
             return loggerConfiguration;
         }
+
+        var seqServerUrl = environmentService.GetRequiredVariable("SEQ_SERVER_URL")!;
 
         return loggerConfiguration
             .WriteTo.Console(
                 formatProvider: InvariantCulture,
                 outputTemplate: TextBasedOutputTemplate,
-                theme: AnsiConsoleTheme.Code
-            );
+                theme: AnsiConsoleTheme.Code)
+            .WriteTo.Seq(seqServerUrl);
     }
 }

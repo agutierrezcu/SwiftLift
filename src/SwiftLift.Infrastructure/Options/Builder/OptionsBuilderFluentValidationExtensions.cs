@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Options;
 
-namespace SwiftLift.Infrastructure.Options.Validation;
+namespace SwiftLift.Infrastructure.Options.Builder;
 
 internal static partial class OptionsBuilderFluentValidationExtensions
 {

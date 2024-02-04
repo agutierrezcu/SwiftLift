@@ -227,7 +227,7 @@ public static partial class Extensions
                 await response.WriteAsync(fileContent, cancellation)
                     .ConfigureAwait(false);
             })
-            .WithDisplayName("Build info")
+            .WithDisplayName(ExcludedLoggingEndpoint.BuildInfo.ToString())
             .ExcludeFromDescription();
 
         return app;

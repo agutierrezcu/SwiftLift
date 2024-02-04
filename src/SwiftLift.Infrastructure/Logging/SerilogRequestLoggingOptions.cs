@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Http;
 using Serilog;
 using Serilog.AspNetCore;
@@ -16,26 +17,16 @@ public static class SerilogRequestLoggingOptions
         options.IncludeQueryInRequestPath = true;
     }
 
-    private static readonly HashSet<string> s_defaultExcludedEndpoints =
-        [
-            "Health checks",
-            "Build info"
-        ];
-
     public static Func<HttpContext, double, Exception?, LogEventLevel> GetLevel(
         LogEventLevel traceLevel = LogEventLevel.Verbose,
         params string[] traceEndpointNames)
     {
         Guard.Against.Null(traceEndpointNames);
 
-        traceEndpointNames
-            .ToList()
-            .ForEach(t => s_defaultExcludedEndpoints.Add(t));
-
         return (ctx, _, ex) =>
             IsError(ctx, ex)
             ? LogEventLevel.Error
-            : IsTraceEndpoint(ctx, s_defaultExcludedEndpoints)
+            : IsTraceEndpoint(ctx, traceEndpointNames)
                 ? traceLevel
                 : LogEventLevel.Information;
     }
@@ -45,13 +36,18 @@ public static class SerilogRequestLoggingOptions
         return ex is not null || ctx.Response.StatusCode > 499;
     }
 
-    private static bool IsTraceEndpoint(HttpContext ctx, ISet<string> traceEndpoints)
+    private static bool IsTraceEndpoint(HttpContext ctx, IEnumerable<string> traceEndpoints)
     {
         var endpoint = ctx.GetEndpoint();
 
         if (endpoint is null)
         {
             return false;
+        }
+
+        if (ExcludedLoggingEndpoint.TryFromName(endpoint.DisplayName, out _))
+        {
+            return true;
         }
 
         return traceEndpoints.Any(e => string.Equals(e, endpoint.DisplayName,
@@ -70,6 +66,9 @@ public static class SerilogRequestLoggingOptions
         diagnosticContext.Set("Protocol", request.Protocol);
         diagnosticContext.Set("Scheme", request.Scheme);
 
+        diagnosticContext.Set("RemoteIpAddress",
+            request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.None);
+
         if (request.QueryString.HasValue)
         {
             diagnosticContext.Set("QueryString", request.QueryString.Value);
@@ -77,7 +76,7 @@ public static class SerilogRequestLoggingOptions
 
         var response = httpContext.Response;
 
-        diagnosticContext.Set("ContentType", response.ContentType);
+        diagnosticContext.Set("ContentType", response.ContentType ?? "None");
 
         var endpoint = httpContext.GetEndpoint();
 

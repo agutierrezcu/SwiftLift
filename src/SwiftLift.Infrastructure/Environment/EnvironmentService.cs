@@ -14,4 +14,18 @@ public sealed class EnvironmentService : IEnvironmentService
 
         return System.Environment.GetEnvironmentVariable(name);
     }
+
+    public string GetRequiredVariable(string name)
+    {
+        Guard.Against.NullOrWhiteSpace(name);
+
+        var environmentVariable = GetVariable(name);
+
+        if (string.IsNullOrWhiteSpace(environmentVariable))
+        {
+            throw new InvalidOperationException("Environment variable is not defined or value is not set.");
+        }
+
+        return environmentVariable;
+    }
 }

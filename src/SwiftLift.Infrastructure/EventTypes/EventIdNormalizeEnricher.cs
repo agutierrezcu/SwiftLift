@@ -23,7 +23,7 @@ internal sealed class EventIdNormalizeEnricher : ILogEventEnricher
         }
 
         var eventIdProperty = propertyFactory.CreateProperty(
-            "EventId", currentEventIdProperty.Value);
+            "EventId", new ScalarValue(currentEventIdProperty.Value));
 
         logEvent.AddOrUpdateProperty(eventIdProperty);
 
@@ -39,7 +39,7 @@ internal sealed class EventIdNormalizeEnricher : ILogEventEnricher
             .ToString().Replace("\"", string.Empty);
 
         var eventNameProperty = propertyFactory.CreateProperty(
-            "EventName", eventNameValue);
+            "EventName", new ScalarValue(eventNameValue));
 
         logEvent.AddOrUpdateProperty(eventNameProperty);
     }

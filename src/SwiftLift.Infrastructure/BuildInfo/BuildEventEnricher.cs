@@ -27,8 +27,13 @@ internal sealed class BuildEventEnricher(IServiceProvider _serviceProvider)
 
         var build = buildTask.GetAwaiter().GetResult();
 
-        yield return propertyFactory.CreateProperty("BuildId", build.Id);
-        yield return propertyFactory.CreateProperty("BuildNumber", build.Number);
-        yield return propertyFactory.CreateProperty("BuildCommit", build.Commit);
+        yield return propertyFactory.CreateProperty(
+            "BuildId", new ScalarValue(build.Id));
+
+        yield return propertyFactory.CreateProperty(
+            "BuildNumber", new ScalarValue(build.Number));
+
+        yield return propertyFactory.CreateProperty(
+            "BuildCommit", new ScalarValue(build.Commit));
     }
 }

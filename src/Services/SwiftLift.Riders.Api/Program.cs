@@ -18,7 +18,7 @@ var applicationInsightConnectionString = ApplicationInsightResource.Instance
 Log.Logger = builder.CreateBootstrapLogger(applicationInfo.Id,
     applicationInsightConnectionString);
 
-Log.Logger.Information("Logger created.");
+Log.Information("Bootstrap logger created.");
 
 try
 {
@@ -84,6 +84,7 @@ finally
 {
     Log.Information("Shut down complete.");
 
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync()
+        .ConfigureAwait(false);
 }
 

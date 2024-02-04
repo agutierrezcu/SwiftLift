@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Options;
 
-namespace SwiftLift.Infrastructure.Options.Validation;
+namespace SwiftLift.Infrastructure.Options.Builder;
 
 internal sealed class ConfigurationSectionValidateOptions<TOptions>(
     IConfiguration _configuration,

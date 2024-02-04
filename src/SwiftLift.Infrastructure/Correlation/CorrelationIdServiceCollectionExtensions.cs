@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.HeaderPropagation;
 using Microsoft.AspNetCore.Hosting;
 using Serilog.Core;
 
@@ -10,10 +9,8 @@ public static class CorrelationIdServiceCollectionExtensions
     {
         Guard.Against.Null(services);
 
-        services.AddSingleton<ILogEventEnricher, CorrelationIdEnricher>();
-        services.AddSingleton<ICorrelationIdResolver, CorrelationIdEnricher>();
-
-        services.CheckServiceIsRegistered<HeaderPropagationValues>();
+        services.AddSingleton<ILogEventEnricher, CorrelationIdManager>();
+        services.AddSingleton<ICorrelationIdResolver, CorrelationIdManager>();
 
         services.AddHeaderPropagation(options =>
         {
