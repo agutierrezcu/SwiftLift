@@ -1,3 +1,5 @@
+using FastEndpoints;
+using FastEndpoints.Swagger;
 using Serilog;
 using SwiftLift.Infrastructure;
 using SwiftLift.Infrastructure.ApplicationInsight;
@@ -60,6 +62,9 @@ try
     app.UseAuthorization();
 
     app.MapDefaultEndpoints();
+
+    app.UseFastEndpoints();
+    app.UseSwaggerGen();
 
     if (app.Environment.IsDevelopment())
     {

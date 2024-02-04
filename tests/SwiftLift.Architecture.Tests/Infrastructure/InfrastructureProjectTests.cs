@@ -50,7 +50,7 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public void Project_Should_Not_Have_Any_Dependency()
+    public void Project_Should_Not_Have_Dependency_Other_Than()
     {
         // Act
         var result = s_infrastructureTypes
@@ -58,7 +58,7 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
             .HaveDependencyOtherThan(
                 "System", "Microsoft", "Oakton", "Serilog",
                 "FluentValidation", "Ardalis", "SwiftLift.Infrastructure",
-                "MassTransit", "Murmur", "Scrutor")
+                "MassTransit", "Murmur", "Scrutor", "FastEndpoints")
             .GetResult();
 
         PrintOutIfFail(output, result);

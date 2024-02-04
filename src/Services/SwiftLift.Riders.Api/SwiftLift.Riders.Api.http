@@ -17,3 +17,9 @@ GET {{SwiftLift.Riders.Api_HostAddress}}/alive
 Accept: application/json
 
 ###
+
+
+GET {{SwiftLift.Riders.Api_HostAddress}}/dummy
+Accept: application/json
+
+###

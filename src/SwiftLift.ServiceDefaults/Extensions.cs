@@ -3,6 +3,8 @@ using System.Reflection;
 using Ardalis.GuardClauses;
 using Azure.Identity;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
+using FastEndpoints;
+using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
@@ -46,6 +48,8 @@ public static partial class Extensions
             applicationInfo.Id,
             applicationInsightConnectionString,
             azureFileLoggingOptionsConfigurationKey);
+
+        builder.AddFastEndpoints();
 
         builder.ConfigureOpenTelemetry(applicationInfo);
 
@@ -171,6 +175,19 @@ public static partial class Extensions
                         : new ManagedIdentityCredential();
                 }
             );
+
+        return builder;
+    }
+
+    public static IHostApplicationBuilder AddFastEndpoints(this IHostApplicationBuilder builder)
+    {
+        builder.Services
+            .AddFastEndpoints(
+                opts =>
+                {
+                    //opts.
+                })
+            .SwaggerDocument();
 
         return builder;
     }
