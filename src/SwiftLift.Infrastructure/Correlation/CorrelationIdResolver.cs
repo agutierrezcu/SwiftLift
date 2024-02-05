@@ -4,10 +4,10 @@ using Serilog.Events;
 
 namespace SwiftLift.Infrastructure.Correlation;
 
-internal sealed class CorrelationIdManager(
+internal sealed class CorrelationIdResolver(
     HeaderPropagationValues _headerPropagationValues)
         : ILogEventEnricher,
-            ICorrelationIdResolver
+          ICorrelationIdResolver
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {

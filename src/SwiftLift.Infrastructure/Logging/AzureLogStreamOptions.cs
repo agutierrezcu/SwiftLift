@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 namespace SwiftLift.Infrastructure.Logging;
 
 [ExcludeFromCodeCoverage]
-internal sealed class AzureFileLoggingOptions
+internal sealed class AzureLogStreamOptions
 {
-    internal static AzureFileLoggingOptions CreateDefault(IWebHostEnvironment environment)
+    internal static AzureLogStreamOptions CreateDefault(IWebHostEnvironment environment)
     {
         Guard.Against.Null(environment);
 
@@ -16,7 +16,6 @@ internal sealed class AzureFileLoggingOptions
 
         return new()
         {
-            Enabled = true,
             PathTemplate = pathTemplate,
             FileSizeLimit = 4 * 1024 * 1024,
             RollOnSizeLimit = true,
@@ -24,8 +23,6 @@ internal sealed class AzureFileLoggingOptions
             RetainTimeLimit = TimeSpan.FromDays(1)
         };
     }
-
-    public bool Enabled { get; init; }
 
     public string? PathTemplate { get; init; }
 

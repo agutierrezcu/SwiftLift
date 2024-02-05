@@ -110,6 +110,11 @@ public sealed class RidersApiWebApplicationFactory : WebApplicationFactory<Progr
 
     Task IAsyncLifetime.DisposeAsync()
     {
+        Environment.SetEnvironmentVariable(
+            ApplicationInsightSettings.EnvironmentVariable,
+            string.Empty,
+            EnvironmentVariableTarget.Process);
+
         if (_buildPath.EndsWith(BuildTestFileRelativePath))
         {
             File.Delete(_buildPath);

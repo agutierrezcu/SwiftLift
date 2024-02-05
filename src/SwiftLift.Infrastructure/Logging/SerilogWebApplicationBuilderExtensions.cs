@@ -1,9 +1,11 @@
-using Microsoft.ApplicationInsights.Extensibility;
+using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Core;
 using Serilog.Enrichers.Sensitive;
+using Serilog.Enrichers.Span;
 using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
@@ -13,34 +15,41 @@ using SwiftLift.Infrastructure.ConnectionString;
 using SwiftLift.Infrastructure.Environment;
 using SwiftLift.Infrastructure.Options;
 
-using static System.Globalization.CultureInfo;
-
 namespace SwiftLift.Infrastructure.Logging;
 
 public static class SerilogWebApplicationBuilderExtensions
 {
     public static void AddLogging(this WebApplicationBuilder builder,
-        string applicationId,
         ConnectionStringResource applicationInsightConnectionString,
-        string azureFileLoggingOptionsConfigurationKey)
+        string azureFileLoggingOptionsConfigurationKey,
+        Assembly[] applicationAssemblies)
     {
         Guard.Against.Null(builder);
-        Guard.Against.NullOrWhiteSpace(applicationId);
         Guard.Against.Null(applicationInsightConnectionString);
         Guard.Against.NullOrWhiteSpace(azureFileLoggingOptionsConfigurationKey);
+        Guard.Against.NullOrEmpty(applicationAssemblies);
 
-        builder.Logging
-            .ClearProviders();
+        var services = builder.Services;
 
-        builder.Services
-            .ConfigureOptions<AzureFileLoggingOptions, AzureFileLoggingOptionsValidator>(
+        services
+            .ConfigureOptions<AzureLogStreamOptions, AzureLogStreamOptionsValidator>(
                 azureFileLoggingOptionsConfigurationKey,
                 opts => opts.RegisterAsSingleton = true);
+
+        services
+            .Scan(scan => scan
+                .FromAssemblies(applicationAssemblies)
+                .AddClasses(s => s.AssignableTo<ILogEventEnricher>(), false)
+                .As<ILogEventEnricher>()
+                .WithSingletonLifetime()
+            );
+
+        builder.Logging
+          .ClearProviders();
 
         builder.Host.UseSerilog(
             (context, serviceProvider, loggerConfiguration) =>
             {
-                var azureFileOptions = serviceProvider.GetRequiredService<AzureFileLoggingOptions>();
                 var environmentService = serviceProvider.GetRequiredService<IEnvironmentService>();
 
                 loggerConfiguration
@@ -51,8 +60,8 @@ public static class SerilogWebApplicationBuilderExtensions
                     .Enrich.WithMachineName()
                     .Enrich.WithEnvironmentName()
                     .Enrich.WithThreadId()
-                    .Enrich.WithRequestUserId()
-                    .Enrich.WithProperty("ApplicationId", applicationId)
+                    .Enrich.WithSpan()
+                    .Enrich.WithProperty("ApplicationName", context.HostingEnvironment.ApplicationName)
                     .Enrich.WithSensitiveDataMasking(opts => opts.Mode = MaskingMode.InArea)
                     .Enrich.WithExceptionDetails(
                         new DestructuringOptionsBuilder()
@@ -61,104 +70,61 @@ public static class SerilogWebApplicationBuilderExtensions
                             {
                                 new ApiExceptionDestructurer()
                             }))
-                    .WriteToApplicationInsights(applicationInsightConnectionString)
-                    .WriteToLogStreamFileIf(
-                        () => azureFileOptions.Enabled, context.HostingEnvironment, azureFileOptions)
-                    .WriteToForDevelopmentIf(
-                        () => builder.Environment.IsDevelopment(), environmentService);
+                    .WriteTo.ApplicationInsights(
+                        applicationInsightConnectionString.Value,
+                        TelemetryConverter.Traces);
+
+                var azureLogStreamEnabledValue = environmentService.GetVariable("AZURE_LOG_STREAM_ENABLED");
+
+                if (bool.TryParse(azureLogStreamEnabledValue, out var azureLogStreamEnabled) && azureLogStreamEnabled)
+                {
+                    var azureLogStreamOptions = serviceProvider.GetRequiredService<AzureLogStreamOptions>();
+
+                    loggerConfiguration
+                        .WriteToLogStreamFile(
+                            azureLogStreamOptions,
+                            context.HostingEnvironment.ApplicationName);
+                }
+
+                if (context.HostingEnvironment.IsDevelopment())
+                {
+                    var seqServerUrl = environmentService.GetRequiredVariable("SEQ_SERVER_URL")!;
+
+                    loggerConfiguration
+                        .WriteTo.Console(
+                            formatProvider: CultureInfo.InvariantCulture,
+                            outputTemplate: TextBasedOutputTemplate,
+                            theme: AnsiConsoleTheme.Code)
+                        .WriteTo.Seq(seqServerUrl);
+                }
             });
     }
 
-    private static TelemetryConfiguration? s_telemetryConfiguration;
-
-    internal static LoggerConfiguration WriteToApplicationInsights(
-       this LoggerConfiguration loggerConfiguration,
-       ConnectionStringResource applicationInsightConnectionString)
-    {
-        Guard.Against.Null(loggerConfiguration);
-        Guard.Against.Null(applicationInsightConnectionString);
-
-        s_telemetryConfiguration ??= CreateTelemetryConfiguration(applicationInsightConnectionString);
-
-        return loggerConfiguration.
-            WriteTo.ApplicationInsights(
-                s_telemetryConfiguration, TelemetryConverter.Traces);
-    }
-
-    private static TelemetryConfiguration? CreateTelemetryConfiguration(
-        ConnectionStringResource connectionStringResource)
-    {
-        Guard.Against.Null(connectionStringResource);
-
-        var telemetryConfiguration = TelemetryConfiguration.CreateDefault();
-
-        telemetryConfiguration.ConnectionString = connectionStringResource.Value;
-        telemetryConfiguration.DisableTelemetry = true;
-
-        return telemetryConfiguration;
-    }
-
-    private const string TextBasedOutputTemplate =
+    internal const string TextBasedOutputTemplate =
         "[{Timestamp:yyyy-MM-dd HH:mm:ss}] [{EventId}] [{EventName}] [{EventType:x8} {Level:u3}] {Message:lj}{NewLine}{Exception}";
 
-    internal static LoggerConfiguration WriteToLogStreamFileIf(
+    internal static LoggerConfiguration WriteToLogStreamFile(
        this LoggerConfiguration loggerConfiguration,
-       Func<bool> requiredCondition,
-       IHostEnvironment environment,
-       AzureFileLoggingOptions azureFileOptions)
+       AzureLogStreamOptions azureFileOptions,
+       string applicationName)
     {
-        Guard.Against.Null(requiredCondition);
         Guard.Against.Null(loggerConfiguration);
-        Guard.Against.Null(environment);
         Guard.Against.Null(azureFileOptions);
-
-        if (!requiredCondition())
-        {
-            return loggerConfiguration;
-        }
-
-        if (!requiredCondition())
-        {
-            return loggerConfiguration;
-        }
+        Guard.Against.NullOrWhiteSpace(applicationName);
 
         return loggerConfiguration
             .WriteTo.Async(
                 sync => sync.File(
-                    path: string.Format(InvariantCulture,
-                        azureFileOptions.PathTemplate!, environment.ApplicationName),
+                    path: string.Format(CultureInfo.InvariantCulture,
+                        azureFileOptions.PathTemplate!, applicationName),
                     fileSizeLimitBytes: azureFileOptions.FileSizeLimit,
                     rollOnFileSizeLimit: azureFileOptions.RollOnSizeLimit,
                     retainedFileCountLimit: azureFileOptions.RetainedFileCount,
                     retainedFileTimeLimit: azureFileOptions.RetainTimeLimit,
                     shared: true,
                     flushToDiskInterval: TimeSpan.FromSeconds(1),
-                    formatProvider: InvariantCulture,
+                    formatProvider: CultureInfo.InvariantCulture,
                     outputTemplate: TextBasedOutputTemplate
                 ));
-    }
-
-    internal static LoggerConfiguration WriteToForDevelopmentIf(
-       this LoggerConfiguration loggerConfiguration,
-       Func<bool> requiredCondition,
-       IEnvironmentService environmentService)
-    {
-        Guard.Against.Null(requiredCondition);
-        Guard.Against.Null(loggerConfiguration);
-        Guard.Against.Null(environmentService);
-
-        if (!requiredCondition())
-        {
-            return loggerConfiguration;
-        }
-
-        var seqServerUrl = environmentService.GetRequiredVariable("SEQ_SERVER_URL")!;
-
-        return loggerConfiguration
-            .WriteTo.Console(
-                formatProvider: InvariantCulture,
-                outputTemplate: TextBasedOutputTemplate,
-                theme: AnsiConsoleTheme.Code)
-            .WriteTo.Seq(seqServerUrl);
     }
 }

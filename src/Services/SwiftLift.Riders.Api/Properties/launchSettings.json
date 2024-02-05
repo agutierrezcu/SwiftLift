@@ -16,9 +16,6 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5067",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "APPLICATIONINSIGHTS_CONNECTION_STRING": "InstrumentationKey=00000000-0000-0000-0000-000000000000",
-        "SEQ_SERVER_URL": "http://localhost:5341/"
       }
     },
     "https": {
@@ -28,9 +25,6 @@
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7173;http://localhost:5067",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "APPLICATIONINSIGHTS_CONNECTION_STRING": "InstrumentationKey=00000000-0000-0000-0000-000000000000",
-        "SEQ_SERVER_URL": "http://localhost:5341/"
       }
     },
     "IIS Express": {
@@ -38,9 +32,6 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "APPLICATIONINSIGHTS_CONNECTION_STRING": "InstrumentationKey=00000000-0000-0000-0000-000000000000",
-        "SEQ_SERVER_URL": "http://localhost:5341/"
       }
     }
   }

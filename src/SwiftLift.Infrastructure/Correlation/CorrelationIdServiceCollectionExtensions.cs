@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Hosting;
-using Serilog.Core;
 
 namespace SwiftLift.Infrastructure.Correlation;
 
@@ -9,8 +8,7 @@ public static class CorrelationIdServiceCollectionExtensions
     {
         Guard.Against.Null(services);
 
-        services.AddSingleton<ILogEventEnricher, CorrelationIdManager>();
-        services.AddSingleton<ICorrelationIdResolver, CorrelationIdManager>();
+        services.AddSingleton<ICorrelationIdResolver, CorrelationIdResolver>();
 
         services.AddHeaderPropagation(options =>
         {

@@ -12,6 +12,9 @@ internal sealed class EventTypeEnricher : ILogEventEnricher
 
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
+        Guard.Against.Null(logEvent);
+        Guard.Against.Null(propertyFactory);
+
         var eventTypeProperty = _cachedMessageTemplateEventType.GetOrAdd(
             logEvent.MessageTemplate.Text,
             messageTemplate =>

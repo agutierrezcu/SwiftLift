@@ -7,10 +7,10 @@ namespace SwiftLift.Infrastructure.Checks;
 public static class EnvironmentCheckExtensions
 {
     public static WebApplicationBuilder AddEnvironmentChecks(this WebApplicationBuilder builder,
-        Assembly[] assemblies)
+        Assembly[] applicationAssemblies)
     {
         Guard.Against.Null(builder);
-        Guard.Against.NullOrEmpty(assemblies);
+        Guard.Against.NullOrEmpty(applicationAssemblies);
 
         builder.Host.ApplyOaktonExtensions();
 
@@ -20,7 +20,7 @@ public static class EnvironmentCheckExtensions
 
         services
             .Scan(scan => scan
-                .FromAssemblies(assemblies)
+                .FromAssemblies(applicationAssemblies)
                 .AddClasses(s => s.AssignableTo<IEnvironmentCheck>(), false)
                 .As<IEnvironmentCheck>()
                 .WithTransientLifetime()

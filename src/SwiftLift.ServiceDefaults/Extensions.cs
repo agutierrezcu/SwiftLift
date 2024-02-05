@@ -1,10 +1,10 @@
 using System.Net.Mime;
-using System.Reflection;
 using Ardalis.GuardClauses;
 using Azure.Identity;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
@@ -20,10 +20,8 @@ using OpenTelemetry.Trace;
 using SwiftLift.Infrastructure.ApplicationInsight;
 using SwiftLift.Infrastructure.BuildInfo;
 using SwiftLift.Infrastructure.Checks;
-using SwiftLift.Infrastructure.ConnectionString;
 using SwiftLift.Infrastructure.Correlation;
 using SwiftLift.Infrastructure.Environment;
-using SwiftLift.Infrastructure.EventTypes;
 using SwiftLift.Infrastructure.Logging;
 using SwiftLift.Infrastructure.Serialization;
 using SwiftLift.SharedKernel.Application;
@@ -33,29 +31,28 @@ namespace SwiftLift.ServiceDefaults;
 public static partial class Extensions
 {
     public static IHostApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder,
-        ApplicationInfo applicationInfo,
-        ConnectionStringResource applicationInsightConnectionString,
-        Assembly[] assemblies,
-        string azureFileLoggingOptionsConfigurationKey)
+        Action<ServiceDefaultsOptions> config)
     {
         Guard.Against.Null(builder);
-        Guard.Against.Null(applicationInfo);
-        Guard.Against.Null(applicationInsightConnectionString);
-        Guard.Against.NullOrEmpty(assemblies);
-        Guard.Against.NullOrWhiteSpace(azureFileLoggingOptionsConfigurationKey);
+
+        var serviceDefaultsOptions = new ServiceDefaultsOptions();
+        config(serviceDefaultsOptions);
+
+        var serviceDefaultsOptionsValidator = new ServiceDefaultsOptionsValidator();
+        serviceDefaultsOptionsValidator.ValidateAndThrow(serviceDefaultsOptions);
 
         builder.AddLogging(
-            applicationInfo.Id,
-            applicationInsightConnectionString,
-            azureFileLoggingOptionsConfigurationKey);
+            serviceDefaultsOptions.ApplicationInsightConnectionString,
+            serviceDefaultsOptions.AzureLogStreamConfigurationSectionKey,
+            serviceDefaultsOptions.ApplicationAssemblies);
 
         builder.AddFastEndpoints();
 
-        builder.ConfigureOpenTelemetry(applicationInfo);
+        builder.ConfigureOpenTelemetry(serviceDefaultsOptions.ApplicationInfo);
 
         builder.AddDefaultHealthChecks();
 
-        builder.AddEnvironmentChecks(assemblies);
+        builder.AddEnvironmentChecks(serviceDefaultsOptions.ApplicationAssemblies);
 
         var services = builder.Services;
 
@@ -67,9 +64,7 @@ public static partial class Extensions
 
         services.AddSnakeSerialization();
 
-        services.AddValidators(assemblies);
-
-        services.AddEventTypes();
+        services.AddValidators(serviceDefaultsOptions.ApplicationAssemblies);
 
         services.AddCorrelationId();
 
@@ -227,7 +222,7 @@ public static partial class Extensions
                 await response.WriteAsync(fileContent, cancellation)
                     .ConfigureAwait(false);
             })
-            .WithDisplayName(ExcludedLoggingEndpoint.BuildInfo.ToString())
+            .WithDisplayName(OperationEndpoint.BuildInfo.ToString())
             .ExcludeFromDescription();
 
         return app;

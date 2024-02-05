@@ -8,12 +8,12 @@ namespace SwiftLift.ServiceDefaults;
 public static partial class Extensions
 {
     private static IServiceCollection AddValidators(this IServiceCollection services,
-        Assembly[] assemblies)
+        Assembly[] applicationAssemblies)
     {
         Guard.Against.Null(services);
-        Guard.Against.NullOrEmpty(assemblies);
+        Guard.Against.NullOrEmpty(applicationAssemblies);
 
-        services.AddValidatorsFromAssemblies(assemblies,
+        services.AddValidatorsFromAssemblies(applicationAssemblies,
             lifetime: ServiceLifetime.Singleton,
             includeInternalTypes: true);
 

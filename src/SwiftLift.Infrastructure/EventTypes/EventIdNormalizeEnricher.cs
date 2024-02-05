@@ -8,6 +8,9 @@ internal sealed class EventIdNormalizeEnricher : ILogEventEnricher
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
+        Guard.Against.Null(logEvent);
+        Guard.Against.Null(propertyFactory);
+
         if (!logEvent.Properties.TryGetValue(nameof(EventId), out var eventIdPropertyValue) ||
                 eventIdPropertyValue is not StructureValue structuredEventId)
         {
@@ -39,7 +42,7 @@ internal sealed class EventIdNormalizeEnricher : ILogEventEnricher
             .ToString().Replace("\"", string.Empty);
 
         var eventNameProperty = propertyFactory.CreateProperty(
-            "EventName", new ScalarValue(eventNameValue));
+            "EventName", eventNameValue);
 
         logEvent.AddOrUpdateProperty(eventNameProperty);
     }

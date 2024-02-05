@@ -45,7 +45,7 @@ public static class SerilogRequestLoggingOptions
             return false;
         }
 
-        if (ExcludedLoggingEndpoint.TryFromName(endpoint.DisplayName, out _))
+        if (OperationEndpoint.TryFromName(endpoint.DisplayName, out _))
         {
             return true;
         }

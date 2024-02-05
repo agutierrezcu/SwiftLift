@@ -10,7 +10,7 @@ public class BuildFaker : AutoFaker<Build>
 
     private BuildFaker()
     {
-        base.RuleFor(fake => fake.Id, PickRandomInt);
+        RuleFor(fake => fake.Id, PickRandomInt);
         RuleFor(fake => fake.Number, PickRandomInt);
         RuleFor(fake => fake.Commit, faker => faker.Random.Uuid().ToString());
 
