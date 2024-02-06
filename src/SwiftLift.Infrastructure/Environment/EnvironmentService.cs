@@ -23,7 +23,7 @@ public sealed class EnvironmentService : IEnvironmentService
 
         if (string.IsNullOrWhiteSpace(environmentVariable))
         {
-            throw new InvalidOperationException("Environment variable is not defined or value is not set.");
+            throw new InvalidOperationException($"Environment variable '{name}' is not defined or value is not set.");
         }
 
         return environmentVariable;
