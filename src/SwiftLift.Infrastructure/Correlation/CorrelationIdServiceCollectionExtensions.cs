@@ -8,7 +8,7 @@ public static class CorrelationIdServiceCollectionExtensions
     {
         Guard.Against.Null(services);
 
-        services.AddSingleton<ICorrelationIdResolver, CorrelationIdResolver>();
+        services.TryAddSingleton<ICorrelationIdResolver, CorrelationIdResolver>();
 
         services.AddHeaderPropagation(options =>
         {

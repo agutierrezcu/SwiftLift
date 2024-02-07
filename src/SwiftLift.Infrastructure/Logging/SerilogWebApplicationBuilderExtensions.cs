@@ -20,29 +20,35 @@ namespace SwiftLift.Infrastructure.Logging;
 public static class SerilogWebApplicationBuilderExtensions
 {
     public static void AddLogging(this WebApplicationBuilder builder,
+        IEnvironmentService environmentService,
         ConnectionStringResource applicationInsightConnectionString,
-        string azureFileLoggingOptionsConfigurationKey,
+        string azureLogStreamOptionsSectionPath,
         Assembly[] applicationAssemblies)
     {
         Guard.Against.Null(builder);
+        Guard.Against.Null(environmentService);
         Guard.Against.Null(applicationInsightConnectionString);
-        Guard.Against.NullOrWhiteSpace(azureFileLoggingOptionsConfigurationKey);
+        Guard.Against.NullOrWhiteSpace(azureLogStreamOptionsSectionPath);
         Guard.Against.NullOrEmpty(applicationAssemblies);
 
         var services = builder.Services;
 
-        services
-            .ConfigureOptions<AzureLogStreamOptions, AzureLogStreamOptionsValidator>(
-                azureFileLoggingOptionsConfigurationKey,
-                opts => opts.RegisterAsSingleton = true);
+        var isAzureLogStreamEnabled = IsAzureLogStreamEnabled(environmentService);
+
+        if (isAzureLogStreamEnabled)
+        {
+            services
+                .ConfigureOptions<AzureLogStreamOptions, AzureLogStreamOptionsValidator>(
+                    azureLogStreamOptionsSectionPath,
+                    opts => opts.RegisterAsSingleton = true);
+        }
 
         services
             .Scan(scan => scan
                 .FromAssemblies(applicationAssemblies)
                 .AddClasses(s => s.AssignableTo<ILogEventEnricher>(), false)
                 .As<ILogEventEnricher>()
-                .WithSingletonLifetime()
-            );
+                .WithSingletonLifetime());
 
         builder.Logging
           .ClearProviders();
@@ -50,8 +56,6 @@ public static class SerilogWebApplicationBuilderExtensions
         builder.Host.UseSerilog(
             (context, serviceProvider, loggerConfiguration) =>
             {
-                var environmentService = serviceProvider.GetRequiredService<IEnvironmentService>();
-
                 loggerConfiguration
                     .ReadFrom.Configuration(context.Configuration)
                     .ReadFrom.Services(serviceProvider)
@@ -74,9 +78,7 @@ public static class SerilogWebApplicationBuilderExtensions
                         applicationInsightConnectionString.Value,
                         TelemetryConverter.Traces);
 
-                var azureLogStreamEnabledValue = environmentService.GetVariable("AZURE_LOG_STREAM_ENABLED");
-
-                if (bool.TryParse(azureLogStreamEnabledValue, out var azureLogStreamEnabled) && azureLogStreamEnabled)
+                if (isAzureLogStreamEnabled)
                 {
                     var azureLogStreamOptions = serviceProvider.GetRequiredService<AzureLogStreamOptions>();
 
@@ -100,8 +102,16 @@ public static class SerilogWebApplicationBuilderExtensions
             });
     }
 
+    internal static bool IsAzureLogStreamEnabled(IEnvironmentService environmentService)
+    {
+        var azureLogStreamEnabledValue = environmentService.GetVariable("AZURE_LOG_STREAM_ENABLED");
+
+        return bool.TryParse(azureLogStreamEnabledValue, out var azureLogStreamEnabled)
+                    && azureLogStreamEnabled;
+    }
+
     internal const string TextBasedOutputTemplate =
-        "[{Timestamp:yyyy-MM-dd HH:mm:ss}] [{EventId}] [{EventName}] [{EventType:x8} {Level:u3}] {Message:lj}{NewLine}{Exception}";
+        "[{Timestamp:yyyy-MM-dd HH:mm:ss}] [{BuildId} {BuildNumber} {BuildCommit}] [{EventId}] [{EventName}] [{EventType:x8} {Level:u3}] {Message:lj}{NewLine}{Exception}";
 
     internal static LoggerConfiguration WriteToLogStreamFile(
        this LoggerConfiguration loggerConfiguration,

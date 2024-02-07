@@ -20,20 +20,21 @@ Log.Logger = builder.CreateBootstrapLogger(
     applicationInsightConnectionString,
     EnvironmentService.Instance);
 
-Log.Information("Bootstrap logger created.");
+Log.Information("Starting {ApplicationId} service", applicationInfo.Id);
 
 try
 {
     var applicationAssemblies = AppDomain.CurrentDomain
         .GetApplicationAssemblies(applicationInfo.Namespace);
 
-    builder.AddServiceDefaults(opts =>
+    ServiceDefaultsOptions serviceDefaultsOptions = new()
     {
-        opts.ApplicationInfo = applicationInfo;
-        opts.ApplicationInsightConnectionString = applicationInsightConnectionString;
-        opts.ApplicationAssemblies = applicationAssemblies;
-        opts.AzureLogStreamConfigurationSectionKey = "AzureFileLoggingOptions";
-    });
+        ApplicationInfo = applicationInfo,
+        ApplicationInsightConnectionString = applicationInsightConnectionString,
+        ApplicationAssemblies = applicationAssemblies
+    };
+
+    builder.AddServiceDefaults(serviceDefaultsOptions);
 
     var services = builder.Services;
 
@@ -76,13 +77,13 @@ try
         app.UseSwaggerUI();
     }
 
-    await app.RunAppAsync(args, Log.Logger)
+    await app.RunAppAsync(args)
         .ConfigureAwait(false);
 }
 catch (Exception ex)
     when (ex.GetType().Name is not "StopTheHostException" and not "HostAbortedException")
 {
-    Log.Fatal(ex, "Host terminated unexpectedly");
+    Log.Fatal(ex, "Host terminated unexpectedly.");
 }
 finally
 {

@@ -14,25 +14,27 @@ public class ServiceDefaultsOptionsValidator : AbstractValidator<ServiceDefaults
         RuleFor(o => o.ApplicationInsightConnectionString)
             .SetValidator(new ConnectionStringResourceValidator());
 
-        RuleFor(o => o.ApplicationAssemblies).NotEmpty()
-            .WithMessage("ApplicationAssemblies must not be null or empty.");
+        RuleFor(o => o.ApplicationAssemblies).NotEmpty();
 
-        RuleFor(o => o.AzureLogStreamConfigurationSectionKey).NotEmpty()
-            .WithMessage("AzureLogStreamConfigurationSectionKey must not be empty.");
+        RuleFor(o => o.AzureLogStreamOptionsSectionPath).NotEmpty();
+
+        RuleFor(o => o.EnvironmentService).NotNull();
     }
 
     private sealed class ApplicationInfoValidator : AbstractValidator<ApplicationInfo>
     {
         public ApplicationInfoValidator()
         {
-            RuleFor(ai => ai.Id).NotEmpty()
-                .WithMessage("Application Id must not be empty.");
+            RuleFor(ai => ai).NotNull();
 
-            RuleFor(ai => ai.Name).NotEmpty()
-                .WithMessage("Application Name must not be empty.");
+            When(ai => ai is not null, () =>
+            {
+                RuleFor(ai => ai.Id).NotEmpty();
 
-            RuleFor(ai => ai.Namespace).NotEmpty()
-                .WithMessage("Application Namespace must not be empty.");
+                RuleFor(ai => ai.Name).NotEmpty();
+
+                RuleFor(ai => ai.Namespace).NotEmpty();
+            });
         }
     }
 
@@ -40,11 +42,14 @@ public class ServiceDefaultsOptionsValidator : AbstractValidator<ServiceDefaults
     {
         public ConnectionStringResourceValidator()
         {
-            RuleFor(cs => cs.Name).NotEmpty()
-                .WithMessage("Name must not be empty.");
+            RuleFor(cs => cs).NotNull();
 
-            RuleFor(cs => cs.Value).NotEmpty()
-                .WithMessage("Value must not be empty.");
+            When(cs => cs is not null, () =>
+            {
+                RuleFor(cs => cs.Name).NotEmpty();
+
+                RuleFor(cs => cs.Value).NotEmpty();
+            });
         }
     }
 }

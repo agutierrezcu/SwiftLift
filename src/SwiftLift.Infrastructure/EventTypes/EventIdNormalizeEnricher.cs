@@ -26,7 +26,7 @@ internal sealed class EventIdNormalizeEnricher : ILogEventEnricher
         }
 
         var eventIdProperty = propertyFactory.CreateProperty(
-            "EventId", new ScalarValue(currentEventIdProperty.Value));
+            "EventId", currentEventIdProperty.Value);
 
         logEvent.AddOrUpdateProperty(eventIdProperty);
 

@@ -72,7 +72,7 @@ public sealed class EnvironmentServiceTests
         System.Environment.SetEnvironmentVariable("variable2", "value2");
 
         // Act
-        var value = _sut.GetVariable("variable2");
+        var value = _sut.GetRequiredVariable("variable2");
 
         // Assert
         value.Should().Be("value2");

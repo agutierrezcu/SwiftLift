@@ -31,19 +31,18 @@ namespace SwiftLift.ServiceDefaults;
 public static partial class Extensions
 {
     public static IHostApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder,
-        Action<ServiceDefaultsOptions> config)
+        ServiceDefaultsOptions serviceDefaultsOptions)
     {
         Guard.Against.Null(builder);
-
-        var serviceDefaultsOptions = new ServiceDefaultsOptions();
-        config(serviceDefaultsOptions);
+        Guard.Against.Null(serviceDefaultsOptions);
 
         var serviceDefaultsOptionsValidator = new ServiceDefaultsOptionsValidator();
         serviceDefaultsOptionsValidator.ValidateAndThrow(serviceDefaultsOptions);
 
         builder.AddLogging(
+            serviceDefaultsOptions.EnvironmentService,
             serviceDefaultsOptions.ApplicationInsightConnectionString,
-            serviceDefaultsOptions.AzureLogStreamConfigurationSectionKey,
+            serviceDefaultsOptions.AzureLogStreamOptionsSectionPath,
             serviceDefaultsOptions.ApplicationAssemblies);
 
         builder.AddFastEndpoints();

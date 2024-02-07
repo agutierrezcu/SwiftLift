@@ -7,18 +7,12 @@ internal sealed class AzureLogStreamOptionsValidator : AbstractValidator<AzureLo
         RuleFor(o => o.PathTemplate)
             .NotEmpty()
             .Must(v => v?.Contains("{0}") ?? false)
-            .WithMessage("Path template can not be empty and must contains one place holder");
+            .WithMessage("Path template can not be empty and must contains one place holder for Application Name.");
 
-        RuleFor(o => o.FileSizeLimit)
-            .Must(v => v > 0)
-            .WithMessage($"When specified, {nameof(AzureLogStreamOptions.FileSizeLimit)} must be a positive value");
+        RuleFor(o => o.FileSizeLimit).GreaterThan(0);
 
-        RuleFor(o => o.RetainedFileCount)
-            .Must(v => v > 0)
-            .WithMessage($"When specified, {nameof(AzureLogStreamOptions.RetainedFileCount)} must be a positive value");
+        RuleFor(o => o.RetainedFileCount).GreaterThan(0);
 
-        RuleFor(o => o.RetainTimeLimit)
-            .Must(v => v > TimeSpan.Zero)
-            .WithMessage($"When specified, {nameof(AzureLogStreamOptions.RetainTimeLimit)} must specify a non-negative time span value");
+        RuleFor(o => o.RetainTimeLimit).GreaterThan(TimeSpan.Zero);
     }
 }

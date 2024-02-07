@@ -2,6 +2,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
+using Serilog.Enrichers.Span;
 using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
@@ -29,9 +30,11 @@ public static class SerilogWebApplicationBuilderBootstrapExtensions
                 .MinimumLevel.Information()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
+                .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithEnvironmentName()
                 .Enrich.WithThreadId()
+                .Enrich.WithSpan()
                 .Enrich.WithProperty("Bootstrapping", true)
                 .Enrich.WithProperty("ApplicationName", builder.Environment.ApplicationName)
                 .Enrich.WithExceptionDetails(
@@ -41,9 +44,7 @@ public static class SerilogWebApplicationBuilderBootstrapExtensions
                     applicationInsightConnectionString.Value,
                     TelemetryConverter.Traces);
 
-        var azureLogStreamEnabledValue = environmentService.GetVariable("AZURE_LOG_STREAM_ENABLED");
-
-        if (bool.TryParse(azureLogStreamEnabledValue, out var azureLogStreamEnabled) && azureLogStreamEnabled)
+        if (IsAzureLogStreamEnabled(environmentService))
         {
             var azureLogStreamOptions = AzureLogStreamOptions.CreateDefault(builder.Environment);
             var azureFileLoggingOptionsValidator = new AzureLogStreamOptionsValidator();

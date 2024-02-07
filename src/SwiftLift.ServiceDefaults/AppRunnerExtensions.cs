@@ -1,37 +1,43 @@
 using Ardalis.GuardClauses;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Oakton;
-using Serilog;
 using SwiftLift.Infrastructure.Logging;
 
 namespace SwiftLift.ServiceDefaults;
 
 public static class AppRunnerExtensions
 {
-    public static async Task RunAppAsync(this WebApplication app, string[] args,
-        ILogger logger)
+    public static async Task RunAppAsync(this WebApplication app, string[] args)
     {
         Guard.Against.Null(app);
         Guard.Against.Null(args);
 
-        app.AddApplicationLifetimeEvents(logger);
+        app.AddApplicationLifetimeEvents();
 
         await app.RunOaktonCommands(args)
             .ConfigureAwait(false);
     }
 
-    private static void AddApplicationLifetimeEvents(this WebApplication app, ILogger logger)
+    private static void AddApplicationLifetimeEvents(this WebApplication app)
     {
         Guard.Against.Null(app);
-        Guard.Against.Null(logger);
 
         var lifetime = app.Lifetime;
 
-        lifetime.ApplicationStarted.Register(
-            () => logger.Information("{@EventId} Application started.", LoggingEvent.ApplicationStarted));
+        var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
 
-        lifetime.ApplicationStopping.Register(() => logger.Information("Application stopping."));
-        lifetime.ApplicationStopped.Register(() => logger.Information("Application stopped."));
+        var logger = loggerFactory.CreateLogger(nameof(AppRunnerExtensions));
+
+        lifetime.ApplicationStarted.Register(
+            () => logger.LogInformation(LoggingEvent.ApplicationStarted, "Application started."));
+
+        lifetime.ApplicationStopping.Register(
+            () => logger.LogInformation(LoggingEvent.ApplicationStopping, "Application stopping."));
+
+        lifetime.ApplicationStopped.Register(
+            () => logger.LogInformation(LoggingEvent.ApplicationStopped, "Application stopped."));
     }
 }

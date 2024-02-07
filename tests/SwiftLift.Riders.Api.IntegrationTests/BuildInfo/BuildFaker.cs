@@ -2,7 +2,7 @@ using System.Globalization;
 using Bogus;
 using SwiftLift.Infrastructure.BuildInfo;
 
-namespace SwiftLift.Riders.Api.IntegrationTests;
+namespace SwiftLift.Riders.Api.IntegrationTests.BuildInfo;
 
 public class BuildFaker : AutoFaker<Build>
 {

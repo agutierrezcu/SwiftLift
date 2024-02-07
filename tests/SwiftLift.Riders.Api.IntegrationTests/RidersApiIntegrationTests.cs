@@ -1,12 +1,17 @@
 using System.Net.Mime;
 using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog.Core;
 using SwiftLift.Infrastructure.BuildInfo;
+using SwiftLift.Infrastructure.Correlation;
+using SwiftLift.Infrastructure.EventTypes;
+using SwiftLift.Infrastructure.Logging.Enrichers;
 using SwiftLift.Infrastructure.Serialization;
 
 namespace SwiftLift.Riders.Api.IntegrationTests;
 
-public class BuildEndpointIntegrationTests(RidersApiWebApplicationFactory factory)
-    : IClassFixture<RidersApiWebApplicationFactory>
+public class RidersApiIntegrationTests(SwiftliftApiWebApplicationFactory<Program> factory)
+    : IClassFixture<SwiftliftApiWebApplicationFactory<Program>>
 {
     [Fact]
     public async Task Given_Build_File_When_Content_Is_Valid_Then_Return_As_Json()
@@ -43,5 +48,25 @@ public class BuildEndpointIntegrationTests(RidersApiWebApplicationFactory factor
                 .ConfigureAwait(true);
 
         build.Should().Be(factory.BuildTest);
+    }
+
+    [Fact]
+    public void Given_Services_When_ServiceProvider_Is_Built_Then_All_Enrichers_Should_Be_Registered()
+    {
+        var serviceProvider = factory.Services;
+
+        // Act
+        var enrichers = serviceProvider.GetServices<ILogEventEnricher>();
+
+        // Assert
+        enrichers.Should().NotBeNullOrEmpty();
+
+        enrichers.Should().HaveCount(5);
+
+        enrichers.Should().Contain(e => e is BuildEventEnricher);
+        enrichers.Should().Contain(e => e is CorrelationIdEnricher);
+        enrichers.Should().Contain(e => e is EventIdNormalizeEnricher);
+        enrichers.Should().Contain(e => e is EventTypeEnricher);
+        enrichers.Should().Contain(e => e is RequestUserIdEventEnricher);
     }
 }

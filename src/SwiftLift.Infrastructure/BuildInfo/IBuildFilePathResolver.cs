@@ -1,6 +1,6 @@
 namespace SwiftLift.Infrastructure.BuildInfo;
 
-internal interface IBuildFilePathResolver
+public interface IBuildFilePathResolver
 {
     string GetRelativeToContentRoot();
 }

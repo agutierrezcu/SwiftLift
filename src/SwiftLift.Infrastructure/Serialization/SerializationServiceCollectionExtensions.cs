@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection.Extensions;
-
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 using MvcJsonOptions = Microsoft.AspNetCore.Mvc.JsonOptions;
 

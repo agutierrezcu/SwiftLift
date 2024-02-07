@@ -1,91 +1,79 @@
 # SwiftLift
 
-*"swift" with "lift" suggests quick and efficient transportation, indicating a commitment to providing timely and reliable rides.*
+*"Swift" and "Lift" imply quick and efficient transportation, indicating a commitment to providing timely and reliable rides.*
 
-### System description
+### System Description
 
-Building a simple tiny Uber as case study to put in practice what I've learned in the last years and what I am abut to learn.
-
+Creating a simplified Uber-like system as a case study to apply what I've learned over the years and what I'm about to learn.
 
 ## **First do it, then do it right, then do it better**
 
 ## Goals
 
 - Recreate a distributed system.
-- Event Driven microservices architecture.
-- Domain Driven Design (DDD)
-- Command Query Responsibility Segregation (CQRS)
-- Grpc for synchronous communication
-- Request-Response Pattern.
-- Api versioning
-- Api getway / YARP
-- InMemory / Service Bus
-- Inbox / Outbox Pattern.
-- Saga Pattern
-- Circuit breaker Pattern
-- Resiliency and fault tolerance
-- Central configuration management
-- Design idempotency event consumers
-- Deal with eventual consistency
-- Relational and No DDBB
-- Options settings enforcing early validation
-- Secure endpoints based on JWT from multiple identity providers
-- Quartz for sheduled tasks in background services
-- Service discovery
+- Implement Event-Driven Microservices Architecture.
+- Apply Domain-Driven Design (DDD).
+- Use Command Query Responsibility Segregation (CQRS).
+- Utilize gRPC for synchronous communication.
+- Implement Request-Response Pattern.
+- Apply API versioning.
+- Use API Gateway / YARP.
+- Use InMemory / Service Bus.
+- Implement Inbox / Outbox Pattern.
+- Use Saga Pattern.
+- Implement Circuit Breaker Pattern.
+- Ensure Resiliency and Fault Tolerance.
+- Implement Central Configuration Management.
+- Design Idempotent Event Consumers.
+- Handle Eventual Consistency.
+- Use both Relational and Non-Relational Databases.
+- Enforce Early Validation with Options Settings.
+- Secure Endpoints Based on JWT from Multiple Identity Providers.
+- Use Quartz for Scheduled Tasks in Background Services.
+- Implement Service Discovery.
 
-## Architectural / Design  / Implementation considerations
+## Architectural / Design / Implementation Considerations
 
-- Aspire as startup project template
+- Use Aspire as a Startup Project Template.
+- Add .editorconfig Using the Aspire as a Starting Point.
+- Use Dotnet Tools Locally.
+- Manage NuGet Package Versions Centrally.
+- Propagate Correlation ID Across Applications.
+- Integrate with Application Insight.
+    - Enable Azure Monitor.
+    - Add Connection String Environment Checker.
+- Use Feature Flags to Manage Both Functional and Technical Requirements.
+- Add Snake JSON Serializer / Deserializer Abstractions.
+    - And Their Implementations Based on System.Text.Json.
+- Consider these popular libraries as part of the solution:
+    - Hashids.net / sqids-dotnet.
+    - EF Core.
+    - SignalR.
+    - FastEndpoints.
+    - Masstrasit.
+    - Wolverine as Mediator or MediatR.
+    - SimpleInjector DI.
+    - Mapster.
+    - Marten as Transactional Document DB and Event Store.
+    - FluentResults.Extensions.AspNetCore.
+    - StronglyTypedId.
+    - Refit.
+    - Polly.
+    - Lazard as Local Services Bus.
+    - HeaderPropagation.
 
-- Add .editorconfig using the one from Aspire as starting point
-
-- Use dotnet tools locally
-
-- Manage nuget package versions centrally
-
-- Propagate correlation id across applications
-
-- Integrate with Aapplication Insight
-    - Enable Azure Monitor  
-	- Add connection string environment checker
-
-- Using feature flags for manage both functional and technical requirements
-
-- Add snake json serializer / deserializer abstractions
-   - And their implementations base on System.Text.Json
-
- - Popular solutions to be considered as candidates
-     - Hashids.net / sqids-dotnet
-     - EF Core
-     - SignalR
-     - FastEndpoints
-     - Masstrasit
-     - Wolverine as mediator or MediatR
-     - SimpleInjector DI
-     - Mapster
-     - Marten as transactional document DB and event store
-     - SmartEnum
-     - FluentResults.Extensions.AspNetCore
-     - StronglyTypeId
-     - Refit
-     - Polly
-
-     - Lazard as local services bus
-     - HeaderPropagation
-     
- - For testing
-     - NetArchTest.eNhancedEdition for architecture conventions
-     - Microsoft.AspNetCore.Mvc.Testing for integration testing
-     - AutoBogus.Conventions for fake data generation
-     - FluentAssertions for assertion evaluation
-     - NSubstitute for mocking
-     - xUnit as tests runner
-     - Coverlet and reportgenerator tool for code coverage and reporting
-     - TestContainer
-
+- For Testing:
+    - NetArchTest.EnhancedEdition for Architecture Conventions.
+    - Microsoft.AspNetCore.Mvc.Testing for Integration Testing.
+    - AutoBogus.Conventions for Fake Data Generation.
+    - FluentAssertions for Assertion Evaluation.
+    - NSubstitute for Mocking.
+    - xUnit as Tests Runner.
+    - Coverlet and ReportGenerator Tool for Code Coverage and Reporting.
+    - TestContainer.
 
 #### VS2022 IDE Extensions
 
-- Fine Code Coverage
-- Code Clean Up on Save
-- Github Copilot
+- Fine Code Coverage.
+- Code Clean Up on Save.
+- Github Copilot.

@@ -23,8 +23,7 @@ public static class EnvironmentCheckExtensions
                 .FromAssemblies(applicationAssemblies)
                 .AddClasses(s => s.AssignableTo<IEnvironmentCheck>(), false)
                 .As<IEnvironmentCheck>()
-                .WithTransientLifetime()
-            );
+                .WithTransientLifetime());
 
         return builder;
     }

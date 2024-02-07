@@ -1,3 +1,4 @@
+using Serilog.Core;
 using SwiftLift.Infrastructure;
 using Xunit.Abstractions;
 
@@ -64,6 +65,27 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
         PrintOutIfFail(output, result);
 
         // Assert   
+        result.IsSuccessful.Should().BeTrue();
+    }
+
+    [Fact]
+    public void All_LogEventEnrichers_Classes_Should_EndWith_Enricher()
+    {
+        // Act
+        var result = s_infrastructureTypes
+            .That()
+            .AreClasses()
+            .And()
+            .AreNotNested()
+            .And()
+            .ImplementInterface<ILogEventEnricher>()
+            .Should()
+            .HaveNameEndingWith("Enricher")
+            .GetResult();
+
+        PrintOutIfFail(output, result);
+
+        // Assert
         result.IsSuccessful.Should().BeTrue();
     }
 

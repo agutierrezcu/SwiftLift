@@ -3,10 +3,13 @@ using Microsoft.Extensions.FileProviders;
 using SwiftLift.Infrastructure.ApplicationInsight;
 using SwiftLift.Infrastructure.BuildInfo;
 using SwiftLift.Infrastructure.Serialization;
+using SwiftLift.Riders.Api.IntegrationTests.BuildInfo;
 
 namespace SwiftLift.Riders.Api.IntegrationTests;
 
-public sealed class RidersApiWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
+public sealed class SwiftliftApiWebApplicationFactory<TEntryPoint>
+    : WebApplicationFactory<TEntryPoint>, IAsyncLifetime
+        where TEntryPoint : class
 {
     private const string BuildTestFileRelativePath = "/build-info-test.json";
 
@@ -14,7 +17,7 @@ public sealed class RidersApiWebApplicationFactory : WebApplicationFactory<Progr
 
     public Build? BuildTest { get; private set; }
 
-    static RidersApiWebApplicationFactory()
+    static SwiftliftApiWebApplicationFactory()
     {
         OaktonEnvironment.AutoStartHost = true;
 

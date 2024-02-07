@@ -28,8 +28,7 @@ internal sealed class EventTypeEnricher : ILogEventEnricher
                         var hash = murmur.ComputeHash(bytes);
                         var numericHash = BitConverter.ToUInt32(hash, 0);
 
-                        return propertyFactory.CreateProperty(
-                            "EventType", new ScalarValue(numericHash));
+                        return propertyFactory.CreateProperty("EventType", numericHash);
                     });
             });
 
