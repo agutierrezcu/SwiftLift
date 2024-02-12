@@ -3,7 +3,7 @@ using SwiftLift.Infrastructure.Options.Builder;
 
 namespace SwiftLift.Infrastructure.Options;
 
-public static class ServiceCollectionExtensions
+public static class OptionsServiceCollectionExtensions
 {
     public static IServiceCollection ConfigureOptions<TOptions, TOptionsValidator>(
         this IServiceCollection services,

@@ -24,6 +24,7 @@ using SwiftLift.Infrastructure.Correlation;
 using SwiftLift.Infrastructure.Environment;
 using SwiftLift.Infrastructure.Logging;
 using SwiftLift.Infrastructure.Serialization;
+using SwiftLift.Infrastructure.UserContext;
 using SwiftLift.SharedKernel.Application;
 
 namespace SwiftLift.ServiceDefaults;
@@ -60,6 +61,8 @@ public static partial class Extensions
         services.AddFeatureManagement();
 
         services.AddBuildInfo();
+
+        services.AddUserContext();
 
         services.AddSnakeSerialization();
 

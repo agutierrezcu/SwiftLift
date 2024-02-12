@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Http;
 using Serilog.Core;
 using Serilog.Events;
+using SwiftLift.Infrastructure.UserContext;
 
 namespace SwiftLift.Infrastructure.Logging.Enrichers;
 
-internal sealed class RequestUserIdEventEnricher(IHttpContextAccessor _httpContextAccessor)
-    : ILogEventEnricher
+internal sealed class RequestUserIdEventEnricher(
+    IHttpContextAccessor _httpContextAccessor, IUserContext _userContext)
+        : ILogEventEnricher
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
@@ -17,29 +19,40 @@ internal sealed class RequestUserIdEventEnricher(IHttpContextAccessor _httpConte
             return;
         }
 
-        var user = _httpContextAccessor.HttpContext?.User;
+        var isAuthenticated = _userContext.IsAuthenticated();
 
-        if (user?.Identity?.IsAuthenticated ?? false)
+        AddRequestAuthenticatedProperty(logEvent, propertyFactory, isAuthenticated);
+
+        if (!isAuthenticated)
         {
-            RequestAuthenticatedProperty(logEvent, propertyFactory, true);
-
-            var userIdProperty = propertyFactory.CreateProperty(
-                "RequestUserId", user?.Identity?.Name ?? "Unknow");
-
-            logEvent.AddPropertyIfAbsent(userIdProperty);
-
             return;
         }
 
-        RequestAuthenticatedProperty(logEvent, propertyFactory, false);
+        if (_userContext.TryGetUserId(out var userId))
+        {
+            AddRequestUserIdProperty(logEvent, propertyFactory, userId);
+        }
+        else
+        {
+            AddRequestUserIdProperty(logEvent, propertyFactory, "Unknow");
+        }
     }
 
-    private static void RequestAuthenticatedProperty(LogEvent logEvent,
+    private static void AddRequestAuthenticatedProperty(LogEvent logEvent,
         ILogEventPropertyFactory propertyFactory, bool value)
     {
         var logEventProperty = propertyFactory.CreateProperty(
             "RequestAuthenticated", value);
 
         logEvent.AddPropertyIfAbsent(logEventProperty);
+    }
+
+    private static void AddRequestUserIdProperty(LogEvent logEvent,
+        ILogEventPropertyFactory propertyFactory, string userId)
+    {
+        var userIdProperty = propertyFactory.CreateProperty(
+            "RequestUserId", userId);
+
+        logEvent.AddPropertyIfAbsent(userIdProperty);
     }
 }

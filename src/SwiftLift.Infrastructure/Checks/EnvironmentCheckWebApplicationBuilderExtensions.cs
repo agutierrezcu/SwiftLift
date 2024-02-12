@@ -4,7 +4,7 @@ using Oakton;
 
 namespace SwiftLift.Infrastructure.Checks;
 
-public static class EnvironmentCheckExtensions
+public static class EnvironmentCheckWebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder AddEnvironmentChecks(this WebApplicationBuilder builder,
         Assembly[] applicationAssemblies)

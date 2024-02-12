@@ -18,7 +18,7 @@ public sealed record ConnectionStringResource
 
     public IDictionary<string, string> Segments { get; }
 
-    public bool TryGetSegmentValue(string keyword, out string? value)
+    public bool TryGetSegmentValue(string keyword, [NotNullWhen(true)] out string? value)
     {
         Guard.Against.NullOrWhiteSpace(keyword);
 
