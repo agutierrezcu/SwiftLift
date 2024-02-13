@@ -12,7 +12,7 @@ public sealed class ApplicationInsightResourceTests
 {
     private static readonly ApplicationInsightResource s_sut = ApplicationInsightResource.Instance;
 
-    public class Given_Invalid_Connection_String
+    public class Given_InvalidConnectionString
     {
         private static Action Act(IEnvironmentService environmentService, IConfiguration configuration)
         {
@@ -20,7 +20,7 @@ public sealed class ApplicationInsightResourceTests
         }
 
         [Fact]
-        public void When_Does_Not_Exist_In_Configuration_Then_Throw_Exception()
+        public void When_DoesNotExistInConfiguration_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
             var environmentServiceMock = Substitute.For<IEnvironmentService>();
@@ -41,7 +41,7 @@ public sealed class ApplicationInsightResourceTests
             // Assert
             actAssertions
                 .ThrowExactly<InvalidConnectionStringException>()
-                .WithMessage("Application Insight connection string can not be null or empty.")
+                .WithMessage("Application Insight connection string can not be null or empty")
                 .Which.ResourceName.Should().Be(ResourceName);
 
             environmentServiceMock
@@ -56,7 +56,7 @@ public sealed class ApplicationInsightResourceTests
         }
 
         [Fact]
-        public void When_Exists_In_Environment_And_Is_Not_Parseable_Then_Throw_Exception()
+        public void When_ExistsInEnvironment_And_IsNotParseable_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
             var environmentServiceMock = Substitute.For<IEnvironmentService>();
@@ -73,7 +73,7 @@ public sealed class ApplicationInsightResourceTests
             // Assert
             actAssertions
                 .ThrowExactly<InvalidConnectionStringException>()
-                .WithMessage("Application Insight connection string is invalid.")
+                .WithMessage("Application Insight connection string is invalid")
                 .Which.InnerException.Should().BeOfType<InvalidConnectionStringException>()
                 .Which.ResourceName.Should().Be(ResourceName);
 
@@ -89,7 +89,7 @@ public sealed class ApplicationInsightResourceTests
         }
 
         [Fact]
-        public void When_Exists_In_ConfigurationSection_And_Is_Not_Parseable_Then_Throw_Exception()
+        public void When_ExistsInConfigurationSection_And_IsNotParseable_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
             var environmentServiceMock = Substitute.For<IEnvironmentService>();
@@ -110,7 +110,7 @@ public sealed class ApplicationInsightResourceTests
             // Assert
             actAssertions
                 .ThrowExactly<InvalidConnectionStringException>()
-                .WithMessage("Application Insight connection string is invalid.")
+                .WithMessage("Application Insight connection string is invalid")
                 .Which.InnerException.Should().BeOfType<InvalidConnectionStringException>()
                 .Which.ResourceName.Should().Be(ResourceName);
 
@@ -126,7 +126,7 @@ public sealed class ApplicationInsightResourceTests
         }
 
         [Fact]
-        public void When_Exists_In_Environment_And_Has_No_Instrumentation_Key_Segment_Then_Throw_Exception()
+        public void When_ExistsInEnvironment_And_HasNoInstrumentationKeySegment_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
             var environmentServiceMock = Substitute.For<IEnvironmentService>();
@@ -143,7 +143,7 @@ public sealed class ApplicationInsightResourceTests
             // Assert
             actAssertions
                 .ThrowExactly<InvalidConnectionStringException>()
-                .WithMessage("Application Insight connection string has no instrumentation key segment.")
+                .WithMessage("Application Insight connection string has no instrumentation key segment")
                 .Which.ResourceName.Should().Be(ResourceName);
 
             environmentServiceMock
@@ -152,7 +152,7 @@ public sealed class ApplicationInsightResourceTests
         }
 
         [Fact]
-        public void When_Exists_In_ConfigurationSection_And_Has_No_Instrumentation_Key_Segment_Then_Throw_Exception()
+        public void When_ExistsInConfigurationSection_And_HasNoInstrumentationKeySegment_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
             var environmentServiceMock = Substitute.For<IEnvironmentService>();
@@ -173,7 +173,7 @@ public sealed class ApplicationInsightResourceTests
             // Assert
             actAssertions
                 .ThrowExactly<InvalidConnectionStringException>()
-                .WithMessage("Application Insight connection string has no instrumentation key segment.")
+                .WithMessage("Application Insight connection string has no instrumentation key segment")
                 .Which.ResourceName.Should().Be(ResourceName);
 
             environmentServiceMock
@@ -188,7 +188,7 @@ public sealed class ApplicationInsightResourceTests
         }
     }
 
-    public class Given_Valid_ConnectionString_In_Environment
+    public class Given_ValidConnectionStringInEnvironment
     {
         private const string ConnectionString = "InstrumentationKey=00000000-0000-0000-0000-000000000000";
 
@@ -196,7 +196,7 @@ public sealed class ApplicationInsightResourceTests
 
         private readonly IEnvironmentService _environmentServiceMock;
 
-        public Given_Valid_ConnectionString_In_Environment()
+        public Given_ValidConnectionStringInEnvironment()
         {
             // Arrange
             _environmentServiceMock = Substitute.For<IEnvironmentService>();
@@ -212,25 +212,25 @@ public sealed class ApplicationInsightResourceTests
         }
 
         [Fact]
-        public void When_Get_Then_Return_Not_Null()
+        public void When_Get_Then_ReturnNotNull()
         {
             _connectionStringResource.Should().NotBeNull();
         }
 
         [Fact]
-        public void When_Get_Then_Resource_Name_Is_OK()
+        public void When_Get_Then_ResourceNameIsOK()
         {
             _connectionStringResource.Name.Should().Be(ResourceName);
         }
 
         [Fact]
-        public void When_Get_Then_Resource_Value_Is_OK()
+        public void When_Get_Then_ResourceValueIsOK()
         {
             _connectionStringResource.Value.Should().Be(ConnectionString);
         }
 
         [Fact]
-        public void When_Get_Then_Environment_Variable_Provider_Is_Called_Once()
+        public void When_Get_Then_EnvironmentVariableProviderIsCalledOnce()
         {
             _environmentServiceMock
                 .Received(1)

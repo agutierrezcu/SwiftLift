@@ -68,7 +68,7 @@ internal sealed class BuildManager
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error retrieving and validation build info from file.");
+            _logger.LogError(ex, "Unexpected error retrieving and validation build info from file");
 
             var sb = new StringBuilder(buildAsString)
                 .AppendLine()

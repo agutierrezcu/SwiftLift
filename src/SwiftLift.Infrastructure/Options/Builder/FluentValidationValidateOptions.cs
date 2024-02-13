@@ -38,7 +38,7 @@ internal sealed class FluentValidationValidateOptions<TOptions>(
         results.Errors
             .ForEach(result => sb.AppendLine(
                 CultureInfo.InvariantCulture,
-                $"Property '{result.PropertyName}' with the error: '{result.ErrorMessage}'."));
+                $"Property '{result.PropertyName}' with the error: '{result.ErrorMessage}'"));
 
         return ValidateOptionsResult.Fail(sb.ToString());
     }

@@ -32,12 +32,12 @@ public static class AppRunnerExtensions
         var logger = loggerFactory.CreateLogger(nameof(AppRunnerExtensions));
 
         lifetime.ApplicationStarted.Register(
-            () => logger.LogInformation(LoggingEvent.ApplicationStarted, "Application started."));
+            () => logger.LogInformation(LoggingEvent.ApplicationStarted, "Application started"));
 
         lifetime.ApplicationStopping.Register(
-            () => logger.LogInformation(LoggingEvent.ApplicationStopping, "Application stopping."));
+            () => logger.LogInformation(LoggingEvent.ApplicationStopping, "Application stopping"));
 
         lifetime.ApplicationStopped.Register(
-            () => logger.LogInformation(LoggingEvent.ApplicationStopped, "Application stopped."));
+            () => logger.LogInformation(LoggingEvent.ApplicationStopped, "Application stopped"));
     }
 }

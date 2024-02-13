@@ -7,7 +7,7 @@ internal sealed class AzureLogStreamOptionsValidator : AbstractValidator<AzureLo
         RuleFor(o => o.PathTemplate)
             .NotEmpty()
             .Must(v => v?.Contains("{0}") ?? false)
-            .WithMessage("Path template can not be empty and must contains one place holder for Application Name.");
+            .WithMessage("Path template can not be empty and must contains one place holder for Application Name");
 
         RuleFor(o => o.FileSizeLimit).GreaterThan(0);
 

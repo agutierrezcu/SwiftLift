@@ -12,10 +12,10 @@ public sealed class ApplicationInsightEnvironmentCheckTests
 {
     private static readonly ApplicationInsightEnvironmentCheck s_sut = new();
 
-    public class Given_Valid_ConnectionString
+    public class Given_ValidConnectionString
     {
         [Fact]
-        public async Task When_Assert_Then_Not_Throw_Exception()
+        public async Task When_Assert_Then_NotThrowException()
         {
             // Arrange
             var environmentServiceMock = Substitute.For<IEnvironmentService>();
@@ -65,10 +65,10 @@ public sealed class ApplicationInsightEnvironmentCheckTests
         }
     }
 
-    public class Given_Invalid_ConnectionString
+    public class Given_InvalidConnectionString
     {
         [Fact]
-        public async Task When_Does_Not_Exist_In_Configuration_Then_Throw_Exception()
+        public async Task When_DoesNotExistInConfiguration_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
             var environmentServiceMock = Substitute.For<IEnvironmentService>();
@@ -78,7 +78,7 @@ public sealed class ApplicationInsightEnvironmentCheckTests
             var applicationInsightResourceMock = Substitute.For<IApplicationInsightResource>();
 
             var invalidConnectionStringException =
-                new InvalidConnectionStringException(ResourceName, "Invalid Connection String exception error message.");
+                new InvalidConnectionStringException(ResourceName, "Invalid Connection String exception error message");
 
             applicationInsightResourceMock
                 .GetConnectionStringGuaranteed(environmentServiceMock, configurationMock)
@@ -103,7 +103,7 @@ public sealed class ApplicationInsightEnvironmentCheckTests
             // Assert
             var exceptionAssertions = await act.Should()
                 .ThrowExactlyAsync<InvalidConnectionStringException>()
-                .WithMessage("Invalid Connection String exception error message.")
+                .WithMessage("Invalid Connection String exception error message")
                     .ConfigureAwait(true);
 
             exceptionAssertions
@@ -127,7 +127,7 @@ public sealed class ApplicationInsightEnvironmentCheckTests
         }
 
         [Fact]
-        public async Task When_Exists_In_Configuration_With_No_Instrumentation_Key_Segment_Then_Throw_Exception()
+        public async Task When_ExistsInConfigurationWithNoInstrumentationKeySegment_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
             var environmentServiceMock = Substitute.For<IEnvironmentService>();
@@ -162,7 +162,7 @@ public sealed class ApplicationInsightEnvironmentCheckTests
             // Assert
             var exceptionAssertions = await act.Should()
                 .ThrowExactlyAsync<InvalidConnectionStringException>()
-                .WithMessage("Application Insight connection string does not have required InstrumentationKey segment key.")
+                .WithMessage("Application Insight connection string does not have required InstrumentationKey segment key")
                     .ConfigureAwait(true);
 
             exceptionAssertions

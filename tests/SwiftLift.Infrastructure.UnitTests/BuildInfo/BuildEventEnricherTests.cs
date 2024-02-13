@@ -8,7 +8,7 @@ namespace SwiftLift.Infrastructure.UnitTests.BuildInfo;
 public sealed class BuildEventEnricherTests
 {
     [Fact]
-    public void Given_NullLogEvent_When_Enrich_Then_ShouldThrowException()
+    public void Given_NullLogEvent_When_Enrich_Then_ThrowArgumentNullException()
     {
         // Arrange
         var serviceProvider = Substitute.For<IServiceProvider>();
@@ -25,7 +25,7 @@ public sealed class BuildEventEnricherTests
     }
 
     [Fact]
-    public void Given_NullPropertyFactory_When_Enrich_Then_ShouldThrowException()
+    public void Given_NullPropertyFactory_When_Enrich_Then_ThrowArgumentNullException()
     {
         // Arrange
         var logEvent = new LogEvent(DateTimeOffset.Now, LogEventLevel.Information, null, new MessageTemplate(string.Empty, []), []);
@@ -78,29 +78,16 @@ public sealed class BuildEventEnricherTests
         sut.Enrich(logEvent, propertyFactory);
 
         // Assert
-        serviceProvider
-            .Received(1)
-            .GetService(typeof(IBuildManager));
+        Received.InOrder(() =>
+        {
+            serviceProvider.GetService(typeof(IBuildManager));
 
-        buildManager
-            .Received(1)
-            .GetBuildAsync(default);
+            buildManager.GetBuildAsync(default);
 
-        propertyFactory
-            .Received(3)
-            .CreateProperty(Arg.Any<string>(), Arg.Any<object?>());
-
-        propertyFactory
-           .Received(1)
-           .CreateProperty("BuildId", build.Id);
-
-        propertyFactory
-          .Received(1)
-          .CreateProperty("BuildNumber", build.Number);
-
-        propertyFactory
-          .Received(1)
-          .CreateProperty("BuildCommit", build.Commit);
+            propertyFactory.CreateProperty("BuildId", build.Id);
+            propertyFactory.CreateProperty("BuildNumber", build.Number);
+            propertyFactory.CreateProperty("BuildCommit", build.Commit);
+        });
 
         var properties = logEvent.Properties;
 
@@ -119,7 +106,7 @@ public sealed class BuildEventEnricherTests
     }
 
     [Fact, Order(2)]
-    public void Given_LogEvent_When_Enrich_Then_BuildPropertiesAreAdded_FromCache()
+    public void Given_LogEvent_When_Enrich_Then_BuildPropertiesAreAddedFromCache()
     {
         // Arrange
         var build = new Build
@@ -147,15 +134,15 @@ public sealed class BuildEventEnricherTests
 
         // Assert
         serviceProvider
-            .Received(0)
+            .DidNotReceiveWithAnyArgs()
             .GetService(typeof(IBuildManager));
 
         buildManager
-            .Received(0)
+            .DidNotReceiveWithAnyArgs()
             .GetBuildAsync(default);
 
         propertyFactory
-            .Received(0)
+            .DidNotReceiveWithAnyArgs()
             .CreateProperty(Arg.Any<string>(), Arg.Any<object?>());
 
         var properties = logEvent.Properties;

@@ -26,6 +26,6 @@ internal sealed class ConfigurationSectionValidateOptions<TOptions>(
             return ValidateOptionsResult.Success;
         }
 
-        return ValidateOptionsResult.Fail($"Configuration section with key '{_sectionPath}' aimed to bind '{typeof(TOptions).FullName}' settings does not exist .");
+        return ValidateOptionsResult.Fail($"Configuration section with key '{_sectionPath}' aimed to bind '{typeof(TOptions).FullName}' settings does not exist ");
     }
 }

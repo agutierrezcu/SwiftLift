@@ -14,7 +14,7 @@ public class RidersApiIntegrationTests(SwiftliftApiWebApplicationFactory<Program
     : IClassFixture<SwiftliftApiWebApplicationFactory<Program>>
 {
     [Fact]
-    public async Task Given_Build_File_When_Content_Is_Valid_Then_Return_As_Json()
+    public async Task Given_BuildFile_When_ContentIsValid_Then_ReturnAsJson()
     {
         // Arrange
         var client = factory.CreateClient();
@@ -51,8 +51,9 @@ public class RidersApiIntegrationTests(SwiftliftApiWebApplicationFactory<Program
     }
 
     [Fact]
-    public void Given_Services_When_ServiceProvider_Is_Built_Then_All_Enrichers_Should_Be_Registered()
+    public void Given_Services_When_ServiceProviderIsBuilt_Then_AllEnrichersShouldBeRegistered()
     {
+        // Arrange
         var serviceProvider = factory.Services;
 
         // Act

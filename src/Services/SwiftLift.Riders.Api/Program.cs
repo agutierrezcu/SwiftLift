@@ -83,11 +83,11 @@ try
 catch (Exception ex)
     when (ex.GetType().Name is not "StopTheHostException" and not "HostAbortedException")
 {
-    Log.Fatal(ex, "Host terminated unexpectedly.");
+    Log.Fatal(ex, "Host terminated unexpectedly");
 }
 finally
 {
-    Log.Information("Shut down complete.");
+    Log.Information("Shut down complete");
 
     await Log.CloseAndFlushAsync()
         .ConfigureAwait(false);

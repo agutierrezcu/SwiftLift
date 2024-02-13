@@ -7,7 +7,7 @@ public sealed class EnvironmentServiceTests
     private readonly EnvironmentService _sut = EnvironmentService.Instance;
 
     [Fact]
-    public void Given_Environment_Variable_Name_When_GetVariable_Called_Then_Return_Value()
+    public void Given_EnvironmentVariableName_When_GetVariableCalled_Then_ReturnValue()
     {
         // Arrange
         System.Environment.SetEnvironmentVariable("variable1", "value1");
@@ -22,7 +22,7 @@ public sealed class EnvironmentServiceTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void Given_Invalid_Environment_Variable_Name_When_GetVariable_Called_Then_Throw_ArgumentException(string? variableName)
+    public void Given_InvalidEnvironmentVariableName_When_GetVariableCalled_Then_ThrowArgumentException(string? variableName)
     {
         // Arrange
 
@@ -36,7 +36,7 @@ public sealed class EnvironmentServiceTests
     }
 
     [Fact]
-    public void Given_Non_Existing_Environment_Variable_Name_When_GetVariable_Called_Then_Returns_Null()
+    public void Given_NonExistingEnvironmentVariableName_When_GetVariableCalled_Then_ReturnsNull()
     {
         // Arrange
 
@@ -51,7 +51,7 @@ public sealed class EnvironmentServiceTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
-    public void Given_Invalid_Environment_Variable_Name_When_GetRequiredVariable_Called_Then_Throw_ArgumentException(
+    public void Given_InvalidEnvironmentVariableName_When_GetRequiredVariableCalled_Then_ThrowArgumentException(
        string? variableName)
     {
         // Arrange
@@ -66,7 +66,7 @@ public sealed class EnvironmentServiceTests
     }
 
     [Fact]
-    public void Given_Environment_Variable_Name_When_GetRequiredVariable_Called_Then_Return_Value()
+    public void Given_EnvironmentVariableName_When_GetRequiredVariableCalled_Then_ReturnValue()
     {
         // Arrange
         System.Environment.SetEnvironmentVariable("variable2", "value2");
@@ -79,7 +79,7 @@ public sealed class EnvironmentServiceTests
     }
 
     [Fact]
-    public void Given_Environment_Variable_Name_When_GetRequiredVariable_Called_Then_Throw_InvalidOperationException()
+    public void Given_EnvironmentVariableName_When_GetRequiredVariableCalled_Then_ThrowInvalidOperationException()
     {
         // Arrange
         System.Environment.SetEnvironmentVariable("variable3", "");
@@ -90,6 +90,6 @@ public sealed class EnvironmentServiceTests
         // Assert
         act.Should()
             .Throw<InvalidOperationException>()
-            .WithMessage($"Environment variable 'variable3' is not defined or value is not set.");
+            .WithMessage($"Environment variable 'variable3' is not defined or value is not set");
     }
 }

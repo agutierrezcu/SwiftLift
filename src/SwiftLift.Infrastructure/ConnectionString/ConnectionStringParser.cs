@@ -126,11 +126,11 @@ internal static class ConnectionStringParser
             if (segmentStart == 0)
             {
                 throw new InvalidConnectionStringException(
-                    resourceName, $"Connection string starts with segment separator '{segmentSeparator}'.");
+                    resourceName, $"Connection string starts with segment separator '{segmentSeparator}'");
             }
 
             throw new InvalidConnectionStringException(
-                resourceName, $"Connection string contains two following segment separators '{segmentSeparator}'.");
+                resourceName, $"Connection string contains two following segment separators '{segmentSeparator}'");
         }
 
         var kvSeparatorIndex = connectionString.IndexOf(keywordValueSeparator,
@@ -139,19 +139,19 @@ internal static class ConnectionStringParser
         if (kvSeparatorIndex == -1)
         {
             throw new InvalidConnectionStringException(
-                resourceName, $"Connection string doesn't have value for keyword '{connectionString[segmentStart..segmentEnd]}'.");
+                resourceName, $"Connection string doesn't have value for keyword '{connectionString[segmentStart..segmentEnd]}'");
         }
 
         if (segmentStart == kvSeparatorIndex)
         {
             throw new InvalidConnectionStringException(
-                resourceName, $"Connection string has value '{connectionString[(segmentStart + 1)..segmentEnd]}' with no keyword.");
+                resourceName, $"Connection string has value '{connectionString[(segmentStart + 1)..segmentEnd]}' with no keyword");
         }
 
         if (!allowEmptyValues && kvSeparatorIndex + 1 == segmentEnd)
         {
             throw new InvalidConnectionStringException(
-                resourceName, $"Connection string has keyword '{connectionString[segmentStart..kvSeparatorIndex]}' with empty value.");
+                resourceName, $"Connection string has keyword '{connectionString[segmentStart..kvSeparatorIndex]}' with empty value");
         }
     }
 }

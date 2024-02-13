@@ -28,7 +28,7 @@ public sealed class ApplicationInsightResource : IApplicationInsightResource
         {
             throw new InvalidConnectionStringException(
                 ResourceName,
-                "Application Insight connection string can not be null or empty.");
+                "Application Insight connection string can not be null or empty");
         }
 
         ConnectionStringResource connectionStringResource;
@@ -42,14 +42,14 @@ public sealed class ApplicationInsightResource : IApplicationInsightResource
         {
             throw new InvalidConnectionStringException(
                 ResourceName,
-                "Application Insight connection string is invalid.", ex);
+                "Application Insight connection string is invalid", ex);
         }
 
         if (!connectionStringResource.TryGetSegmentValue("InstrumentationKey", out _))
         {
             throw new InvalidConnectionStringException(
                 ResourceName,
-                "Application Insight connection string has no instrumentation key segment.");
+                "Application Insight connection string has no instrumentation key segment");
         }
 
         return connectionStringResource;

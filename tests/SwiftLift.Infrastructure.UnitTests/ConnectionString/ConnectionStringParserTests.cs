@@ -12,7 +12,7 @@ public sealed class ConnectionStringParserTests
     [InlineData("resource", null, ";", "=", "connectionString")]
     [InlineData("resource", "connection", null, "=", "segmentSeparator")]
     [InlineData("resource", "connection", ";", null, "keywordValueSeparator")]
-    public void Given_Invalid_String_Parameters(
+    public void Given_InvalidStringParameters(
         string? resource,
         string? connectionString,
         string? segmentSeparator,
@@ -36,10 +36,10 @@ public sealed class ConnectionStringParserTests
             .WithMessage($"Value cannot be null. (Parameter '{parameterName}')");
     }
 
-    public class Given_Invalid_Connection_String
+    public class Given_InvalidConnectionString
     {
         [Fact]
-        public void When_StartWith_Segment_Separator_Then_Throw_Exception()
+        public void When_StartWithSegmentSeparator_Then_ThrowInvalidConnectionStringException()
         {
             // Act
             Action act = () =>
@@ -50,12 +50,12 @@ public sealed class ConnectionStringParserTests
             // Assert
             actAssertions
                 .ThrowExactly<InvalidConnectionStringException>()
-                .WithMessage($"Connection string starts with segment separator '{SegmentSeparator}'.")
+                .WithMessage($"Connection string starts with segment separator '{SegmentSeparator}'")
                 .Which.ResourceName.Should().Be(ResourceName);
         }
 
         [Fact]
-        public void When_Duplicated_Keyword_Then_Throw_Exception()
+        public void When_DuplicatedKeyword_Then_ThrowInvalidConnectionStringException()
         {
             // Act
             Action act = () =>
@@ -71,7 +71,7 @@ public sealed class ConnectionStringParserTests
         }
 
         [Fact]
-        public void When_Contains_Two_Following_Segment_Separator_Then_Throw_Exception()
+        public void When_ContainsTwoFollowingSegmentSeparator_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
             Action act = () =>
@@ -82,12 +82,12 @@ public sealed class ConnectionStringParserTests
             // Assert
             actAssertions
                 .ThrowExactly<InvalidConnectionStringException>()
-                .WithMessage($"Connection string contains two following segment separators '{SegmentSeparator}'.")
+                .WithMessage($"Connection string contains two following segment separators '{SegmentSeparator}'")
                 .Which.ResourceName.Should().Be(ResourceName);
         }
 
         [Fact]
-        public void When_Any_Keyword_Has_No_Value_Then_Throw_Exception()
+        public void When_AnyKeywordHasNoValue_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
             Action act = () =>
@@ -98,12 +98,12 @@ public sealed class ConnectionStringParserTests
             // Assert
             actAssertions
                 .ThrowExactly<InvalidConnectionStringException>()
-                .WithMessage($"Connection string doesn't have value for keyword 'key2'.")
+                .WithMessage($"Connection string doesn't have value for keyword 'key2'")
                 .Which.ResourceName.Should().Be(ResourceName);
         }
 
         [Fact]
-        public void When_Any_Keyword_Has_Empty_Value_Then_Throw_Exception()
+        public void When_AnyKeywordHasEmptyValue_Then_ThrowInvalidConnectionStringException()
         {
             Action act = () =>
                ConnectionStringParser.Parse(ResourceName, "key1=;key2=value2");
@@ -113,12 +113,12 @@ public sealed class ConnectionStringParserTests
             // Assert
             actAssertions
                 .ThrowExactly<InvalidConnectionStringException>()
-                .WithMessage($"Connection string has keyword 'key1' with empty value.")
+                .WithMessage($"Connection string has keyword 'key1' with empty value")
                 .Which.ResourceName.Should().Be(ResourceName);
         }
 
         [Fact]
-        public void When_Any_Value_Has_No_Keyword_Then_Throw_Exception()
+        public void When_AnyValueHasNoKeyword_Then_ThrowInvalidConnectionStringException()
         {
             Action act = () =>
                ConnectionStringParser.Parse(ResourceName, "key1=value1;=value2");
@@ -128,16 +128,16 @@ public sealed class ConnectionStringParserTests
             // Assert
             actAssertions
                 .ThrowExactly<InvalidConnectionStringException>()
-                .WithMessage($"Connection string has value 'value2' with no keyword.")
+                .WithMessage($"Connection string has value 'value2' with no keyword")
                 .Which.ResourceName.Should().Be(ResourceName);
         }
     }
 
-    public class Given_Standard_Valid_ConnectionString
+    public class Given_StandardValidConnectionString
     {
         private readonly ConnectionStringResource _connectionStringResource;
 
-        public Given_Standard_Valid_ConnectionString()
+        public Given_StandardValidConnectionString()
         {
             // Act
             _connectionStringResource = ConnectionStringParser.Parse(
@@ -151,7 +151,7 @@ public sealed class ConnectionStringParserTests
         [InlineData("Database", "myDataBase")]
         [InlineData("UID", "myUsername")]
         [InlineData("PWD", "myPassword")]
-        public void When_Parse_With_Default_Settings_Then_Segment_Value_Is_OK(string keyword, string expectedValue)
+        public void When_ParseWithDefaultSettings_Then_SegmentValueIsOK(string keyword, string expectedValue)
         {
             _connectionStringResource.TryGetSegmentValue(keyword, out var value);
 
@@ -159,11 +159,11 @@ public sealed class ConnectionStringParserTests
         }
     }
 
-    public class Given_Custom_ConnectionString_With_Empty_Segment_Values
+    public class Given_CustomConnectionStringWithEmptySegmentValues
     {
         private readonly ConnectionStringResource _connectionStringResource;
 
-        public Given_Custom_ConnectionString_With_Empty_Segment_Values()
+        public Given_CustomConnectionStringWithEmptySegmentValues()
         {
             _connectionStringResource = ConnectionStringParser.Parse(
                 ResourceName,
@@ -179,7 +179,7 @@ public sealed class ConnectionStringParserTests
         [InlineData("Database", "myDataBase")]
         [InlineData("UID", "myUsername")]
         [InlineData("PWD", "")]
-        public void When_Parse_With_Custom_Settings_Then_Segment_Value_Is_OK(string keyword, string expectedValue)
+        public void When_ParseWithCustomSettings_Then_SegmentValueIsOK(string keyword, string expectedValue)
         {
             _connectionStringResource.TryGetSegmentValue(keyword, out var value);
 
