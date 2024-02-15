@@ -6,6 +6,8 @@ using static System.Environment;
 
 namespace SwiftLift.Infrastructure.BuildInfo;
 
+using BuildData = (Build? build, string buildContentAsJson);
+
 internal sealed class BuildManager
     (IBuildFileProvider _buildFileProvider,
     ISnakeJsonDeserializer _jsonSnakeDeserializer,
@@ -13,7 +15,7 @@ internal sealed class BuildManager
     ILogger<BuildManager> _logger)
         : IBuildManager
 {
-    private Task<(Build?, string)>? _loadBuildTask;
+    private Task<BuildData>? _loadBuildTask;
 
     public async Task<string> GetBuildAsJsonAsync(CancellationToken cancellation)
     {
@@ -31,12 +33,12 @@ internal sealed class BuildManager
         return build!;
     }
 
-    private Task<(Build?, string)> LoadBuildOnceAsync(CancellationToken cancellation)
+    private Task<BuildData> LoadBuildOnceAsync(CancellationToken cancellation)
     {
         return _loadBuildTask ??= LoadBuildAsync(cancellation);
     }
 
-    private async Task<(Build?, string)> LoadBuildAsync(CancellationToken cancellation)
+    private async Task<BuildData> LoadBuildAsync(CancellationToken cancellation)
     {
         var buildAsString = "";
 
