@@ -46,6 +46,12 @@ public static partial class Extensions
             serviceDefaultsOptions.AzureLogStreamOptionsSectionPath,
             serviceDefaultsOptions.ApplicationAssemblies);
 
+        builder.Host.UseDefaultServiceProvider(opts =>
+        {
+            opts.ValidateScopes = true;
+            opts.ValidateOnBuild = true;
+        });
+
         builder.AddFastEndpoints();
 
         builder.ConfigureOpenTelemetry(serviceDefaultsOptions.ApplicationInfo);

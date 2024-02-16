@@ -65,7 +65,7 @@ public class BuildEnvironmentCheckTests
 
             buildFileProvider.GetContentAsync(cancellationToken);
             snakeJsonDeserializer.Deserialize<Build>(Arg.Any<string>());
-            buildValidator.ValidateAndThrowAsync(Arg.Any<Build>(), cancellationToken);
+            buildValidator.ValidateAsync(Arg.Any<IValidationContext>(), cancellationToken);
         });
     }
 
@@ -113,9 +113,10 @@ public class BuildEnvironmentCheckTests
             .DidNotReceiveWithAnyArgs()
             .Deserialize<Build>(Arg.Any<string>());
 
-        buildValidator
+        await buildValidator
             .DidNotReceiveWithAnyArgs()
-            .ValidateAndThrowAsync(Arg.Any<Build>(), Arg.Any<CancellationToken>());
+            .ValidateAsync(Arg.Any<IValidationContext>(), cancellationToken)
+                .ConfigureAwait(true);
     }
 
     [Fact]
@@ -164,9 +165,10 @@ public class BuildEnvironmentCheckTests
             snakeJsonDeserializer.Deserialize<Build>("build.json");
         });
 
-        buildValidator
+        await buildValidator
             .DidNotReceiveWithAnyArgs()
-            .ValidateAndThrowAsync(Arg.Any<Build>(), Arg.Any<CancellationToken>());
+            .ValidateAsync(Arg.Any<IValidationContext>(), cancellationToken)
+                .ConfigureAwait(true);
     }
 
     [Fact]

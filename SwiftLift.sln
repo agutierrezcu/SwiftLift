@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		coverage.cmd = coverage.cmd
 		Directory.Build.props = Directory.Build.props
-		src\Directory.Packages.props = src\Directory.Packages.props
+		Directory.Packages.props = Directory.Packages.props
 		.config\dotnet-tools.json = .config\dotnet-tools.json
 		README.md = README.md
 	EndProjectSection
@@ -20,9 +20,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.SharedKernel", "src\SwiftLift.SharedKernel\SwiftLift.SharedKernel.csproj", "{6DF3A769-C9F2-4E8C-B0FA-F55AED11EDED}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BB18F88A-B78E-4E13-AFA4-DDB0B177D859}"
-	ProjectSection(SolutionItems) = preProject
-		tests\Directory.Packages.props = tests\Directory.Packages.props
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.SharedKernel.UnitTests", "tests\SwiftLift.SharedKernel.UnitTests\SwiftLift.SharedKernel.UnitTests.csproj", "{186333B2-97F3-446C-B301-04659A660CA2}"
 EndProject
