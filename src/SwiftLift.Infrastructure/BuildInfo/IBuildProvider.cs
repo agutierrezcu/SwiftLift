@@ -1,6 +1,6 @@
 namespace SwiftLift.Infrastructure.BuildInfo;
 
-public interface IBuildManager
+public interface IBuildProvider
 {
     Task<string> GetBuildAsJsonAsync(CancellationToken cancellation);
 

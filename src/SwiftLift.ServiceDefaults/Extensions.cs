@@ -219,10 +219,10 @@ public static partial class Extensions
         });
 
         app.MapGet("/build-info",
-            async (IBuildManager buildManager, HttpResponse response, CancellationToken cancellation) =>
+            async (IBuildProvider buildProvider, HttpResponse response, CancellationToken cancellation) =>
             {
                 var fileContent =
-                    await buildManager.GetBuildAsJsonAsync(cancellation)
+                    await buildProvider.GetBuildAsJsonAsync(cancellation)
                         .ConfigureAwait(false);
 
                 response.ContentType = MediaTypeNames.Application.Json;

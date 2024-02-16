@@ -8,12 +8,12 @@ namespace SwiftLift.Infrastructure.BuildInfo;
 
 using BuildData = (Build? build, string buildContentAsJson);
 
-internal sealed class BuildManager
+internal sealed class BuildProvider
     (IBuildFileProvider _buildFileProvider,
     ISnakeJsonDeserializer _jsonSnakeDeserializer,
     IValidator<Build> _validator,
-    ILogger<BuildManager> _logger)
-        : IBuildManager
+    ILogger<BuildProvider> _logger)
+        : IBuildProvider
 {
     private Task<BuildData>? _loadBuildTask;
 

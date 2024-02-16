@@ -12,20 +12,9 @@ internal sealed class BuildFileProvider(
         var fileInfo = _hostEnvironment.ContentRootFileProvider
             .GetFileInfo(relativePath);
 
-        var fileContent = await ReadAllContentAsync(fileInfo, cancellation)
-            .ConfigureAwait(false);
+        using var streamReader = new StreamReader(fileInfo.CreateReadStream());
 
-        return fileContent;
-    }
-
-    private static async Task<string> ReadAllContentAsync(IFileInfo fileInfo,
-        CancellationToken cancellation)
-    {
-        Guard.Against.Null(fileInfo);
-
-        using var reader = new StreamReader(fileInfo.CreateReadStream());
-
-        return await reader.ReadToEndAsync(cancellation)
+        return await streamReader.ReadToEndAsync(cancellation)
             .ConfigureAwait(false);
     }
 }

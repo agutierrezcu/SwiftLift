@@ -6,34 +6,35 @@ namespace SwiftLift.Infrastructure.BuildInfo;
 internal sealed class BuildEventEnricher(IServiceProvider _serviceProvider)
     : ILogEventEnricher
 {
-    private static Lazy<List<LogEventProperty>>? s_cachedBuildProperties;
+    private static Lazy<Task<List<LogEventProperty>>>? s_cachedBuildProperties;
 
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
         Guard.Against.Null(logEvent);
         Guard.Against.Null(propertyFactory);
 
-        s_cachedBuildProperties ??= new Lazy<List<LogEventProperty>>(
-            () => CreateEventProperties(propertyFactory).ToList());
+        s_cachedBuildProperties ??= new Lazy<Task<List<LogEventProperty>>>(
+            () => CreateLogEventPropertiesAsync(propertyFactory));
 
-        foreach (var property in s_cachedBuildProperties.Value)
+        foreach (var property in s_cachedBuildProperties.Value.Result)
         {
             logEvent.AddPropertyIfAbsent(property);
         }
     }
 
-    private IEnumerable<LogEventProperty> CreateEventProperties(ILogEventPropertyFactory propertyFactory)
+    private async Task<List<LogEventProperty>> CreateLogEventPropertiesAsync(
+        ILogEventPropertyFactory propertyFactory)
     {
-        var buildManager = _serviceProvider.GetRequiredService<IBuildManager>();
+        var buildProvider = _serviceProvider.GetRequiredService<IBuildProvider>();
 
-        var buildTask = buildManager.GetBuildAsync(default);
+        var build = await buildProvider.GetBuildAsync(default)
+            .ConfigureAwait(false);
 
-        var build = buildTask.GetAwaiter().GetResult();
-
-        yield return propertyFactory.CreateProperty("BuildId", build.Id);
-
-        yield return propertyFactory.CreateProperty("BuildNumber", build.Number);
-
-        yield return propertyFactory.CreateProperty("BuildCommit", build.Commit);
+        return
+        [
+            propertyFactory.CreateProperty("BuildId", build.Id),
+            propertyFactory.CreateProperty("BuildNumber", build.Number),
+            propertyFactory.CreateProperty("BuildCommit", build.Commit)
+        ];
     }
 }

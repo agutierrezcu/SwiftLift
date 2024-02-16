@@ -61,13 +61,13 @@ public sealed class BuildEventEnricherTests
         propertyFactory.CreateProperty(Arg.Any<string>(), Arg.Any<object?>())
            .Returns(callInfo => new LogEventProperty((string)callInfo[0], new ScalarValue(callInfo[1])));
 
-        var buildManager = Substitute.For<IBuildManager>();
+        var buildProvider = Substitute.For<IBuildProvider>();
 
-        buildManager.GetBuildAsync(default).Returns(Task.FromResult(build));
+        buildProvider.GetBuildAsync(default).Returns(Task.FromResult(build));
 
         var serviceProvider = Substitute.For<IServiceProvider>();
 
-        serviceProvider.GetService(typeof(IBuildManager)).Returns(buildManager);
+        serviceProvider.GetService(typeof(IBuildProvider)).Returns(buildProvider);
 
         var logEvent = new LogEvent(DateTimeOffset.Now, LogEventLevel.Information, null,
             new MessageTemplate(string.Empty, []), []);
@@ -80,9 +80,9 @@ public sealed class BuildEventEnricherTests
         // Assert
         Received.InOrder(() =>
         {
-            serviceProvider.GetService(typeof(IBuildManager));
+            serviceProvider.GetService(typeof(IBuildProvider));
 
-            buildManager.GetBuildAsync(default);
+            buildProvider.GetBuildAsync(default);
 
             propertyFactory.CreateProperty("BuildId", build.Id);
             propertyFactory.CreateProperty("BuildNumber", build.Number);
@@ -120,7 +120,7 @@ public sealed class BuildEventEnricherTests
 
         var propertyFactory = Substitute.For<ILogEventPropertyFactory>();
 
-        var buildManager = Substitute.For<IBuildManager>();
+        var buildProvider = Substitute.For<IBuildProvider>();
 
         var serviceProvider = Substitute.For<IServiceProvider>();
 
@@ -135,9 +135,9 @@ public sealed class BuildEventEnricherTests
         // Assert
         serviceProvider
             .DidNotReceiveWithAnyArgs()
-            .GetService(typeof(IBuildManager));
+            .GetService(typeof(IBuildProvider));
 
-        buildManager
+        buildProvider
             .DidNotReceiveWithAnyArgs()
             .GetBuildAsync(default);
 
