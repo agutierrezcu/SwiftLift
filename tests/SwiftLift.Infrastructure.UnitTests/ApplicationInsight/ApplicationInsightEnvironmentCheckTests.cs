@@ -18,50 +18,50 @@ public sealed class ApplicationInsightEnvironmentCheckTests
         public async Task When_Assert_Then_NotThrowException()
         {
             // Arrange
-            var environmentServiceMock = Substitute.For<IEnvironmentService>();
+            var environmentService = Substitute.For<IEnvironmentService>();
 
-            var configurationMock = Substitute.For<IConfiguration>();
+            var configuration = Substitute.For<IConfiguration>();
 
             var connectionStringResource = ConnectionStringParser.Parse(
                 ResourceName, "InstrumentationKey=00000000-0000-0000-0000-000000000000");
 
-            var applicationInsightResourceMock = Substitute.For<IApplicationInsightResource>();
+            var applicationInsightResource = Substitute.For<IApplicationInsightResource>();
 
-            applicationInsightResourceMock
-                .GetConnectionStringGuaranteed(environmentServiceMock, configurationMock)
+            applicationInsightResource
+                .GetConnectionStringGuaranteed(environmentService, configuration)
                 .Returns(connectionStringResource);
 
-            var serviceProviderMock = Substitute.For<IServiceProvider>();
+            var serviceProvider = Substitute.For<IServiceProvider>();
 
-            serviceProviderMock.GetService(typeof(IApplicationInsightResource))
-                .Returns(applicationInsightResourceMock);
+            serviceProvider.GetService(typeof(IApplicationInsightResource))
+                .Returns(applicationInsightResource);
 
-            serviceProviderMock.GetService(typeof(IEnvironmentService))
-                .Returns(environmentServiceMock);
+            serviceProvider.GetService(typeof(IEnvironmentService))
+                .Returns(environmentService);
 
-            serviceProviderMock.GetService(typeof(IConfiguration))
-                .Returns(configurationMock);
+            serviceProvider.GetService(typeof(IConfiguration))
+                .Returns(configuration);
 
             // Act
-            await s_sut.Assert(serviceProviderMock, default)
+            await s_sut.Assert(serviceProvider, default)
                 .ConfigureAwait(true);
 
             // Assert
-            serviceProviderMock
+            serviceProvider
                 .Received(1)
                 .GetService(typeof(IApplicationInsightResource));
 
-            serviceProviderMock
+            serviceProvider
                 .Received(1)
                 .GetService(typeof(IEnvironmentService));
 
-            serviceProviderMock
+            serviceProvider
                 .Received(1)
                 .GetService(typeof(IConfiguration));
 
-            applicationInsightResourceMock
+            applicationInsightResource
                 .Received(1)
-                .GetConnectionStringGuaranteed(environmentServiceMock, configurationMock);
+                .GetConnectionStringGuaranteed(environmentService, configuration);
         }
     }
 
@@ -71,33 +71,33 @@ public sealed class ApplicationInsightEnvironmentCheckTests
         public async Task When_DoesNotExistInConfiguration_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
-            var environmentServiceMock = Substitute.For<IEnvironmentService>();
+            var environmentService = Substitute.For<IEnvironmentService>();
 
-            var configurationMock = Substitute.For<IConfiguration>();
+            var configuration = Substitute.For<IConfiguration>();
 
-            var applicationInsightResourceMock = Substitute.For<IApplicationInsightResource>();
+            var applicationInsightResource = Substitute.For<IApplicationInsightResource>();
 
             var invalidConnectionStringException =
                 new InvalidConnectionStringException(ResourceName, "Invalid Connection String exception error message");
 
-            applicationInsightResourceMock
-                .GetConnectionStringGuaranteed(environmentServiceMock, configurationMock)
+            applicationInsightResource
+                .GetConnectionStringGuaranteed(environmentService, configuration)
                 .Throws(invalidConnectionStringException);
 
-            var serviceProviderMock = Substitute.For<IServiceProvider>();
+            var serviceProvider = Substitute.For<IServiceProvider>();
 
-            serviceProviderMock.GetService(typeof(IApplicationInsightResource))
-                .Returns(applicationInsightResourceMock);
+            serviceProvider.GetService(typeof(IApplicationInsightResource))
+                .Returns(applicationInsightResource);
 
-            serviceProviderMock.GetService(typeof(IEnvironmentService))
-                .Returns(environmentServiceMock);
+            serviceProvider.GetService(typeof(IEnvironmentService))
+                .Returns(environmentService);
 
-            serviceProviderMock.GetService(typeof(IConfiguration))
-                .Returns(configurationMock);
+            serviceProvider.GetService(typeof(IConfiguration))
+                .Returns(configuration);
 
             // Act
             var act = async () =>
-                await s_sut.Assert(serviceProviderMock, default)
+                await s_sut.Assert(serviceProvider, default)
                     .ConfigureAwait(true);
 
             // Assert
@@ -109,54 +109,54 @@ public sealed class ApplicationInsightEnvironmentCheckTests
             exceptionAssertions
                 .Which.ResourceName.Should().Be(ResourceName);
 
-            serviceProviderMock
+            serviceProvider
                 .Received(1)
                 .GetService(typeof(IApplicationInsightResource));
 
-            serviceProviderMock
+            serviceProvider
                 .Received(1)
                 .GetService(typeof(IEnvironmentService));
 
-            serviceProviderMock
+            serviceProvider
                 .Received(1)
                 .GetService(typeof(IConfiguration));
 
-            applicationInsightResourceMock
+            applicationInsightResource
                 .Received(1)
-                .GetConnectionStringGuaranteed(environmentServiceMock, configurationMock);
+                .GetConnectionStringGuaranteed(environmentService, configuration);
         }
 
         [Fact]
         public async Task When_ExistsInConfigurationWithNoInstrumentationKeySegment_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
-            var environmentServiceMock = Substitute.For<IEnvironmentService>();
+            var environmentService = Substitute.For<IEnvironmentService>();
 
-            var configurationMock = Substitute.For<IConfiguration>();
+            var configuration = Substitute.For<IConfiguration>();
 
-            var applicationInsightResourceMock = Substitute.For<IApplicationInsightResource>();
+            var applicationInsightResource = Substitute.For<IApplicationInsightResource>();
 
             var connectionStringResource = ConnectionStringParser.Parse(
                 ResourceName, "key=value");
 
-            applicationInsightResourceMock
-                .GetConnectionStringGuaranteed(environmentServiceMock, configurationMock)
+            applicationInsightResource
+                .GetConnectionStringGuaranteed(environmentService, configuration)
                 .Returns(connectionStringResource);
 
-            var serviceProviderMock = Substitute.For<IServiceProvider>();
+            var serviceProvider = Substitute.For<IServiceProvider>();
 
-            serviceProviderMock.GetService(typeof(IApplicationInsightResource))
-                .Returns(applicationInsightResourceMock);
+            serviceProvider.GetService(typeof(IApplicationInsightResource))
+                .Returns(applicationInsightResource);
 
-            serviceProviderMock.GetService(typeof(IEnvironmentService))
-                .Returns(environmentServiceMock);
+            serviceProvider.GetService(typeof(IEnvironmentService))
+                .Returns(environmentService);
 
-            serviceProviderMock.GetService(typeof(IConfiguration))
-                .Returns(configurationMock);
+            serviceProvider.GetService(typeof(IConfiguration))
+                .Returns(configuration);
 
             // Act
             var act = async () =>
-                await s_sut.Assert(serviceProviderMock, default)
+                await s_sut.Assert(serviceProvider, default)
                     .ConfigureAwait(true);
 
             // Assert
@@ -168,21 +168,21 @@ public sealed class ApplicationInsightEnvironmentCheckTests
             exceptionAssertions
                 .Which.ResourceName.Should().Be(ResourceName);
 
-            serviceProviderMock
+            serviceProvider
                 .Received(1)
                 .GetService(typeof(IApplicationInsightResource));
 
-            serviceProviderMock
+            serviceProvider
                 .Received(1)
                 .GetService(typeof(IEnvironmentService));
 
-            serviceProviderMock
+            serviceProvider
                 .Received(1)
                 .GetService(typeof(IConfiguration));
 
-            applicationInsightResourceMock
+            applicationInsightResource
                 .Received(1)
-                .GetConnectionStringGuaranteed(environmentServiceMock, configurationMock);
+                .GetConnectionStringGuaranteed(environmentService, configuration);
         }
     }
 }

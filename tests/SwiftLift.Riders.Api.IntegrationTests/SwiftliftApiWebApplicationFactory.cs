@@ -77,12 +77,12 @@ public sealed class SwiftliftApiWebApplicationFactory<TEntryPoint>
 
         services.Remove(buildFilePathResolverDescriptor);
 
-        var buildFilePathResolverMock = Substitute.For<IBuildFilePathResolver>();
+        var buildFilePathResolver = Substitute.For<IBuildFilePathResolver>();
 
-        buildFilePathResolverMock.GetRelativeToContentRoot()
+        buildFilePathResolver.GetRelativeToContentRoot()
             .Returns(BuildTestFileRelativePath);
 
-        services.AddSingleton(_ => buildFilePathResolverMock);
+        services.AddSingleton(_ => buildFilePathResolver);
     }
 
     private void CreateBuildFileTest()

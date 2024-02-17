@@ -67,6 +67,32 @@ public class BuildEnvironmentCheckTests
             snakeJsonDeserializer.Deserialize<Build>(Arg.Any<string>());
             buildValidator.ValidateAsync(Arg.Any<IValidationContext>(), cancellationToken);
         });
+
+        serviceProvider
+            .Received(1)
+            .GetService(typeof(IBuildFileProvider));
+
+        serviceProvider
+            .Received(1)
+            .GetService(typeof(ISnakeJsonDeserializer));
+
+        serviceProvider
+            .Received(1)
+            .GetService(typeof(IValidator<Build>));
+
+        await buildFileProvider
+            .Received(1)
+            .GetContentAsync(cancellationToken)
+                .ConfigureAwait(true);
+
+        snakeJsonDeserializer
+            .Received(1)
+            .Deserialize<Build>(Arg.Any<string>());
+
+        await buildValidator
+            .Received(1)
+            .ValidateAsync(Arg.Any<IValidationContext>(), cancellationToken)
+                .ConfigureAwait(true);
     }
 
     [Fact]
@@ -108,6 +134,23 @@ public class BuildEnvironmentCheckTests
 
             buildFileProvider.GetContentAsync(cancellationToken);
         });
+
+        serviceProvider
+            .Received(1)
+            .GetService(typeof(IBuildFileProvider));
+
+        serviceProvider
+            .Received(1)
+            .GetService(typeof(ISnakeJsonDeserializer));
+
+        serviceProvider
+            .Received(1)
+            .GetService(typeof(IValidator<Build>));
+
+        await buildFileProvider
+            .Received(1)
+            .GetContentAsync(cancellationToken)
+                .ConfigureAwait(true);
 
         snakeJsonDeserializer
             .DidNotReceiveWithAnyArgs()
@@ -164,6 +207,27 @@ public class BuildEnvironmentCheckTests
             buildFileProvider.GetContentAsync(cancellationToken);
             snakeJsonDeserializer.Deserialize<Build>("build.json");
         });
+
+        serviceProvider
+            .Received(1)
+            .GetService(typeof(IBuildFileProvider));
+
+        serviceProvider
+            .Received(1)
+            .GetService(typeof(ISnakeJsonDeserializer));
+
+        serviceProvider
+            .Received(1)
+            .GetService(typeof(IValidator<Build>));
+
+        await buildFileProvider
+            .Received(1)
+            .GetContentAsync(cancellationToken)
+                .ConfigureAwait(true);
+
+        snakeJsonDeserializer
+            .Received(1)
+            .Deserialize<Build>(Arg.Any<string>());
 
         await buildValidator
             .DidNotReceiveWithAnyArgs()
@@ -227,6 +291,27 @@ public class BuildEnvironmentCheckTests
             buildFileProvider.GetContentAsync(cancellationToken);
             snakeJsonDeserializer.Deserialize<Build>("build.json");
         });
+
+        serviceProvider
+            .Received(1)
+            .GetService(typeof(IBuildFileProvider));
+
+        serviceProvider
+            .Received(1)
+            .GetService(typeof(ISnakeJsonDeserializer));
+
+        serviceProvider
+            .Received(1)
+            .GetService(typeof(IValidator<Build>));
+
+        await buildFileProvider
+            .Received(1)
+            .GetContentAsync(cancellationToken)
+                .ConfigureAwait(true);
+
+        snakeJsonDeserializer
+            .Received(1)
+            .Deserialize<Build>(Arg.Any<string>());
     }
 }
 

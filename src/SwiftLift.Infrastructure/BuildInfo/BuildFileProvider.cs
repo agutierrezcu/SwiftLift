@@ -1,20 +1,23 @@
 namespace SwiftLift.Infrastructure.BuildInfo;
 
 internal sealed class BuildFileProvider(
+    IBuildFilePathResolver _buildFilePathResolver,
     IHostEnvironment _hostEnvironment,
-    IBuildFilePathResolver _buildFilePathResolver)
+    IFileReaderService _fileReaderService)
         : IBuildFileProvider
 {
-    public async Task<string> GetContentAsync(CancellationToken cancellation)
+    public Task<string> GetContentAsync(CancellationToken cancellation)
     {
         var relativePath = _buildFilePathResolver.GetRelativeToContentRoot();
 
         var fileInfo = _hostEnvironment.ContentRootFileProvider
             .GetFileInfo(relativePath);
 
-        using var streamReader = new StreamReader(fileInfo.CreateReadStream());
+        if (fileInfo is null or { Exists: false })
+        {
+            throw new InvalidOperationException($"File {relativePath} does not exists.");
+        }
 
-        return await streamReader.ReadToEndAsync(cancellation)
-            .ConfigureAwait(false);
+        return _fileReaderService.ReadAllTextAsync(fileInfo.PhysicalPath!, cancellation);
     }
 }

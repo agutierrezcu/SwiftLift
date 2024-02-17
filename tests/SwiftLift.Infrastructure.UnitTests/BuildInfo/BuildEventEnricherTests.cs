@@ -89,6 +89,26 @@ public sealed class BuildEventEnricherTests
             propertyFactory.CreateProperty("BuildCommit", build.Commit);
         });
 
+        serviceProvider
+            .Received(1)
+            .GetService(typeof(IBuildProvider));
+
+        buildProvider
+            .Received(1)
+            .GetBuildAsync(default);
+
+        propertyFactory
+            .Received(1)
+            .CreateProperty("BuildId", build.Id);
+
+        propertyFactory
+            .Received(1)
+            .CreateProperty("BuildNumber", build.Number);
+
+        propertyFactory
+            .Received(1)
+            .CreateProperty("BuildCommit", build.Commit);
+
         var properties = logEvent.Properties;
 
         var expectedProperties = new List<LogEventProperty>

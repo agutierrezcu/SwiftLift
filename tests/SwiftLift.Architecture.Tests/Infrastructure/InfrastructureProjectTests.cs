@@ -1,3 +1,4 @@
+using Oakton.Environment;
 using Serilog.Core;
 using SwiftLift.Infrastructure;
 using Xunit.Abstractions;
@@ -14,6 +15,8 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
         // Act
         var result = s_infrastructureTypes
             .That()
+            .ResideInNamespace("SwiftLift")
+            .And()
             .AreClasses()
             .And()
             .AreNotNested()
@@ -35,6 +38,8 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
         // Act
         var result = s_infrastructureTypes
             .That()
+            .ResideInNamespace("SwiftLift")
+            .And()
             .AreClasses()
             .And()
             .AreNotNested()
@@ -55,11 +60,17 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
     {
         // Act
         var result = s_infrastructureTypes
+            .That()
+            .ResideInNamespace("SwiftLift")
+            .And()
+            .AreClasses()
+            .And()
+            .AreNotNested()
             .ShouldNot()
             .HaveDependencyOtherThan(
                 "System", "Microsoft", "Oakton", "Serilog",
                 "FluentValidation", "Ardalis", "SwiftLift.Infrastructure",
-                "MassTransit", "Murmur", "Scrutor", "FastEndpoints")
+                "MassTransit", "Murmur", "Scrutor", "FastEndpoints", "Coverlet")
             .GetResult();
 
         PrintOutIfFail(output, result);
@@ -74,6 +85,8 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
         // Act
         var result = s_infrastructureTypes
             .That()
+            .ResideInNamespace("SwiftLift")
+            .And()
             .AreClasses()
             .And()
             .AreNotNested()
@@ -81,6 +94,29 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
             .ImplementInterface<ILogEventEnricher>()
             .Should()
             .HaveNameEndingWith("Enricher")
+            .GetResult();
+
+        PrintOutIfFail(output, result);
+
+        // Assert
+        result.IsSuccessful.Should().BeTrue();
+    }
+
+    [Fact]
+    public void All_EnvironmentChecks_Classes_Should_EndWith_EnvironmentCheck()
+    {
+        // Act
+        var result = s_infrastructureTypes
+            .That()
+            .ResideInNamespace("SwiftLift")
+            .And()
+            .AreClasses()
+            .And()
+            .AreNotNested()
+            .And()
+            .ImplementInterface<IEnvironmentCheck>()
+            .Should()
+            .HaveNameEndingWith("EnvironmentCheck")
             .GetResult();
 
         PrintOutIfFail(output, result);

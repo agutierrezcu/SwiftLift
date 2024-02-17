@@ -30,7 +30,7 @@ internal static class ConnectionStringParser
         in string keywordValueSeparator,
         in bool allowEmptyValues = false)
     {
-        Dictionary<string, string>? segments = new(StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, string> segments = new(StringComparer.OrdinalIgnoreCase);
 
         var segmentStart = -1;
         var segmentEnd = 0;

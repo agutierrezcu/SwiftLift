@@ -1,3 +1,9 @@
+rmdir /q /s tests\coverage
+rmdir /q /s tests\SwiftLift.Architecture.Tests\TestResults
+rmdir /q /s tests\SwiftLift.Infrastructure.UnitTests\TestResults
+rmdir /q /s tests\SwiftLift.Riders.Api.IntegrationTests\TestResults
+rmdir /q /s tests\SwiftLift.SharedKernel.UnitTests\TestResults
+
 dotnet clean
 dotnet build -c Release
 dotnet tool restore

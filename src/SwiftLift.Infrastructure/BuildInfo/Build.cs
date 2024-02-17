@@ -1,6 +1,5 @@
 namespace SwiftLift.Infrastructure.BuildInfo;
 
-[ExcludeFromCodeCoverage]
 public sealed record Build
 {
     public required string Id { get; init; }
