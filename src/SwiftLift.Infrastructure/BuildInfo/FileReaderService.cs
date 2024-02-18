@@ -1,7 +1,7 @@
 namespace SwiftLift.Infrastructure.BuildInfo;
 
 [ExcludeFromCodeCoverage]
-internal sealed class FileReaderService : IFileReaderService
+public sealed class FileReaderService : IFileReaderService
 {
     public Task<string> ReadAllTextAsync(string filePath, CancellationToken cancellationToken)
     {

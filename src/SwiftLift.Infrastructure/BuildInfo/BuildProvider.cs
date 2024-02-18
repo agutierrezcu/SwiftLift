@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using SwiftLift.Infrastructure.Exceptions;
 using SwiftLift.Infrastructure.Serialization;
 
@@ -12,7 +11,7 @@ internal sealed class BuildProvider
     (IBuildFileProvider _buildFileProvider,
     ISnakeJsonDeserializer _jsonSnakeDeserializer,
     IValidator<Build> _validator,
-    ILogger<BuildProvider> _logger)
+    IBuildInfoLogger _logger)
         : IBuildProvider
 {
     private Task<BuildData>? _loadBuildTask;
@@ -70,7 +69,7 @@ internal sealed class BuildProvider
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error retrieving and validation build info from file");
+            _logger.LogUnexpectedErrorLoadingBuildFile(ex);
 
             var sb = new StringBuilder(buildAsString)
                 .AppendLine()

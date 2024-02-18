@@ -8,8 +8,9 @@ public static class BuildServiceCollectionExtensions
 
         services.TryAddSingleton<IBuildFilePathResolver, BuildFilePathResolver>();
         services.AddSingleton<IBuildFileProvider, BuildFileProvider>();
-        services.TryAddSingleton<IBuildProvider, BuildProvider>();
         services.TryAddSingleton<IFileReaderService, FileReaderService>();
+        services.TryAddSingleton<IBuildProvider, BuildProvider>();
+        services.AddSingleton<IBuildInfoLogger, BuildInfoLogger>();
 
         return services;
     }

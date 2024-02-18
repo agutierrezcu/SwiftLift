@@ -1,9 +1,7 @@
 using FluentValidation.Results;
-using Microsoft.Extensions.Logging;
 using NSubstitute.ExceptionExtensions;
 using SwiftLift.Infrastructure.BuildInfo;
 using SwiftLift.Infrastructure.Serialization;
-using SwiftLift.Infrastructure.UnitTests.Extensions;
 using Xunit.Extensions.Ordering;
 
 namespace SwiftLift.Infrastructure.UnitTests.BuildInfo;
@@ -16,7 +14,7 @@ public class BuildProviderTests
 
         private static BuildProvider? s_sut;
 
-        private readonly ILogger<BuildProvider> _logger;
+        private readonly IBuildInfoLogger _logger;
         private readonly IBuildFileProvider _buildFileProvider;
         private readonly ISnakeJsonDeserializer _jsonSnakeDeserializer;
         private readonly IValidator<Build> _validator;
@@ -47,7 +45,7 @@ public class BuildProviderTests
             _validator = Substitute.For<IValidator<Build>>();
             _validator.ValidateAsync(_build, s_cancellation).Returns(new ValidationResult());
 
-            _logger = Substitute.For<ILogger<BuildProvider>>();
+            _logger = Substitute.For<IBuildInfoLogger>();
 
             s_sut ??= new BuildProvider(_buildFileProvider, _jsonSnakeDeserializer, _validator, _logger);
         }
@@ -84,7 +82,8 @@ public class BuildProviderTests
                     .ConfigureAwait(true);
 
             _logger
-                .DidNotReceiveMatchingArgs();
+                .DidNotReceiveWithAnyArgs()
+                .LogUnexpectedErrorLoadingBuildFile(Arg.Any<Exception>());
         }
 
         [Fact]
@@ -118,9 +117,9 @@ public class BuildProviderTests
                     .ConfigureAwait(true);
 
             _logger
-                .DidNotReceiveMatchingArgs();
+               .DidNotReceiveWithAnyArgs()
+               .LogUnexpectedErrorLoadingBuildFile(Arg.Any<Exception>());
         }
-
     }
 
     [Fact]
@@ -149,7 +148,7 @@ public class BuildProviderTests
         var validator = Substitute.For<IValidator<Build>>();
         validator.ValidateAsync(build, cancellation).Returns(new ValidationResult());
 
-        var logger = Substitute.For<ILogger<BuildProvider>>();
+        var logger = Substitute.For<IBuildInfoLogger>();
 
         var sut = new BuildProvider(buildFileProvider, jsonSnakeDeserializer, validator, logger);
 
@@ -181,7 +180,8 @@ public class BuildProviderTests
                 .ConfigureAwait(true);
 
         logger
-            .DidNotReceiveMatchingArgs();
+            .DidNotReceiveWithAnyArgs()
+            .LogUnexpectedErrorLoadingBuildFile(Arg.Any<Exception>());
     }
 
     [Fact]
@@ -193,6 +193,7 @@ public class BuildProviderTests
         var buildFileProvider = Substitute.For<IBuildFileProvider>();
 
         var exception = new InvalidOperationException("File does not exist");
+
         buildFileProvider.GetContentAsync(cancellation)
             .ThrowsAsync(exception);
 
@@ -200,7 +201,7 @@ public class BuildProviderTests
 
         var validator = Substitute.For<IValidator<Build>>();
 
-        var logger = Substitute.For<ILogger<BuildProvider>>();
+        var logger = Substitute.For<IBuildInfoLogger>();
 
         var sut = new BuildProvider(buildFileProvider, jsonSnakeDeserializer, validator, logger);
 
@@ -226,8 +227,8 @@ public class BuildProviderTests
                 .ConfigureAwait(true);
 
         logger
-            .ReceivedMatchingArgs(1, LogLevel.Error,
-            exception, "Unexpected error retrieving and validation build info from file");
+            .Received(1)
+            .LogUnexpectedErrorLoadingBuildFile(exception);
     }
 
     [Fact]
@@ -239,6 +240,7 @@ public class BuildProviderTests
         var buildFileProvider = Substitute.For<IBuildFileProvider>();
 
         var exception = new InvalidOperationException("File does not exist");
+
         buildFileProvider.GetContentAsync(cancellation)
             .ThrowsAsync(exception);
 
@@ -246,7 +248,7 @@ public class BuildProviderTests
 
         var validator = Substitute.For<IValidator<Build>>();
 
-        var logger = Substitute.For<ILogger<BuildProvider>>();
+        var logger = Substitute.For<IBuildInfoLogger>();
 
         var sut = new BuildProvider(buildFileProvider, jsonSnakeDeserializer, validator, logger);
 
@@ -276,7 +278,7 @@ public class BuildProviderTests
                 .ConfigureAwait(true);
 
         logger
-            .ReceivedMatchingArgs(1, LogLevel.Error,
-            exception, "Unexpected error retrieving and validation build info from file");
+            .Received(1)
+            .LogUnexpectedErrorLoadingBuildFile(exception);
     }
 }

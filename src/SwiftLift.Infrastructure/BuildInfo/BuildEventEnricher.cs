@@ -16,6 +16,11 @@ internal sealed class BuildEventEnricher(IServiceProvider _serviceProvider)
         s_cachedBuildProperties ??= new Lazy<Task<List<LogEventProperty>>>(
             () => CreateLogEventPropertiesAsync(propertyFactory));
 
+        if (s_cachedBuildProperties.Value.IsFaulted)
+        {
+            return;
+        }
+
         foreach (var property in s_cachedBuildProperties.Value.Result)
         {
             logEvent.AddPropertyIfAbsent(property);
