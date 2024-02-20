@@ -1,7 +1,7 @@
 using Oakton.Environment;
 using Serilog.Core;
+using SwiftLift.Architecture.Tests.Rules;
 using SwiftLift.Infrastructure;
-using SwiftLift.Infrastructure.Operations;
 using Xunit.Abstractions;
 
 namespace SwiftLift.Architecture.Tests.Infrastructure;
@@ -22,11 +22,13 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
             .And()
             .AreNotNested()
             .And()
-            .AreNotOfType(typeof(OperationEndpointExtensions))
+            .AreNotEnumExtensionsGenerator()
             .Should()
             .ResideInNamespaceMatching("SwiftLift.Infrastructure")
             .And()
             .HaveSourceFileNameMatchingName()
+            .And()
+            .HaveSourceFilePathMatchingNamespace()
             .GetResult();
 
         PrintOutIfFail(output, result);
@@ -80,7 +82,7 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
 
         PrintOutIfFail(output, result);
 
-        // Assert   
+        // Assert
         result.IsSuccessful.Should().BeTrue();
     }
 

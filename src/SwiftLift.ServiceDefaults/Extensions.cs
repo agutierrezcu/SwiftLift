@@ -1,7 +1,5 @@
 using System.Net.Mime;
 using Ardalis.GuardClauses;
-using Azure.Identity;
-using Azure.Monitor.OpenTelemetry.AspNetCore;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using FluentValidation;
@@ -167,18 +165,18 @@ public static partial class Extensions
                 resourceBuilder => resourceBuilder.AddAttributes(resourceAttributes)));
 
         // TODO: check this out later having into account the issue https://github.com/dotnet/aspire/issues/1562
-        services.AddOpenTelemetry()
-           .UseAzureMonitor(
-                opts =>
-                {
-                    opts.SamplingRatio = 0.05F;
+        //services.AddOpenTelemetry()
+        //   .UseAzureMonitor(
+        //        opts =>
+        //        {
+        //            opts.SamplingRatio = 0.05F;
 
-                    opts.Credential =
-                        builder.Environment.IsDevelopment()
-                        ? new DefaultAzureCredential()
-                        : new ManagedIdentityCredential();
-                }
-            );
+        //            opts.Credential =
+        //                builder.Environment.IsDevelopment()
+        //                ? new DefaultAzureCredential()
+        //                : new ManagedIdentityCredential();
+        //        }
+        //    );
 
         return builder;
     }
