@@ -5,49 +5,22 @@ using Xunit.Extensions.Ordering;
 
 namespace SwiftLift.Infrastructure.UnitTests.BuildInfo;
 
-public sealed class BuildEventEnricherTests
+public class BuildEventEnricherFixture
 {
-    [Fact]
-    public void Given_NullLogEvent_When_Enrich_Then_ThrowArgumentNullException()
+    public IServiceProvider ServiceProvider { get; private set; }
+
+    public Build Build { get; private set; }
+
+    public ILogEventPropertyFactory PropertyFactory { get; private set; }
+
+    public IBuildProvider BuildProvider { get; private set; }
+
+    internal BuildEventEnricher Sut { get; private set; }
+
+    public BuildEventEnricherFixture()
     {
         // Arrange
-        var serviceProvider = Substitute.For<IServiceProvider>();
-
-        var sut = new BuildEventEnricher(serviceProvider);
-
-        // Act
-        Action act = () => sut.Enrich(null, null);
-
-        // Assert
-        act.Should()
-            .Throw<ArgumentNullException>()
-            .WithMessage("Value cannot be null. (Parameter 'logEvent')");
-    }
-
-    [Fact]
-    public void Given_NullPropertyFactory_When_Enrich_Then_ThrowArgumentNullException()
-    {
-        // Arrange
-        var logEvent = new LogEvent(DateTimeOffset.Now, LogEventLevel.Information, null, new MessageTemplate(string.Empty, []), []);
-
-        var serviceProvider = Substitute.For<IServiceProvider>();
-
-        var sut = new BuildEventEnricher(serviceProvider);
-
-        //Act
-        Action act = () => sut.Enrich(logEvent, null);
-
-        // Assert
-        act.Should()
-            .Throw<ArgumentNullException>()
-            .WithMessage("Value cannot be null. (Parameter 'propertyFactory')");
-    }
-
-    [Fact, Order(1)]
-    public void Given_LogEvent_When_Enrich_Then_BuildPropertiesAreAdded()
-    {
-        // Arrange
-        var build = new Build
+        Build = new Build
         {
             Id = "1",
             Number = "1.0.0",
@@ -56,66 +29,75 @@ public sealed class BuildEventEnricherTests
             Url = "http://localhost"
         };
 
-        var propertyFactory = Substitute.For<ILogEventPropertyFactory>();
+        PropertyFactory = Substitute.For<ILogEventPropertyFactory>();
 
-        propertyFactory.CreateProperty(Arg.Any<string>(), Arg.Any<object?>())
+        PropertyFactory.CreateProperty(Arg.Any<string>(), Arg.Any<object?>())
            .Returns(callInfo => new LogEventProperty((string)callInfo[0], new ScalarValue(callInfo[1])));
 
-        var buildProvider = Substitute.For<IBuildProvider>();
+        BuildProvider = Substitute.For<IBuildProvider>();
 
-        buildProvider.GetBuildAsync(default).Returns(Task.FromResult(build));
+        BuildProvider.GetBuildAsync(default).Returns(Task.FromResult(Build));
 
-        var serviceProvider = Substitute.For<IServiceProvider>();
+        ServiceProvider = Substitute.For<IServiceProvider>();
 
-        serviceProvider.GetService(typeof(IBuildProvider)).Returns(buildProvider);
+        ServiceProvider.GetService(typeof(IBuildProvider)).Returns(BuildProvider);
 
+        Sut = new BuildEventEnricher(ServiceProvider);
+    }
+}
+
+public sealed class BuildEventEnricherTests(BuildEventEnricherFixture _sutFixture)
+    : IClassFixture<BuildEventEnricherFixture>
+{
+    [Fact, Order(1)]
+    public void Given_LogEvent_When_Enrich_Then_BuildPropertiesAreAdded()
+    {
+        // Arrange
         var logEvent = new LogEvent(DateTimeOffset.Now, LogEventLevel.Information, null,
             new MessageTemplate(string.Empty, []), []);
 
-        var sut = new BuildEventEnricher(serviceProvider);
-
         // Act
-        sut.Enrich(logEvent, propertyFactory);
+        _sutFixture.Sut.Enrich(logEvent, _sutFixture.PropertyFactory);
 
         // Assert
         Received.InOrder(() =>
         {
-            serviceProvider.GetService(typeof(IBuildProvider));
+            _sutFixture.ServiceProvider.GetService(typeof(IBuildProvider));
 
-            buildProvider.GetBuildAsync(default);
+            _sutFixture.BuildProvider.GetBuildAsync(default);
 
-            propertyFactory.CreateProperty("BuildId", build.Id);
-            propertyFactory.CreateProperty("BuildNumber", build.Number);
-            propertyFactory.CreateProperty("BuildCommit", build.Commit);
+            _sutFixture.PropertyFactory.CreateProperty("BuildId", _sutFixture.Build.Id);
+            _sutFixture.PropertyFactory.CreateProperty("BuildNumber", _sutFixture.Build.Number);
+            _sutFixture.PropertyFactory.CreateProperty("BuildCommit", _sutFixture.Build.Commit);
         });
 
-        serviceProvider
+        _sutFixture.ServiceProvider
             .Received(1)
             .GetService(typeof(IBuildProvider));
 
-        buildProvider
+        _sutFixture.BuildProvider
             .Received(1)
             .GetBuildAsync(default);
 
-        propertyFactory
+        _sutFixture.PropertyFactory
             .Received(1)
-            .CreateProperty("BuildId", build.Id);
+            .CreateProperty("BuildId", _sutFixture.Build.Id);
 
-        propertyFactory
+        _sutFixture.PropertyFactory
             .Received(1)
-            .CreateProperty("BuildNumber", build.Number);
+            .CreateProperty("BuildNumber", _sutFixture.Build.Number);
 
-        propertyFactory
+        _sutFixture.PropertyFactory
             .Received(1)
-            .CreateProperty("BuildCommit", build.Commit);
+            .CreateProperty("BuildCommit", _sutFixture.Build.Commit);
 
         var properties = logEvent.Properties;
 
         var expectedProperties = new List<LogEventProperty>
         {
-            new("BuildId", new ScalarValue(build.Id)),
-            new("BuildNumber", new ScalarValue(build.Number)),
-            new("BuildCommit", new ScalarValue(build.Commit))
+            new("BuildId", new ScalarValue(_sutFixture.Build.Id)),
+            new("BuildNumber", new ScalarValue(_sutFixture.Build.Number)),
+            new("BuildCommit", new ScalarValue(_sutFixture.Build.Commit))
         };
 
         foreach (var expectedProperty in expectedProperties)
@@ -129,39 +111,27 @@ public sealed class BuildEventEnricherTests
     public void Given_LogEvent_When_Enrich_Then_BuildPropertiesAreAddedFromCache()
     {
         // Arrange
-        var build = new Build
-        {
-            Id = "1",
-            Number = "1.0.0",
-            Branch = "master",
-            Commit = "abc123",
-            Url = "http://localhost"
-        };
-
-        var propertyFactory = Substitute.For<ILogEventPropertyFactory>();
-
-        var buildProvider = Substitute.For<IBuildProvider>();
-
-        var serviceProvider = Substitute.For<IServiceProvider>();
+        _sutFixture.BuildProvider.ClearReceivedCalls();
+        _sutFixture.PropertyFactory.ClearReceivedCalls();
+        _sutFixture.ServiceProvider.ClearReceivedCalls();
+        _sutFixture.BuildProvider.ClearReceivedCalls();
 
         var logEvent = new LogEvent(DateTimeOffset.Now, LogEventLevel.Information, null,
             new MessageTemplate(string.Empty, []), []);
 
-        var sut = new BuildEventEnricher(serviceProvider);
-
         // Act
-        sut.Enrich(logEvent, propertyFactory);
+        _sutFixture.Sut.Enrich(logEvent, _sutFixture.PropertyFactory);
 
         // Assert
-        serviceProvider
+        _sutFixture.ServiceProvider
             .DidNotReceiveWithAnyArgs()
             .GetService(typeof(IBuildProvider));
 
-        buildProvider
+        _sutFixture.BuildProvider
             .DidNotReceiveWithAnyArgs()
             .GetBuildAsync(default);
 
-        propertyFactory
+        _sutFixture.PropertyFactory
             .DidNotReceiveWithAnyArgs()
             .CreateProperty(Arg.Any<string>(), Arg.Any<object?>());
 
@@ -169,9 +139,9 @@ public sealed class BuildEventEnricherTests
 
         var expectedProperties = new List<LogEventProperty>
         {
-            new("BuildId", new ScalarValue(build.Id)),
-            new("BuildNumber", new ScalarValue(build.Number)),
-            new("BuildCommit", new ScalarValue(build.Commit))
+            new("BuildId", new ScalarValue(_sutFixture.Build.Id)),
+            new("BuildNumber", new ScalarValue(_sutFixture.Build.Number)),
+            new("BuildCommit", new ScalarValue(_sutFixture.Build.Commit))
         };
 
         foreach (var expectedProperty in expectedProperties)

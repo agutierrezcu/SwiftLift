@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Oakton;
 
 namespace SwiftLift.Infrastructure.Checks;
@@ -16,14 +15,14 @@ public static class EnvironmentCheckWebApplicationBuilderExtensions
 
         var services = builder.Services;
 
-        services.AddTransient<IStartupFilter, EnvironmentCheckStartupFilter>();
-
         services
             .Scan(scan => scan
                 .FromAssemblies(applicationAssemblies)
                 .AddClasses(s => s.AssignableTo<IEnvironmentCheck>(), false)
                 .As<IEnvironmentCheck>()
                 .WithTransientLifetime());
+
+        services.AddHostedService<EnvironmentChecksHostedService>();
 
         return builder;
     }

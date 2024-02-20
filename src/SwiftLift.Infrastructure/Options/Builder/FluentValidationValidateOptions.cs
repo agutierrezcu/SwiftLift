@@ -20,8 +20,7 @@ internal sealed class FluentValidationValidateOptions<TOptions>(
 
         Guard.Against.Null(options);
 
-        var results = _validator.ValidateAsync(options)
-            .GetAwaiter().GetResult();
+        var results = _validator.Validate(options);
 
         if (results.IsValid)
         {

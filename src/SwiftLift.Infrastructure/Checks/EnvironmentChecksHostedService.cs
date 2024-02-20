@@ -1,31 +1,26 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace SwiftLift.Infrastructure.Checks;
 
-internal sealed class EnvironmentCheckStartupFilter : IStartupFilter
+internal sealed class EnvironmentChecksHostedService
+    (IServiceProvider _serviceProvider, ILogger<EnvironmentChecksHostedService> _logger)
+        : IHostedService
 {
-    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-        return app =>
+        _logger.LogInformation($"Starting {nameof(EnvironmentChecksHostedService)} hosted service");
+
+        var checkResults = await EnvironmentChecker.ExecuteAllEnvironmentChecks(
+            _serviceProvider, cancellationToken)
+                .ConfigureAwait(false);
+
+        if (!checkResults.Succeeded())
         {
-            var checkResults =
-                EnvironmentChecker.ExecuteAllEnvironmentChecks(app.ApplicationServices)
-                    .GetAwaiter().GetResult();
+            _logger.LogError("Environment Checks failures {Results}",
+                GetResultsSummary(checkResults));
+        }
 
-            if (!checkResults.Succeeded())
-            {
-                var logger = app.ApplicationServices.GetRequiredService<Serilog.ILogger>();
-
-                logger.ForContext<EnvironmentCheckStartupFilter>()
-                    .Error("Environment Checks failures {Results}",
-                        GetResultsSummary(checkResults));
-            }
-
-            checkResults.Assert();
-
-            next(app);
-        };
+        checkResults.Assert();
     }
 
     private static string GetResultsSummary(EnvironmentCheckResults checkResults)
@@ -67,5 +62,12 @@ internal sealed class EnvironmentCheckStartupFilter : IStartupFilter
         }
 
         return sb.ToString();
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation($"Stopping {nameof(EnvironmentChecksHostedService)} hosted service");
+
+        return Task.CompletedTask;
     }
 }

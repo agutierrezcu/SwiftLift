@@ -12,8 +12,8 @@ internal sealed class CorrelationIdResponseMiddleware(
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         var isAddCorrelationIdToResponseEnabled =
-               _featureManager.IsEnabledAsync("AddCorrelationIdToResponse")
-                   .GetAwaiter().GetResult();
+               await _featureManager.IsEnabledAsync("AddCorrelationIdToResponse")
+                .ConfigureAwait(false);
 
         if (isAddCorrelationIdToResponseEnabled)
         {

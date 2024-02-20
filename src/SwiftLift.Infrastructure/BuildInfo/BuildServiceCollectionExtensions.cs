@@ -6,11 +6,11 @@ public static class BuildServiceCollectionExtensions
     {
         Guard.Against.Null(services);
 
-        services.TryAddSingleton<IBuildFilePathResolver, BuildFilePathResolver>();
         services.AddSingleton<IBuildFileProvider, BuildFileProvider>();
+        services.AddSingleton<IBuildInfoLogger, BuildInfoLogger>();
+        services.TryAddSingleton<IBuildFilePathResolver, BuildFilePathResolver>();
         services.TryAddSingleton<IFileReaderService, FileReaderService>();
         services.TryAddSingleton<IBuildProvider, BuildProvider>();
-        services.AddSingleton<IBuildInfoLogger, BuildInfoLogger>();
 
         return services;
     }

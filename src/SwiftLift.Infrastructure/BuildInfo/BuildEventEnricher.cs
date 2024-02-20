@@ -6,34 +6,26 @@ namespace SwiftLift.Infrastructure.BuildInfo;
 internal sealed class BuildEventEnricher(IServiceProvider _serviceProvider)
     : ILogEventEnricher
 {
-    private static Lazy<Task<List<LogEventProperty>>>? s_cachedBuildProperties;
+    private List<LogEventProperty>? _cachedBuildProperties;
 
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
-        Guard.Against.Null(logEvent);
-        Guard.Against.Null(propertyFactory);
+        _cachedBuildProperties ??= CreateBuildLogEventProperties(propertyFactory);
 
-        s_cachedBuildProperties ??= new Lazy<Task<List<LogEventProperty>>>(
-            () => CreateLogEventPropertiesAsync(propertyFactory));
-
-        if (s_cachedBuildProperties.Value.IsFaulted)
-        {
-            return;
-        }
-
-        foreach (var property in s_cachedBuildProperties.Value.Result)
+        foreach (var property in _cachedBuildProperties)
         {
             logEvent.AddPropertyIfAbsent(property);
         }
     }
 
-    private async Task<List<LogEventProperty>> CreateLogEventPropertiesAsync(
+    private List<LogEventProperty> CreateBuildLogEventProperties(
         ILogEventPropertyFactory propertyFactory)
     {
         var buildProvider = _serviceProvider.GetRequiredService<IBuildProvider>();
 
-        var build = await buildProvider.GetBuildAsync(default)
-            .ConfigureAwait(false);
+#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
+        var build = buildProvider.GetBuildAsync(default).GetAwaiter().GetResult();
+#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
 
         return
         [
