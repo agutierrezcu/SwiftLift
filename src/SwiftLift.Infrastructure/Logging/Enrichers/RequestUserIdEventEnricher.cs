@@ -11,9 +11,6 @@ internal sealed class RequestUserIdEventEnricher(
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
-        Guard.Against.Null(logEvent);
-        Guard.Against.Null(propertyFactory);
-
         if (_httpContextAccessor.HttpContext is null)
         {
             return;

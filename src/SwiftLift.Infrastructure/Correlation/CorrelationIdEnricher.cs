@@ -8,9 +8,6 @@ internal sealed class CorrelationIdEnricher(ICorrelationIdResolver _correlationI
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
-        Guard.Against.Null(logEvent);
-        Guard.Against.Null(propertyFactory);
-
         if (!_correlationIdResolver.TryGet(out var correlationId))
         {
             return;
