@@ -43,7 +43,7 @@ public class Benchmarks
     [Benchmark]
     public DayOfWeekSmartEnum[] GetValues_Smart()
     {
-        return DayOfWeekSmartEnum.List.ToArray();
+        return [.. DayOfWeekSmartEnum.List];
     }
 
     [Benchmark]

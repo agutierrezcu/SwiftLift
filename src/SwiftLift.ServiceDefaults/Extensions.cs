@@ -23,6 +23,7 @@ using SwiftLift.Infrastructure.Checks;
 using SwiftLift.Infrastructure.Correlation;
 using SwiftLift.Infrastructure.Environment;
 using SwiftLift.Infrastructure.Logging;
+using SwiftLift.Infrastructure.Operations;
 using SwiftLift.Infrastructure.Serialization;
 using SwiftLift.Infrastructure.UserContext;
 using SwiftLift.SharedKernel.Application;

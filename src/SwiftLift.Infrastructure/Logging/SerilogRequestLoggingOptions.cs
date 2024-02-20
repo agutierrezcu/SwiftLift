@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Serilog;
 using Serilog.AspNetCore;
 using Serilog.Events;
+using SwiftLift.Infrastructure.Operations;
 
 namespace SwiftLift.Infrastructure.Logging;
 
@@ -45,7 +46,10 @@ public static class SerilogRequestLoggingOptions
             return false;
         }
 
-        if (OperationEndpoint.TryFromName(endpoint.DisplayName, out _))
+        var operationName = endpoint.DisplayName ?? string.Empty;
+
+        if (OperationEndpointExtensions.IsDefined(
+                operationName, allowMatchingMetadataAttribute: true))
         {
             return true;
         }

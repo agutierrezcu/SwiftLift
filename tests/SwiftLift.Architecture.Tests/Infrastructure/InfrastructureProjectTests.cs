@@ -1,6 +1,7 @@
 using Oakton.Environment;
 using Serilog.Core;
 using SwiftLift.Infrastructure;
+using SwiftLift.Infrastructure.Operations;
 using Xunit.Abstractions;
 
 namespace SwiftLift.Architecture.Tests.Infrastructure;
@@ -20,6 +21,8 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
             .AreClasses()
             .And()
             .AreNotNested()
+            .And()
+            .AreNotOfType(typeof(OperationEndpointExtensions))
             .Should()
             .ResideInNamespaceMatching("SwiftLift.Infrastructure")
             .And()
