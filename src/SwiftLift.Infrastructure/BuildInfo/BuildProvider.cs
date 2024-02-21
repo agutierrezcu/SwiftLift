@@ -52,18 +52,20 @@ internal sealed class BuildProvider
                 await _validator.ValidateAsync(build, cancellation)
                     .ConfigureAwait(false);
 
-            if (!validationResult.IsValid)
+            if (validationResult.IsValid)
             {
-                var errorMessages = validationResult.Errors
-                    .Select(e => $"{e.PropertyName}: {e.ErrorMessage}")
-                    .ToList();
-
-                var sb = new StringBuilder(buildAsString)
-                    .AppendLine()
-                    .AppendLine(string.Join(NewLine, errorMessages));
-
-                buildAsString = sb.ToString();
+                return (build, buildAsString);
             }
+
+            var errorMessages = validationResult.Errors
+                .Select(e => $"{e.PropertyName}: {e.ErrorMessage}")
+                .ToList();
+
+            var sb = new StringBuilder(buildAsString)
+                .AppendLine()
+                .AppendLine(string.Join(NewLine, errorMessages));
+
+            buildAsString = sb.ToString();
 
             return (build, buildAsString);
         }

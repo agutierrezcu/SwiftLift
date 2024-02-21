@@ -9,13 +9,13 @@ internal sealed class UserContext(IHttpContextAccessor _httpContextAccessor)
     {
         userId = null;
 
-        return _httpContextAccessor.HttpContext?.User?
+        return _httpContextAccessor.HttpContext?.User
             .TryGetUserId(out userId) ?? false;
     }
 
     public bool IsAuthenticated()
     {
-        return _httpContextAccessor.HttpContext?.User?
+        return _httpContextAccessor.HttpContext?.User
             .Identity?.IsAuthenticated ?? false;
     }
 }

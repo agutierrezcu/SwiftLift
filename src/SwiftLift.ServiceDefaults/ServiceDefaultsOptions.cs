@@ -7,13 +7,14 @@ namespace SwiftLift.ServiceDefaults;
 
 public sealed class ServiceDefaultsOptions
 {
-    public required ApplicationInfo ApplicationInfo { get; set; }
+    public required ApplicationInfo ApplicationInfo { get; init; }
 
-    public required ConnectionStringResource ApplicationInsightConnectionString { get; set; }
+    public required ConnectionStringResource ApplicationInsightConnectionString { get; init; }
 
-    public required Assembly[] ApplicationAssemblies { get; set; }
+    public required Assembly[] ApplicationAssemblies { get; init; }
 
-    public string AzureLogStreamOptionsSectionPath { get; set; } = "AzureLogStream";
+    public string AzureLogStreamOptionsSectionPath { get; init; } = "AzureLogStream";
 
-    public IEnvironmentService EnvironmentService { get; set; } = Infrastructure.Environment.EnvironmentService.Instance;
+    public IEnvironmentService EnvironmentService { get; init; } =
+        Infrastructure.Environment.EnvironmentService.Instance;
 }

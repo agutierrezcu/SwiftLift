@@ -23,7 +23,7 @@ public static class SerilogWebApplicationBuilderExtensions
         IEnvironmentService environmentService,
         ConnectionStringResource applicationInsightConnectionString,
         string azureLogStreamOptionsSectionPath,
-        Assembly[] applicationAssemblies)
+        params Assembly[] applicationAssemblies)
     {
         Guard.Against.Null(builder);
         Guard.Against.Null(environmentService);

@@ -23,7 +23,6 @@ public static class CorrelationIdServiceCollectionExtensions
         });
 
         services.AddTransient<IStartupFilter, CorrelationIdStartupFilter>();
-        services.AddScoped<CorrelationIdResponseMiddleware>();
 
         return services;
     }

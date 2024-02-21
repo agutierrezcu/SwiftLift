@@ -1,9 +1,7 @@
 <Project>
   <ItemGroup Label="Microsoft">
-    <PackageVersion Include="Ardalis.SmartEnum" Version="8.0.0" />
     <PackageVersion Include="Azure.Identity" Version="1.10.4" />
     <PackageVersion Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.1.0" />
-    <PackageVersion Include="Calzolari.ILogger.Extensions.NSusbtitute" Version="2.2.0.1" />
     <PackageVersion Include="Microsoft.AspNetCore.HeaderPropagation" Version="8.0.2" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="8.0.2" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Analyzers" Version="8.0.2" />
@@ -12,17 +10,19 @@
     <PackageVersion Include="Microsoft.FeatureManagement.AspNetCore" Version="3.1.1" />
     <PackageVersion Include="Microsoft.NETCore.Jit" Version="2.0.8" />
     <PackageVersion Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.9.28" />
-    <PackageVersion Include="NetEscapades.EnumGenerators" Version="1.0.0-beta08" />
     <PackageVersion Include="System.Net.Http" Version="4.3.4" />
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
   <ItemGroup Label="ThirdParty">
     <PackageVersion Include="Ardalis.GuardClauses" Version="4.4.0" />
+    <PackageVersion Include="Ardalis.SmartEnum" Version="8.0.0" />
     <PackageVersion Include="Ardalis.SmartEnum.SystemTextJson" Version="8.0.0" />
+    <PackageVersion Include="Calzolari.ILogger.Extensions.NSusbtitute" Version="2.2.0.1" />
     <PackageVersion Include="FastEndpoints" Version="5.22.0" />
     <PackageVersion Include="FastEndpoints.Swagger" Version="5.22.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.0" />
     <PackageVersion Include="murmurhash" Version="1.0.3" />
+    <PackageVersion Include="NetEscapades.EnumGenerators" Version="1.0.0-beta08" />
     <PackageVersion Include="NewId" Version="4.0.1" />
     <PackageVersion Include="Oakton" Version="6.1.0" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.7.0" />

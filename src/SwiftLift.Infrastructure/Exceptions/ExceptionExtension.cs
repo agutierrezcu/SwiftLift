@@ -21,7 +21,7 @@ public static class ExceptionExtension
         sb.AppendLine(InvariantCulture, $"Message: {exception.Message}");
         sb.AppendLine(InvariantCulture, $"Source: {exception.Source}");
 
-        if (exception.Data?.Count > 0)
+        if (exception.Data.Count > 0)
         {
             sb.AppendLine("Data:");
             foreach (DictionaryEntry entry in exception.Data)

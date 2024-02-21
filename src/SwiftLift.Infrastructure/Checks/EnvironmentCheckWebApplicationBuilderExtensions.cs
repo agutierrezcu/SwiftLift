@@ -6,7 +6,7 @@ namespace SwiftLift.Infrastructure.Checks;
 public static class EnvironmentCheckWebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder AddEnvironmentChecks(this WebApplicationBuilder builder,
-        Assembly[] applicationAssemblies)
+        params Assembly[] applicationAssemblies)
     {
         Guard.Against.Null(builder);
         Guard.Against.NullOrEmpty(applicationAssemblies);

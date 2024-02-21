@@ -18,7 +18,7 @@ internal sealed class ApplicationInsightEnvironmentCheck : IEnvironmentCheck
             .GetConnectionStringGuaranteed(
                 environmentService, configuration);
 
-        if (!connectionStringResource?.TryGetSegmentValue("InstrumentationKey", out _) ?? true)
+        if (!connectionStringResource.TryGetSegmentValue("InstrumentationKey", out _))
         {
             throw new InvalidConnectionStringException(
                 ApplicationInsightSettings.ResourceName,

@@ -14,11 +14,12 @@ public static class AppDomainExtensions
         var directoryName = Path.GetDirectoryName(entryAssemblyLocation)!;
 
         return currentAssemblies
-            .Where(a => a.FullName?.StartsWith(@namespace, StringComparison.InvariantCultureIgnoreCase) ?? false)
+            .Where(a => a.FullName?.StartsWith(@namespace,
+                StringComparison.InvariantCultureIgnoreCase) ?? false)
             .Union(Directory
-                   .EnumerateFiles(directoryName, assembliesSearchPattern)
-                   .Where(a => !currentAssemblies.Any(aa => aa.FullName == a))
-                   .Select(a => Assembly.Load(AssemblyName.GetAssemblyName(a))))
+                .EnumerateFiles(directoryName, assembliesSearchPattern)
+                .Where(a => currentAssemblies.All(aa => aa.FullName != a))
+                .Select(a => Assembly.Load(AssemblyName.GetAssemblyName(a))))
            .Union(new[] { Assembly.GetEntryAssembly() })
            .GroupBy(a => a?.FullName)
            .Select(a => a.First())

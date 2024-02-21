@@ -4,22 +4,20 @@ using Microsoft.FeatureManagement;
 
 namespace SwiftLift.Infrastructure.Correlation;
 
-internal sealed class CorrelationIdResponseMiddleware(
-    ICorrelationIdResolver _correlationIdResolver,
-    IFeatureManagerSnapshot _featureManager)
-        : IMiddleware
+internal sealed class CorrelationIdResponseMiddleware(RequestDelegate _next)
 {
-    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+    public async Task InvokeAsync(HttpContext context,
+        ICorrelationIdResolver correlationIdResolver, IFeatureManagerSnapshot featureManager)
     {
         var isAddCorrelationIdToResponseEnabled =
-               await _featureManager.IsEnabledAsync("AddCorrelationIdToResponse")
+               await featureManager.IsEnabledAsync("AddCorrelationIdToResponse")
                 .ConfigureAwait(false);
 
         if (isAddCorrelationIdToResponseEnabled)
         {
             context.Response.OnStarting(() =>
             {
-                if (!_correlationIdResolver.TryGet(out var correlationId))
+                if (!correlationIdResolver.TryGet(out var correlationId))
                 {
                     return Task.CompletedTask;
                 }
@@ -32,7 +30,7 @@ internal sealed class CorrelationIdResponseMiddleware(
             });
         }
 
-        await next(context)
+        await _next(context)
           .ConfigureAwait(false);
     }
 }

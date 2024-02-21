@@ -161,7 +161,7 @@ public static partial class Extensions
         };
 
         services.ConfigureOpenTelemetryTracerProvider(
-            builder => builder.ConfigureResource(
+            config => config.ConfigureResource(
                 resourceBuilder => resourceBuilder.AddAttributes(resourceAttributes)));
 
         // TODO: check this out later having into account the issue https://github.com/dotnet/aspire/issues/1562
