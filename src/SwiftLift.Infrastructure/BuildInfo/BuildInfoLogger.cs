@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 namespace SwiftLift.Infrastructure.BuildInfo;
 
 [ExcludeFromCodeCoverage]
-internal partial class BuildInfoLogger(ILogger<BuildInfoLogger> _logger) : IBuildInfoLogger
+internal sealed partial class BuildInfoLogger(ILogger<BuildInfoLogger> _logger) : IBuildInfoLogger
 {
     public void LogUnexpectedErrorLoadingBuildFile(Exception ex)
     {

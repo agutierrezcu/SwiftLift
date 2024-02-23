@@ -5,7 +5,7 @@ using Serilog.Events;
 
 namespace SwiftLift.Infrastructure.EventTypes;
 
-internal sealed class EventTypeEnricher : ILogEventEnricher
+internal sealed class EventTypeLogEventEnricher : ILogEventEnricher
 {
     private readonly ConcurrentDictionary<string, Lazy<LogEventProperty>>
         _cachedMessageTemplateEventType = new();

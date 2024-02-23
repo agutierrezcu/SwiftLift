@@ -1,12 +1,12 @@
-﻿using Mono.Cecil;
+using Mono.Cecil;
 
 namespace SwiftLift.Architecture.Tests.Rules;
 
 public static class TypeDefinitionExtensions
 {
-    public static PredicateList AreNotEnumExtensionsGenerator(this Predicate predicate)
+    public static PredicateList AreNotInGeneratedFile(this Predicate predicate)
     {
-        return predicate.MeetCustomRule(EnumExtensionsGeneratorExclusionRule.Instance);
+        return predicate.MeetCustomRule(ClassInGeneratedFileExclusionRule.Instance);
     }
 
     public static string? GetFilePath(this TypeDefinition typeDefinition)

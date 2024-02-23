@@ -3,7 +3,7 @@ using Serilog.Events;
 
 namespace SwiftLift.Infrastructure.BuildInfo;
 
-internal sealed class BuildEventEnricher(IServiceProvider _serviceProvider)
+internal sealed class BuildLogEventEnricher(IServiceProvider _serviceProvider)
     : ILogEventEnricher
 {
     private List<LogEventProperty>? _cachedBuildProperties;

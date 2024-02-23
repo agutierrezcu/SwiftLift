@@ -5,7 +5,7 @@ using SwiftLift.Infrastructure.UserContext;
 
 namespace SwiftLift.Infrastructure.Logging.Enrichers;
 
-internal sealed class RequestUserIdEventEnricher(
+internal sealed class RequestUserIdLogEventEnricher(
     IHttpContextAccessor _httpContextAccessor, IUserContext _userContext)
         : ILogEventEnricher
 {

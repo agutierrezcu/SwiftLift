@@ -15,7 +15,7 @@ public class BuildEventEnricherFixture
 
     public IBuildProvider BuildProvider { get; private set; }
 
-    internal BuildEventEnricher Sut { get; private set; }
+    internal BuildLogEventEnricher Sut { get; private set; }
 
     public BuildEventEnricherFixture()
     {
@@ -42,7 +42,7 @@ public class BuildEventEnricherFixture
 
         ServiceProvider.GetService(typeof(IBuildProvider)).Returns(BuildProvider);
 
-        Sut = new BuildEventEnricher(ServiceProvider);
+        Sut = new BuildLogEventEnricher(ServiceProvider);
     }
 }
 
