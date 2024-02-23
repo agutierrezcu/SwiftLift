@@ -1,7 +1,7 @@
 namespace SwiftLift.Infrastructure.Correlation;
 
 [StronglyTypedId(
-    backingType: StronglyTypedIdBackingType.String,
+    backingType: StronglyTypedIdBackingType.Guid,
     jsonConverter: StronglyTypedIdJsonConverter.SystemTextJson)]
 internal partial struct CorrelationId
 {

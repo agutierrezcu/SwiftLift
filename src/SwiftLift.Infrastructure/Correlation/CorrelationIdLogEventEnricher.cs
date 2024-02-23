@@ -3,7 +3,7 @@ using Serilog.Events;
 
 namespace SwiftLift.Infrastructure.Correlation;
 
-internal sealed class CorrelationIdEnricher(ICorrelationIdResolver _correlationIdResolver)
+internal sealed class CorrelationIdLogEventEnricher(ICorrelationIdResolver _correlationIdResolver)
     : ILogEventEnricher
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)

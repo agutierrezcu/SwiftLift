@@ -64,10 +64,10 @@ public class RidersApiIntegrationTests(SwiftliftApiWebApplicationFactory<Program
 
         enrichers.Should().HaveCount(5);
 
-        enrichers.Should().Contain(e => e is BuildEventEnricher);
-        enrichers.Should().Contain(e => e is CorrelationIdEnricher);
-        enrichers.Should().Contain(e => e is EventIdNormalizeEnricher);
-        enrichers.Should().Contain(e => e is EventTypeEnricher);
-        enrichers.Should().Contain(e => e is RequestUserIdEventEnricher);
+        enrichers.Should().Contain(e => e is BuildLogEventEnricher);
+        enrichers.Should().Contain(e => e is CorrelationIdLogEventEnricher);
+        enrichers.Should().Contain(e => e is EventIdNormalizeLogEventEnricher);
+        enrichers.Should().Contain(e => e is EventTypeLogEventEnricher);
+        enrichers.Should().Contain(e => e is RequestUserIdLogEventEnricher);
     }
 }

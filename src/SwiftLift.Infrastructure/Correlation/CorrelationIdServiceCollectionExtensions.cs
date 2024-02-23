@@ -17,10 +17,12 @@ public static class CorrelationIdServiceCollectionExtensions
                 context =>
                 {
                     return string.IsNullOrWhiteSpace(context.HeaderValue)
-                        ? Guid.NewGuid().ToString()
+                        ? CorrelationId.New().ToString()
                         : context.HeaderValue;
                 });
         });
+
+        services.AddScoped<CorrelationIdResponseMiddleware>();
 
         services.AddTransient<IStartupFilter, CorrelationIdStartupFilter>();
 

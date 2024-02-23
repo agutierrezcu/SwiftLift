@@ -12,7 +12,7 @@ internal sealed class CorrelationIdResolver(HeaderPropagationValues _headerPropa
         {
             var correlationIdValue = correlationIdHeader.FirstOrDefault() ?? "Not set";
 
-            correlationId = new(correlationIdValue);
+            correlationId = new(Guid.Parse(correlationIdValue));
             return true;
         }
 

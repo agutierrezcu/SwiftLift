@@ -4,7 +4,7 @@ using Serilog.Events;
 
 namespace SwiftLift.Infrastructure.EventTypes;
 
-internal sealed class EventIdNormalizeEnricher : ILogEventEnricher
+internal sealed class EventIdNormalizeLogEventEnricher : ILogEventEnricher
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {

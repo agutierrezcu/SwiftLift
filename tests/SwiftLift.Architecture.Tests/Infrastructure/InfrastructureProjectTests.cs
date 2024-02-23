@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Oakton.Environment;
 using Serilog.Core;
 using SwiftLift.Architecture.Tests.Rules;
@@ -8,13 +9,8 @@ namespace SwiftLift.Architecture.Tests.Infrastructure;
 
 public sealed class InfrastructureProjectTests(ITestOutputHelper output)
 {
-    private static readonly Types s_infrastructureTypes = Types.InAssembly(typeof(AppDomainExtensions).Assembly);
-
-    [Fact]
-    public void All_Classes_Should_Be_Reside_Infrastructure_Namespace_And_Match_Source_File_Name()
-    {
-        // Act
-        var result = s_infrastructureTypes
+    private readonly Func<PredicateList> _getInfrastructureTypesPredicateList = () =>
+        Types.InAssembly(typeof(AppDomainExtensions).Assembly)
             .That()
             .ResideInNamespace("SwiftLift")
             .And()
@@ -22,7 +18,13 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
             .And()
             .AreNotNested()
             .And()
-            .AreNotEnumExtensionsGenerator()
+            .AreNotInGeneratedFile();
+
+    [Fact]
+    public void All_Classes_Should_Be_Reside_Infrastructure_Namespace_And_Match_Source_File_Name()
+    {
+        // Act
+        var result = _getInfrastructureTypesPredicateList()
             .Should()
             .ResideInNamespaceMatching("SwiftLift.Infrastructure")
             .And()
@@ -41,15 +43,7 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
     public void All_Classes_Should_Be_Internal_Or_Sealed()
     {
         // Act
-        var result = s_infrastructureTypes
-            .That()
-            .ResideInNamespace("SwiftLift")
-            .And()
-            .AreClasses()
-            .And()
-            .AreNotNested()
-            .And()
-            .DoNotImplementInterface<IApplicationLogger>()
+        var result = _getInfrastructureTypesPredicateList()
             .Should()
             .BeStatic()
             .Or()
@@ -66,13 +60,7 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
     public void Project_Should_Not_Have_Dependency_Other_Than()
     {
         // Act
-        var result = s_infrastructureTypes
-            .That()
-            .ResideInNamespace("SwiftLift")
-            .And()
-            .AreClasses()
-            .And()
-            .AreNotNested()
+        var result = _getInfrastructureTypesPredicateList()
             .ShouldNot()
             .HaveDependencyOtherThan(
                 "System", "Microsoft", "Oakton", "Serilog",
@@ -86,44 +74,18 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
         result.IsSuccessful.Should().BeTrue();
     }
 
-    [Fact]
-    public void All_LogEventEnrichers_Classes_Should_EndWith_Enricher()
+    [Theory]
+    [InlineData(typeof(ILogEventEnricher))]
+    [InlineData(typeof(IEnvironmentCheck))]
+    [InlineData(typeof(IMiddleware))]
+    public void All_LogEventEnrichers_Classes_Should_EndWith_Enricher(Type @interface, string? classNameSuffix = null)
     {
         // Act
-        var result = s_infrastructureTypes
-            .That()
-            .ResideInNamespace("SwiftLift")
+        var result = _getInfrastructureTypesPredicateList()
             .And()
-            .AreClasses()
-            .And()
-            .AreNotNested()
-            .And()
-            .ImplementInterface<ILogEventEnricher>()
+            .ImplementInterface(@interface)
             .Should()
-            .HaveNameEndingWith("Enricher")
-            .GetResult();
-
-        PrintOutIfFail(output, result);
-
-        // Assert
-        result.IsSuccessful.Should().BeTrue();
-    }
-
-    [Fact]
-    public void All_EnvironmentChecks_Classes_Should_EndWith_EnvironmentCheck()
-    {
-        // Act
-        var result = s_infrastructureTypes
-            .That()
-            .ResideInNamespace("SwiftLift")
-            .And()
-            .AreClasses()
-            .And()
-            .AreNotNested()
-            .And()
-            .ImplementInterface<IEnvironmentCheck>()
-            .Should()
-            .HaveNameEndingWith("EnvironmentCheck")
+            .HaveNameEndingWith(classNameSuffix ?? @interface.Name[1..])
             .GetResult();
 
         PrintOutIfFail(output, result);
