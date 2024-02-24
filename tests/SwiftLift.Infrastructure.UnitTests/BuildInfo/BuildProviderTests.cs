@@ -82,8 +82,12 @@ public class BuildProviderTests
                     .ConfigureAwait(true);
 
             _logger
+             .DidNotReceiveWithAnyArgs()
+             .LogInvalidBuildInfo(Arg.Any<string>(), Arg.Any<string>());
+
+            _logger
                 .DidNotReceiveWithAnyArgs()
-                .LogUnexpectedErrorLoadingBuildFile(Arg.Any<Exception>());
+                .LogUnexpectedExceptionLoadingBuildInfo(Arg.Any<Exception>());
         }
 
         [Fact]
@@ -115,10 +119,13 @@ public class BuildProviderTests
                 .DidNotReceiveWithAnyArgs()
                 .ValidateAsync(_build, s_cancellation)
                     .ConfigureAwait(true);
+            _logger
+              .DidNotReceiveWithAnyArgs()
+              .LogInvalidBuildInfo(Arg.Any<string>(), Arg.Any<string>());
 
             _logger
                .DidNotReceiveWithAnyArgs()
-               .LogUnexpectedErrorLoadingBuildFile(Arg.Any<Exception>());
+               .LogUnexpectedExceptionLoadingBuildInfo(Arg.Any<Exception>());
         }
     }
 
@@ -180,8 +187,12 @@ public class BuildProviderTests
                 .ConfigureAwait(true);
 
         logger
+          .DidNotReceiveWithAnyArgs()
+          .LogInvalidBuildInfo(Arg.Any<string>(), Arg.Any<string>());
+
+        logger
             .DidNotReceiveWithAnyArgs()
-            .LogUnexpectedErrorLoadingBuildFile(Arg.Any<Exception>());
+            .LogUnexpectedExceptionLoadingBuildInfo(Arg.Any<Exception>());
     }
 
     [Fact]
@@ -227,8 +238,12 @@ public class BuildProviderTests
                 .ConfigureAwait(true);
 
         logger
+          .DidNotReceiveWithAnyArgs()
+          .LogInvalidBuildInfo(Arg.Any<string>(), Arg.Any<string>());
+
+        logger
             .Received(1)
-            .LogUnexpectedErrorLoadingBuildFile(exception);
+            .LogUnexpectedExceptionLoadingBuildInfo(exception);
     }
 
     [Fact]
@@ -278,7 +293,71 @@ public class BuildProviderTests
                 .ConfigureAwait(true);
 
         logger
+          .DidNotReceiveWithAnyArgs()
+          .LogInvalidBuildInfo(Arg.Any<string>(), Arg.Any<string>());
+
+        logger
             .Received(1)
-            .LogUnexpectedErrorLoadingBuildFile(exception);
+            .LogUnexpectedExceptionLoadingBuildInfo(exception);
+    }
+
+    [Fact]
+    public async Task Given_InvalidBuildContent_When_GetBuildAsJsonAsync_Then_JsonContentIncludesValidationErrors()
+    {
+        // Arrange
+        var cancellation = CancellationToken.None;
+
+        var build = new Build
+        {
+            Id = "1",
+            Number = "1.0.0",
+            Branch = "master",
+            Commit = "abc123",
+            Url = "http://localhost"
+        };
+
+        var buildContent = SnakeJsonSerialization.Instance.Serialize(build);
+
+        var buildFileProvider = Substitute.For<IBuildFileProvider>();
+        buildFileProvider.GetContentAsync(cancellation).Returns(buildContent);
+
+        var jsonSnakeDeserializer = Substitute.For<ISnakeJsonDeserializer>();
+        jsonSnakeDeserializer.Deserialize<Build>(buildContent).Returns(build);
+
+        var validator = new InlineValidator<Build>();
+        validator.RuleFor(x => x.Url)
+            .Custom((x, context) => context.AddFailure("Invalid Url"));
+
+        var logger = Substitute.For<IBuildInfoLogger>();
+
+        var sut = new BuildProvider(buildFileProvider, jsonSnakeDeserializer, validator, logger);
+
+        // Act
+        var result = await sut.GetBuildAsJsonAsync(cancellation)
+                        .ConfigureAwait(true);
+
+        // Assert
+        result
+            .Should()
+            .Contain("Invalid Build Info")
+            .And
+            .Contain("Invalid Url");
+
+        await buildFileProvider
+            .Received(1)
+            .GetContentAsync(cancellation)
+                .ConfigureAwait(true);
+
+        jsonSnakeDeserializer
+            .Received(1)
+            .Deserialize<Build>(buildContent);
+
+        logger
+            .Received(1)
+            .LogInvalidBuildInfo(Arg.Any<string>(), Arg.Any<string>());
+
+        logger
+           .DidNotReceiveWithAnyArgs()
+           .LogUnexpectedExceptionLoadingBuildInfo(Arg.Any<Exception>());
     }
 }

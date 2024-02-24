@@ -57,13 +57,18 @@ internal sealed class BuildProvider
                 return (build, buildAsString);
             }
 
-            var errorMessages = validationResult.Errors
+            var errors = validationResult.Errors
                 .Select(e => $"{e.PropertyName}: {e.ErrorMessage}")
                 .ToList();
 
+            var errorMessages = string.Join(NewLine, errors);
+
+            _logger.LogInvalidBuildInfo(buildAsString, errorMessages);
+
             var sb = new StringBuilder(buildAsString)
                 .AppendLine()
-                .AppendLine(string.Join(NewLine, errorMessages));
+                .AppendLine("Invalid Build Info")
+                .AppendLine(errorMessages);
 
             buildAsString = sb.ToString();
 
@@ -71,10 +76,11 @@ internal sealed class BuildProvider
         }
         catch (Exception ex)
         {
-            _logger.LogUnexpectedErrorLoadingBuildFile(ex);
+            _logger.LogUnexpectedExceptionLoadingBuildInfo(ex);
 
             var sb = new StringBuilder(buildAsString)
                 .AppendLine()
+                .AppendLine("Unexpected error loading Build Info")
                 .AppendLine(ex.GetDetails());
 
             buildAsString = sb.ToString();

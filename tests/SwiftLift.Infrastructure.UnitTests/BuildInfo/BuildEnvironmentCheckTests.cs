@@ -268,11 +268,11 @@ public class BuildEnvironmentCheckTests
 
         serviceProvider.GetService(typeof(ISnakeJsonDeserializer)).Returns(snakeJsonDeserializer);
 
-        var buildValidator = new InlineValidator<Build>();
-        buildValidator.RuleFor(x => x.Url)
+        var validator = new InlineValidator<Build>();
+        validator.RuleFor(x => x.Url)
             .Custom((x, context) => context.AddFailure("Invalid Url"));
 
-        serviceProvider.GetService(typeof(IValidator<Build>)).Returns(buildValidator);
+        serviceProvider.GetService(typeof(IValidator<Build>)).Returns(validator);
 
         // Act
         Func<Task> act = () => _sut.Assert(serviceProvider, cancellationToken);
