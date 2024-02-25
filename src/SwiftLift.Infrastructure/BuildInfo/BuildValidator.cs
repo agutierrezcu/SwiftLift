@@ -12,7 +12,7 @@ internal sealed class BuildValidator : AbstractValidator<Build>
 
         RuleFor(build => build.Commit).NotEmpty();
 
-        RuleFor(build => build.Url).NotEmpty()
+        RuleFor(build => build.Url)
             .Must(BeAValidUrl).WithMessage("Invalid URL format");
     }
 

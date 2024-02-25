@@ -302,6 +302,64 @@ public class BuildProviderTests
     }
 
     [Fact]
+    public async Task Given_InvalidBuildContent_When_GetBuildAsync_Then_JsonContentIncludesValidationErrors()
+    {
+        // Arrange
+        var cancellation = CancellationToken.None;
+
+        var build = new Build
+        {
+            Id = "1",
+            Number = "1.0.0",
+            Branch = "master",
+            Commit = "abc123",
+            Url = "invalid-url"
+        };
+
+        var buildContent = SnakeJsonSerialization.Instance.Serialize(build);
+
+        var buildFileProvider = Substitute.For<IBuildFileProvider>();
+        buildFileProvider.GetContentAsync(cancellation).Returns(buildContent);
+
+        var jsonSnakeDeserializer = Substitute.For<ISnakeJsonDeserializer>();
+        jsonSnakeDeserializer.Deserialize<Build>(buildContent).Returns(build);
+
+        var validator = new InlineValidator<Build>();
+        validator.RuleFor(x => x.Url)
+            .Custom((x, context) => context.AddFailure("Invalid Url"));
+
+        var logger = Substitute.For<IBuildInfoLogger>();
+
+        var sut = new BuildProvider(buildFileProvider, jsonSnakeDeserializer, validator, logger);
+
+        // Act
+        var result = await sut.GetBuildAsync(cancellation)
+                        .ConfigureAwait(true);
+
+        // Assert
+        result
+            .Should()
+            .BeEquivalentTo(build);
+
+        await buildFileProvider
+            .Received(1)
+            .GetContentAsync(cancellation)
+                .ConfigureAwait(true);
+
+        jsonSnakeDeserializer
+            .Received(1)
+            .Deserialize<Build>(buildContent);
+
+        logger
+            .Received(1)
+            .LogInvalidBuildInfo(Arg.Any<string>(), Arg.Any<string>());
+
+        logger
+           .DidNotReceiveWithAnyArgs()
+           .LogUnexpectedExceptionLoadingBuildInfo(Arg.Any<Exception>());
+    }
+
+    [Fact]
     public async Task Given_InvalidBuildContent_When_GetBuildAsJsonAsync_Then_JsonContentIncludesValidationErrors()
     {
         // Arrange
@@ -313,7 +371,7 @@ public class BuildProviderTests
             Number = "1.0.0",
             Branch = "master",
             Commit = "abc123",
-            Url = "http://localhost"
+            Url = "invalid-url"
         };
 
         var buildContent = SnakeJsonSerialization.Instance.Serialize(build);

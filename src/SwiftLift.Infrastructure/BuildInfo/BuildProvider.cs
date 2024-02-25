@@ -57,9 +57,9 @@ internal sealed class BuildProvider
                 return (build, buildAsString);
             }
 
-            var errors = validationResult.Errors
-                .Select(e => $"{e.PropertyName}: {e.ErrorMessage}")
-                .ToList();
+            var errors = validationResult
+                .ToDictionary()
+                .Select(e => $"{e.Key}: {NewLine} {string.Join(NewLine, e.Value)}");
 
             var errorMessages = string.Join(NewLine, errors);
 
