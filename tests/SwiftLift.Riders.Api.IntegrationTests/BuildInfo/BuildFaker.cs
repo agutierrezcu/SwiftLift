@@ -1,4 +1,3 @@
-using System.Globalization;
 using Bogus;
 using SwiftLift.Infrastructure.BuildInfo;
 
@@ -16,7 +15,7 @@ public class BuildFaker : AutoFaker<Build>
 
         static string PickRandomInt(Faker faker)
         {
-            return faker.Random.Int(1, 99999).ToString(CultureInfo.InvariantCulture);
+            return faker.Random.Int(1, 99999).ToString();
         }
     }
 }

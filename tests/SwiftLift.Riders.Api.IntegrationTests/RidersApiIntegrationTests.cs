@@ -2,6 +2,7 @@ using System.Net.Mime;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Core;
+using SwiftLift.Infrastructure.Application;
 using SwiftLift.Infrastructure.BuildInfo;
 using SwiftLift.Infrastructure.Correlation;
 using SwiftLift.Infrastructure.EventTypes;
@@ -62,8 +63,9 @@ public class RidersApiIntegrationTests(SwiftliftApiWebApplicationFactory<Program
         // Assert
         enrichers.Should().NotBeNullOrEmpty();
 
-        enrichers.Should().HaveCount(5);
+        enrichers.Should().HaveCount(6);
 
+        enrichers.Should().Contain(e => e is ApplicationInfoLogEventEnricher);
         enrichers.Should().Contain(e => e is BuildLogEventEnricher);
         enrichers.Should().Contain(e => e is CorrelationIdLogEventEnricher);
         enrichers.Should().Contain(e => e is EventIdNormalizeLogEventEnricher);

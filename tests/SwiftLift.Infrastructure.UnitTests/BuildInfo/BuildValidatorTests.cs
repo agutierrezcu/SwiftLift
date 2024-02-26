@@ -54,7 +54,7 @@ public class BuildValidatorTests
         // Assert
         result.IsValid.Should().BeFalse();
 
-        result.Errors.Should().ContainSingle();
+        result.Errors.Should().HaveCountGreaterThanOrEqualTo(1);
 
         result.Errors[0].PropertyName.Should().Be(propertyName);
     }

@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
@@ -62,7 +61,6 @@ public static class SerilogWebApplicationBuilderBootstrapExtensions
 
             loggerConfiguration
                 .WriteTo.Console(
-                    formatProvider: CultureInfo.InvariantCulture,
                     outputTemplate: TextBasedOutputTemplate,
                     theme: AnsiConsoleTheme.Code)
                 .WriteTo.Seq(seqServerUrl);

@@ -20,7 +20,7 @@ Log.Logger = builder.CreateBootstrapLogger(
     applicationInsightConnectionString,
     EnvironmentService.Instance);
 
-Log.Information("Starting {ApplicationId} service", applicationInfo.Id);
+Log.Information("Starting {ApplicationId} service up", applicationInfo.Id);
 
 try
 {
@@ -38,13 +38,15 @@ try
 
     var services = builder.Services;
 
-    services.AddEndpointsApiExplorer();
-    services.AddSwaggerGen();
-
     services.AddAuthentication();
     services.AddAuthorization();
 
     var app = builder.Build();
+
+    app.UseSerilogRequestLogging(
+           SerilogRequestLoggingOptions.Configure);
+
+    app.UseExceptionHandler();
 
     if (app.Environment.IsDevelopment())
     {
@@ -56,23 +58,19 @@ try
     }
 
     app.UseHttpsRedirection();
-
     app.UseHeaderPropagation();
-
-    app.UseSerilogRequestLogging(
-        SerilogRequestLoggingOptions.Configure);
 
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
 
-    app.MapDefaultEndpoints();
-
     app.UseFastEndpoints();
-    app.UseSwaggerGen();
+
+    app.MapDefaultEndpoints();
 
     if (app.Environment.IsDevelopment())
     {
+        app.UseSwaggerGen();
         app.UseSwagger();
         app.UseSwaggerUI();
     }

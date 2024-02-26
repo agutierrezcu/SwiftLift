@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using System.Reflection;
 using Ardalis.GuardClauses;
 using FastEndpoints;
 using FastEndpoints.Swagger;
@@ -36,6 +37,12 @@ public static partial class Extensions
         Guard.Against.Null(builder);
         Guard.Against.Null(serviceDefaultsOptions);
 
+        builder.Host.UseDefaultServiceProvider(opts =>
+        {
+            opts.ValidateScopes = true;
+            opts.ValidateOnBuild = true;
+        });
+
         var serviceDefaultsOptionsValidator = new ServiceDefaultsOptionsValidator();
         serviceDefaultsOptionsValidator.ValidateAndThrow(serviceDefaultsOptions);
 
@@ -45,35 +52,40 @@ public static partial class Extensions
             serviceDefaultsOptions.AzureLogStreamOptionsSectionPath,
             serviceDefaultsOptions.ApplicationAssemblies);
 
-        builder.Host.UseDefaultServiceProvider(opts =>
+        var services = builder.Services;
+
+        services.AddProblemDetails();
+
+        if (serviceDefaultsOptions.UseFastEndpoints)
         {
-            opts.ValidateScopes = true;
-            opts.ValidateOnBuild = true;
-        });
+            services.AddFastEndpoints();
+        }
 
-        builder.AddFastEndpoints();
+        var applicationInfo = serviceDefaultsOptions.ApplicationInfo;
 
-        builder.ConfigureOpenTelemetry(serviceDefaultsOptions.ApplicationInfo);
-
-        builder.AddDefaultHealthChecks();
+        builder.ConfigureOpenTelemetry(applicationInfo);
 
         builder.AddEnvironmentChecks(serviceDefaultsOptions.ApplicationAssemblies);
-
-        var services = builder.Services;
 
         services.AddMemoryCache();
         services.AddHttpContextAccessor();
         services.AddFeatureManagement();
 
-        services.AddBuildInfo();
+        services.AddSingleton<IApplicationInsightResource>(_ => ApplicationInsightResource.Instance);
+        services.AddSingleton<IEnvironmentService>(_ => EnvironmentService.Instance);
+        services.AddSingleton(_ => applicationInfo);
 
-        services.AddUserContext();
+        services.AddDefaultHealthChecks();
+
+        services.AddBuildInfo();
 
         services.AddSnakeSerialization();
 
         services.AddValidators(serviceDefaultsOptions.ApplicationAssemblies);
 
         services.AddCorrelationId();
+
+        services.AddUserContext();
 
         services.AddServiceDiscovery();
 
@@ -89,13 +101,10 @@ public static partial class Extensions
                 opts => opts.Headers.Add(CorrelationIdHeader.Name));
         });
 
-        services.AddSingleton<IApplicationInsightResource>(_ => ApplicationInsightResource.Instance);
-        services.AddSingleton<IEnvironmentService>(_ => EnvironmentService.Instance);
-
         return builder;
     }
 
-    public static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder,
+    private static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder,
         ApplicationInfo applicationInfo)
     {
         Guard.Against.Null(builder);
@@ -181,9 +190,24 @@ public static partial class Extensions
         return builder;
     }
 
-    public static IHostApplicationBuilder AddFastEndpoints(this IHostApplicationBuilder builder)
+    private static IServiceCollection AddValidators(this IServiceCollection services,
+        params Assembly[] applicationAssemblies)
     {
-        builder.Services
+        Guard.Against.Null(services);
+        Guard.Against.NullOrEmpty(applicationAssemblies);
+
+        services.AddValidatorsFromAssemblies(applicationAssemblies,
+            lifetime: ServiceLifetime.Singleton,
+            includeInternalTypes: true);
+
+        return services;
+    }
+
+    private static IServiceCollection AddFastEndpoints(this IServiceCollection services)
+    {
+        Guard.Against.Null(services);
+
+        services
             .AddFastEndpoints(
                 opts =>
                 {
@@ -191,16 +215,21 @@ public static partial class Extensions
                 })
             .SwaggerDocument();
 
-        return builder;
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
+
+        return services;
     }
 
-    public static IHostApplicationBuilder AddDefaultHealthChecks(this IHostApplicationBuilder builder)
+    private static IServiceCollection AddDefaultHealthChecks(this IServiceCollection services)
     {
-        builder.Services.AddHealthChecks()
+        Guard.Against.Null(services);
+
+        services.AddHealthChecks()
             // Add a default liveness check to ensure app is responsive
             .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
 
-        return builder;
+        return services;
     }
 
     public static WebApplication MapDefaultEndpoints(this WebApplication app)

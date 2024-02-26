@@ -63,9 +63,12 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
         var result = _getInfrastructureTypesPredicateList()
             .ShouldNot()
             .HaveDependencyOtherThan(
-                "System", "Microsoft", "Oakton", "Serilog",
-                "FluentValidation", "Ardalis", "SwiftLift.Infrastructure",
-                "MassTransit", "Murmur", "Scrutor", "FastEndpoints", "Coverlet")
+                "SwiftLift.Infrastructure", "SwiftLift.SharedKernel",
+                "System", "Microsoft",
+                "Oakton", "Serilog",
+                "FluentValidation", "Ardalis",
+                "MassTransit", "Murmur", "Scrutor",
+                "FastEndpoints", "Coverlet")
             .GetResult();
 
         PrintOutIfFail(output, result);

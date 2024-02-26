@@ -4,15 +4,17 @@
     <OutputType>Exe</OutputType>
     <IsAspireHost>true</IsAspireHost>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <UserSecretsId>b93fdd02-7ac8-4278-9edf-816a80f1cd19</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting" Version="8.0.0-preview.3.24105.21" />
-    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.3.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.3.1" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.4.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.4.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Services\SwiftLift.IdentityServer.Api\SwiftLift.IdentityServer.Api.csproj" />
     <ProjectReference Include="..\Services\SwiftLift.Riders.Api\SwiftLift.Riders.Api.csproj" />
     <ProjectReference Include="..\SwiftLift.Infrastructure\SwiftLift.Infrastructure.csproj" IsAspireProjectResource="false" />
   </ItemGroup>

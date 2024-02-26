@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
@@ -94,7 +93,6 @@ public static class SerilogWebApplicationBuilderExtensions
 
                     loggerConfiguration
                         .WriteTo.Console(
-                            formatProvider: CultureInfo.InvariantCulture,
                             outputTemplate: TextBasedOutputTemplate,
                             theme: AnsiConsoleTheme.Code)
                         .WriteTo.Seq(seqServerUrl);
@@ -125,15 +123,13 @@ public static class SerilogWebApplicationBuilderExtensions
         return loggerConfiguration
             .WriteTo.Async(
                 sync => sync.File(
-                    path: string.Format(CultureInfo.InvariantCulture,
-                        azureFileOptions.PathTemplate!, applicationName),
+                    path: string.Format(azureFileOptions.PathTemplate!, applicationName),
                     fileSizeLimitBytes: azureFileOptions.FileSizeLimit,
                     rollOnFileSizeLimit: azureFileOptions.RollOnSizeLimit,
                     retainedFileCountLimit: azureFileOptions.RetainedFileCount,
                     retainedFileTimeLimit: azureFileOptions.RetainTimeLimit,
                     shared: true,
                     flushToDiskInterval: TimeSpan.FromSeconds(1),
-                    formatProvider: CultureInfo.InvariantCulture,
                     outputTemplate: TextBasedOutputTemplate
                 ));
     }

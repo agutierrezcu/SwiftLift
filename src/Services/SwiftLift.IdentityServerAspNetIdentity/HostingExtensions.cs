@@ -22,8 +22,8 @@ internal static class HostingExtensions
 
         var identityConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-        services.AddDbContext<ApplicationDbContext>(
-            options => options.UseSqlite(identityConnectionString));
+        //services.AddDbContext<ApplicationDbContext>(
+        //    options => options.UseSqlite(identityConnectionString));
 
         services
             .AddIdentityApiEndpoints<ApplicationUser>(
@@ -51,15 +51,15 @@ internal static class HostingExtensions
                 .AddConfigurationStore(
                     opts =>
                     {
-                        opts.ConfigureDbContext = builder =>
-                            builder.UseSqlite(identityConnectionString,
-                                sql => sql.MigrationsAssembly(migrationsAssembly));
+                        //opts.ConfigureDbContext = builder =>
+                        //    builder.UseSqlite(identityConnectionString,
+                        //        sql => sql.MigrationsAssembly(migrationsAssembly));
                     })
                  .AddOperationalStore(opts =>
                  {
-                     opts.ConfigureDbContext = builder =>
-                           builder.UseSqlite(identityConnectionString,
-                               sql => sql.MigrationsAssembly(migrationsAssembly));
+                     //opts.ConfigureDbContext = builder =>
+                     //      builder.UseSqlite(identityConnectionString,
+                     //          sql => sql.MigrationsAssembly(migrationsAssembly));
 
                      // this enables automatic token cleanup. this is optional.
                      opts.EnableTokenCleanup = true;

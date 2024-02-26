@@ -4,9 +4,9 @@ namespace SwiftLift.Infrastructure.Checks;
 
 internal sealed class EnvironmentChecksHostedService
     (IServiceProvider _serviceProvider, ILogger<EnvironmentChecksHostedService> _logger)
-        : IHostedService
+        : BackgroundService
 {
-    public async Task StartAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation($"Starting {nameof(EnvironmentChecksHostedService)} hosted service");
 
@@ -62,12 +62,5 @@ internal sealed class EnvironmentChecksHostedService
         }
 
         return sb.ToString();
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        _logger.LogInformation($"Stopping {nameof(EnvironmentChecksHostedService)} hosted service");
-
-        return Task.CompletedTask;
     }
 }

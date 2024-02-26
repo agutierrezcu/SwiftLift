@@ -1,9 +1,8 @@
-using SwiftLift.IdentityServerAspNetIdentity;
 using Serilog;
-using System.Globalization;
+using SwiftLift.IdentityServerAspNetIdentity;
 
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
+    .WriteTo.Console()
     .CreateBootstrapLogger();
 
 Log.Information("Starting up");
@@ -14,8 +13,7 @@ try
 
     builder.Host.UseSerilog((ctx, lc) => lc
         .WriteTo.Console(
-            outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}",
-            formatProvider: CultureInfo.InvariantCulture)
+            outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}")
         .Enrich.FromLogContext()
         .ReadFrom.Configuration(ctx.Configuration));
 

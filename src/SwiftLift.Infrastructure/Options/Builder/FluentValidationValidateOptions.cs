@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.Extensions.Options;
 
 namespace SwiftLift.Infrastructure.Options.Builder;
@@ -36,7 +35,6 @@ internal sealed class FluentValidationValidateOptions<TOptions>(
 
         results.Errors
             .ForEach(result => sb.AppendLine(
-                CultureInfo.InvariantCulture,
                 $"Property '{result.PropertyName}' with the error: '{result.ErrorMessage}'"));
 
         return ValidateOptionsResult.Fail(sb.ToString());

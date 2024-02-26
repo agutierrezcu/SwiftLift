@@ -20,3 +20,5 @@ pkce
 openid
 Sqlite
 Cors
+identityserver
+identityserverdb
