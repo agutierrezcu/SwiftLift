@@ -1,5 +1,6 @@
 using Ardalis.GuardClauses;
 using Duende.IdentityServer;
+using Duende.IdentityServer.EntityFramework.DbContexts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -37,50 +38,54 @@ internal static class HostingExtensions
 
         builder.AddServiceDefaults(serviceDefaultsOptions);
 
-        builder.AddNpgsqlDbContext<ApplicationDbContext>("identityserverdb", null,
-            opts =>
-                opts.EnableDetailedErrors()
-                    .UseNpgsql(
-                        builder =>
-                        {
-                            var identityServerApiAssembly = typeof(Program).Assembly;
-                            builder
-                                .MigrationsAssembly(identityServerApiAssembly.GetName().Name)
-                                .MigrationsHistoryTable("__EFMigrationsHistory", ApplicationDbContext.Schema);
-                        }));
-
         var services = builder.Services;
-
-        services.AddOpenTelemetry()
-            .WithTracing(tracing => tracing.AddSource(DbContextMigrationsActivity.SourceName));
-
-        if (builder.Environment.IsDevelopment())
-        {
-            services.AddSingleton<DbContextMigrationsRunner<ApplicationDbContext>>();
-            services.AddHostedService(sp => sp.GetRequiredService<DbContextMigrationsRunner<ApplicationDbContext>>());
-        }
-
-        services.AddRazorPages();
 
         services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
-        services
+        var identityServerBuilder = services
             .AddIdentityServer(options =>
             {
                 options.Events.RaiseErrorEvents = true;
                 options.Events.RaiseInformationEvents = true;
                 options.Events.RaiseFailureEvents = true;
                 options.Events.RaiseSuccessEvents = true;
-
-                // see https://docs.duendesoftware.com/identityserver/v6/fundamentals/resources/
                 options.EmitStaticAudienceClaim = true;
+                options.EmitScopesAsSpaceDelimitedStringInJwt = true;
             })
-            .AddInMemoryIdentityResources(Config.IdentityResources)
-            .AddInMemoryApiScopes(Config.ApiScopes)
-            .AddInMemoryClients(Config.Clients)
+            .AddConfigurationStore(
+                opts => opts.DefaultSchema = IdentityServerSchema.Configuration.ToStringFast())
+            .AddOperationalStore(
+                opts =>
+                {
+                    opts.DefaultSchema = IdentityServerSchema.Operational.ToStringFast();
+                    opts.EnableTokenCleanup = true;
+                    opts.TokenCleanupInterval = 3600;
+                })
             .AddAspNetIdentity<ApplicationUser>();
+
+        if (!builder.Environment.IsDevelopment())
+        {
+            identityServerBuilder.AddConfigurationStoreCache();
+        }
+
+        var identityServerAssembly = typeof(Program).Assembly;
+
+        builder.AddIdentityServerDbContext<ApplicationDbContext>(
+            IdentityServerConnectionString.Name,
+            identityServerAssembly,
+            IdentityServerSchema.Users);
+
+        builder.AddIdentityServerDbContext<ConfigurationDbContext>(
+            IdentityServerConnectionString.Name,
+            identityServerAssembly,
+            IdentityServerSchema.Configuration);
+
+        builder.AddIdentityServerDbContext<PersistedGrantDbContext>(
+           IdentityServerConnectionString.Name,
+           identityServerAssembly,
+           IdentityServerSchema.Operational);
 
         services.AddAuthentication()
             .AddGoogle(options =>
@@ -93,6 +98,8 @@ internal static class HostingExtensions
                 options.ClientId = "copy client ID from Google here";
                 options.ClientSecret = "copy client secret from Google here";
             });
+
+        services.AddRazorPages();
 
         return builder.Build();
     }

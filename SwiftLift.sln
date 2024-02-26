@@ -39,9 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.Benchmarks.Enums", "benchmarks\SwiftLift.Benchmarks.Enums\SwiftLift.Benchmarks.Enums.csproj", "{D3EFE90C-748B-4B27-B320-EFA56911B5E8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.IdentityServerAspNetIdentity", "src\Services\SwiftLift.IdentityServerAspNetIdentity\SwiftLift.IdentityServerAspNetIdentity.csproj", "{A89F5FD8-F44C-42F4-9E43-0A978BAD6895}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwiftLift.IdentityServer.Api", "src\Services\SwiftLift.IdentityServer.Api\SwiftLift.IdentityServer.Api.csproj", "{F194D516-C752-40FF-A608-6A522022F4C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftLift.IdentityServer.Api", "src\Services\SwiftLift.IdentityServer.Api\SwiftLift.IdentityServer.Api.csproj", "{F194D516-C752-40FF-A608-6A522022F4C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,10 +87,6 @@ Global
 		{D3EFE90C-748B-4B27-B320-EFA56911B5E8}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{D3EFE90C-748B-4B27-B320-EFA56911B5E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3EFE90C-748B-4B27-B320-EFA56911B5E8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A89F5FD8-F44C-42F4-9E43-0A978BAD6895}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A89F5FD8-F44C-42F4-9E43-0A978BAD6895}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A89F5FD8-F44C-42F4-9E43-0A978BAD6895}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A89F5FD8-F44C-42F4-9E43-0A978BAD6895}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F194D516-C752-40FF-A608-6A522022F4C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F194D516-C752-40FF-A608-6A522022F4C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F194D516-C752-40FF-A608-6A522022F4C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -108,7 +102,6 @@ Global
 		{ECFDF52A-98C5-45DF-B68A-427C9BC7CF69} = {BB18F88A-B78E-4E13-AFA4-DDB0B177D859}
 		{9098C729-2B65-4EEE-8953-D78D77FF34C7} = {BB18F88A-B78E-4E13-AFA4-DDB0B177D859}
 		{D3EFE90C-748B-4B27-B320-EFA56911B5E8} = {5647AEAF-6E02-4B1E-83ED-8777CBD61B76}
-		{A89F5FD8-F44C-42F4-9E43-0A978BAD6895} = {6CDBE436-5C12-4222-AB8E-4B2C83DF9AC7}
 		{F194D516-C752-40FF-A608-6A522022F4C0} = {6CDBE436-5C12-4222-AB8E-4B2C83DF9AC7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
