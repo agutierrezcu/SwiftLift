@@ -1,5 +1,5 @@
 using Duende.IdentityServer.EntityFramework.DbContexts;
-using Microsoft.EntityFrameworkCore;
+using Duende.IdentityServer.EntityFramework.Options;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace SwiftLift.IdentityServer.Api.Data.DesignFactories;
@@ -19,10 +19,12 @@ public sealed class ConfigurationDbContextFactory
 
         var services = builder.Services;
 
-        services
-            .AddIdentityServer()
-            .AddConfigurationStore(
-                opts => opts.DefaultSchema = IdentityServerSchema.Configuration.ToStringFast());
+        var options = new ConfigurationStoreOptions
+        {
+            DefaultSchema = IdentityServerSchema.Configuration.ToStringFast()
+        };
+
+        services.AddSingleton(options);
 
         builder.AddIdentityServerDbContext<ConfigurationDbContext>(
            IdentityServerConnectionString.Name,

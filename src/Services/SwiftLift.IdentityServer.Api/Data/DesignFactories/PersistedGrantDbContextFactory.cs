@@ -1,4 +1,5 @@
 using Duende.IdentityServer.EntityFramework.DbContexts;
+using Duende.IdentityServer.EntityFramework.Options;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace SwiftLift.IdentityServer.Api.Data.DesignFactories;
@@ -18,15 +19,12 @@ public sealed class PersistedGrantDbContextFactory
 
         var services = builder.Services;
 
-        services
-            .AddIdentityServer()
-            .AddOperationalStore(
-                opts =>
-                {
-                    opts.DefaultSchema = IdentityServerSchema.Operational.ToStringFast();
-                    opts.EnableTokenCleanup = true;
-                    opts.TokenCleanupInterval = 3600;
-                });
+        var options = new ConfigurationStoreOptions
+        {
+            DefaultSchema = IdentityServerSchema.Operational.ToStringFast()
+        };
+
+        services.AddSingleton(options);
 
         builder.AddIdentityServerDbContext<PersistedGrantDbContext>(
             IdentityServerConnectionString.Name,

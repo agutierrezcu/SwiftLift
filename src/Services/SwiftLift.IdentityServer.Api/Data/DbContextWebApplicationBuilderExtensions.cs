@@ -39,15 +39,15 @@ internal static class DbContextWebApplicationBuilderExtensions
             services.AddHostedMigrationRunnerService<TDbContext>();
         }
 
-        var dbContextFullName = typeof(TDbContext).FullName;
+        var dbContextName = typeof(TDbContext).Name;
 
         services.AddOpenTelemetry()
             .WithTracing(
                 tracing => tracing.AddSource(
-                    $"{dbContextFullName}{DbContextInitializerActivity.MigrationsSourceNameSuffix}"));
+                    $"{dbContextName}{DbContextInitializerActivity.MigrationsSourceNameSuffix}"));
 
         services.AddHealthChecks()
-            .AddCheck<DbContextInitializerHealthCheck<TDbContext>>($"{dbContextFullName}Initializer");
+            .AddCheck<DbContextInitializerHealthCheck<TDbContext>>($"{dbContextName}Initializer");
     }
 
     private static void TryRemoveDbContextService<TDbContext>(this IServiceCollection services)

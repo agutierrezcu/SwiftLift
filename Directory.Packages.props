@@ -1,9 +1,13 @@
 <Project>
   <ItemGroup Label="Microsoft">
     <PackageVersion Include="Aspire.Npgsql" Version="8.0.0-preview.3.24105.21" />
+    <PackageVersion Include="AspNetCore.HealthChecks.Publisher.ApplicationInsights" Version="8.0.0" />
+    <PackageVersion Include="AspNetCore.HealthChecks.Publisher.Seq" Version="8.0.0" />
+    <PackageVersion Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.0" />
     <PackageVersion Include="Azure.Identity" Version="1.10.4" />
     <PackageVersion Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.1.0" />
     <PackageVersion Include="Duende.IdentityServer.EntityFramework" Version="7.0.1" />
+    <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="8.0.0" />
     <PackageVersion Include="ExpectedObjects" Version="3.5.4" />
     <PackageVersion Include="Microsoft.AspNetCore.HeaderPropagation" Version="8.0.2" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="8.0.2" />
@@ -17,6 +21,9 @@
     <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.4.0" />
     <PackageVersion Include="Microsoft.NETCore.Jit" Version="2.0.8" />
     <PackageVersion Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.9.28" />
+    <PackageVersion Include="Serilog.ExceptionalLogContext" Version="1.1.0" />
+    <PackageVersion Include="Serilog.Exceptions.EntityFrameworkCore" Version="8.4.0" />
+    <PackageVersion Include="Serilog.Exceptions.Grpc" Version="8.4.0" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="7.4.0" />
     <PackageVersion Include="System.Net.Http" Version="4.3.4" />
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />

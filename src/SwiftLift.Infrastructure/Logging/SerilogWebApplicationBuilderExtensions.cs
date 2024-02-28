@@ -6,8 +6,11 @@ using Serilog.Core;
 using Serilog.Enrichers.Sensitive;
 using Serilog.Enrichers.Span;
 using Serilog.Events;
+using Serilog.ExceptionalLogContext;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
+using Serilog.Exceptions.EntityFrameworkCore.Destructurers;
+using Serilog.Exceptions.Grpc.Destructurers;
 using Serilog.Exceptions.Refit.Destructurers;
 using Serilog.Sinks.SystemConsole.Themes;
 using SwiftLift.Infrastructure.ConnectionString;
@@ -19,14 +22,14 @@ namespace SwiftLift.Infrastructure.Logging;
 public static class SerilogWebApplicationBuilderExtensions
 {
     public static void AddLogging(this WebApplicationBuilder builder,
-        IEnvironmentService environmentService,
         ConnectionStringResource applicationInsightConnectionString,
+        IEnvironmentService environmentService,
         string azureLogStreamOptionsSectionPath,
         params Assembly[] applicationAssemblies)
     {
         Guard.Against.Null(builder);
-        Guard.Against.Null(environmentService);
         Guard.Against.Null(applicationInsightConnectionString);
+        Guard.Against.Null(environmentService);
         Guard.Against.NullOrWhiteSpace(azureLogStreamOptionsSectionPath);
         Guard.Against.NullOrEmpty(applicationAssemblies);
 
@@ -64,15 +67,22 @@ public static class SerilogWebApplicationBuilderExtensions
                     .Enrich.WithEnvironmentName()
                     .Enrich.WithThreadId()
                     .Enrich.WithSpan()
+                    .Enrich.WithExceptionalLogContext()
                     .Enrich.WithProperty("ApplicationName", context.HostingEnvironment.ApplicationName)
                     .Enrich.WithSensitiveDataMasking(opts => opts.Mode = MaskingMode.InArea)
                     .Enrich.WithExceptionDetails(
                         new DestructuringOptionsBuilder()
                             .WithDefaultDestructurers()
-                            .WithDestructurers(new[]
-                            {
-                                new ApiExceptionDestructurer()
-                            }))
+                            .WithDestructurers(
+                                [
+                                    new DbUpdateExceptionDestructurer(),
+                                    new RpcExceptionDestructurer(),
+                                    new ApiExceptionDestructurer(
+                                        destructureCommonExceptionProperties: false,
+                                        destructureHttpContent: true
+                                    )
+                                ])
+                            .WithIgnoreStackTraceAndTargetSiteExceptionFilter())
                     .WriteTo.ApplicationInsights(
                         applicationInsightConnectionString.Value,
                         TelemetryConverter.Traces);

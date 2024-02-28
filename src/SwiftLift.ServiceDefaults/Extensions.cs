@@ -4,6 +4,7 @@ using Ardalis.GuardClauses;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using FluentValidation;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
@@ -19,6 +20,7 @@ using OpenTelemetry.Trace;
 using SwiftLift.Infrastructure.ApplicationInsight;
 using SwiftLift.Infrastructure.BuildInfo;
 using SwiftLift.Infrastructure.Checks;
+using SwiftLift.Infrastructure.ConnectionString;
 using SwiftLift.Infrastructure.Correlation;
 using SwiftLift.Infrastructure.Environment;
 using SwiftLift.Infrastructure.Logging;
@@ -46,42 +48,46 @@ public static partial class Extensions
         var serviceDefaultsOptionsValidator = new ServiceDefaultsOptionsValidator();
         serviceDefaultsOptionsValidator.ValidateAndThrow(serviceDefaultsOptions);
 
+        var applicationInsightConnectionString = serviceDefaultsOptions.ApplicationInsightConnectionString;
+        var environmentService = serviceDefaultsOptions.EnvironmentService;
+        var applicationInfo = serviceDefaultsOptions.ApplicationInfo;
+        var applicationAssemblies = serviceDefaultsOptions.ApplicationAssemblies;
+
         builder.AddLogging(
-            serviceDefaultsOptions.EnvironmentService,
-            serviceDefaultsOptions.ApplicationInsightConnectionString,
+            applicationInsightConnectionString,
+            environmentService,
             serviceDefaultsOptions.AzureLogStreamOptionsSectionPath,
-            serviceDefaultsOptions.ApplicationAssemblies);
+            applicationAssemblies);
 
         var services = builder.Services;
-
-        services.AddProblemDetails();
 
         if (serviceDefaultsOptions.UseFastEndpoints)
         {
             services.AddFastEndpoints();
         }
 
-        var applicationInfo = serviceDefaultsOptions.ApplicationInfo;
-
         builder.ConfigureOpenTelemetry(applicationInfo);
 
-        builder.AddEnvironmentChecks(serviceDefaultsOptions.ApplicationAssemblies);
+        builder.AddHealthChecks(
+            applicationInsightConnectionString,
+            environmentService);
+
+        builder.AddEnvironmentChecks(applicationAssemblies);
 
         services.AddMemoryCache();
         services.AddHttpContextAccessor();
         services.AddFeatureManagement();
+        services.AddProblemDetails();
 
         services.AddSingleton<IApplicationInsightResource>(_ => ApplicationInsightResource.Instance);
-        services.AddSingleton<IEnvironmentService>(_ => EnvironmentService.Instance);
+        services.AddSingleton<IEnvironmentService>(_ => environmentService);
         services.AddSingleton(_ => applicationInfo);
-
-        services.AddDefaultHealthChecks();
 
         services.AddBuildInfo();
 
         services.AddSnakeSerialization();
 
-        services.AddValidators(serviceDefaultsOptions.ApplicationAssemblies);
+        services.AddValidators(applicationAssemblies);
 
         services.AddCorrelationId();
 
@@ -97,8 +103,8 @@ public static partial class Extensions
             // Turn on service discovery by default
             http.UseServiceDiscovery();
 
-            http.AddHeaderPropagation(
-                opts => opts.Headers.Add(CorrelationIdHeader.Name));
+            //http.AddHeaderPropagation(
+            //    opts => opts.Headers.Add(CorrelationIdHeader.Name));
         });
 
         return builder;
@@ -221,15 +227,52 @@ public static partial class Extensions
         return services;
     }
 
-    private static IServiceCollection AddDefaultHealthChecks(this IServiceCollection services)
+    private static WebApplicationBuilder AddHealthChecks(this WebApplicationBuilder builder,
+        ConnectionStringResource applicationInsightConnectionString,
+        IEnvironmentService environmentService)
     {
-        Guard.Against.Null(services);
+        Guard.Against.Null(builder);
+        Guard.Against.Null(applicationInsightConnectionString);
+        Guard.Against.Null(environmentService);
 
-        services.AddHealthChecks()
+        var services = builder.Services;
+
+        var isDevelopment = builder.Environment.IsDevelopment();
+
+        var publisherPeriod =
+            isDevelopment
+            ? TimeSpan.FromMinutes(1)
+            : TimeSpan.FromMinutes(10);
+
+        services
+            .Configure<HealthCheckPublisherOptions>(
+                opts =>
+                {
+                    opts.Delay = TimeSpan.FromMinutes(2);
+                    opts.Timeout = TimeSpan.FromSeconds(20);
+                    opts.Period = publisherPeriod;
+                });
+
+        var healthChecksBuilder = services
+            .AddHealthChecks()
             // Add a default liveness check to ensure app is responsive
-            .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
+            .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"])
+            .AddApplicationInsightsPublisher(
+                connectionString: applicationInsightConnectionString.Value,
+                saveDetailedReport: true,
+                excludeHealthyReports: false);
 
-        return services;
+        if (isDevelopment)
+        {
+            var seqServerUrl = environmentService.GetRequiredVariable("SEQ_SERVER_URL")!;
+
+            healthChecksBuilder
+                .AddSeqPublisher(
+                    opts => opts.Endpoint = seqServerUrl
+                );
+        }
+
+        return builder;
     }
 
     public static WebApplication MapDefaultEndpoints(this WebApplication app)
@@ -238,7 +281,14 @@ public static partial class Extensions
         // app.MapPrometheusScrapingEndpoint();
 
         // All health checks must pass for app to be considered ready to accept traffic after starting
-        app.MapHealthChecks("/health");
+        app.MapHealthChecks("/health",
+            new HealthCheckOptions
+            {
+                ResponseWriter =
+                    app.Environment.IsDevelopment()
+                    ? UIResponseWriter.WriteHealthCheckUIResponse
+                    : (_, _) => Task.CompletedTask
+            });
 
         // Only health checks tagged with the "live" tag must pass for app to be considered alive
         app.MapHealthChecks("/alive", new HealthCheckOptions
@@ -258,7 +308,7 @@ public static partial class Extensions
                 await response.WriteAsync(fileContent, cancellation)
                     .ConfigureAwait(false);
             })
-            .WithDisplayName(OperationEndpoint.BuildInfo.ToString())
+            .WithDisplayName(OperationEndpoint.BuildInfo.ToStringFast())
             .ExcludeFromDescription();
 
         return app;

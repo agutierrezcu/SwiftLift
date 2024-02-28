@@ -1,5 +1,6 @@
 using System.Reflection;
 using Ardalis.GuardClauses;
+using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 
 namespace SwiftLift.IdentityServer.Api.Data;
@@ -23,7 +24,8 @@ internal static class DbContextOptionsBuilderExtensions
                     builder
                         .MigrationsAssembly(identityServerApiAssembly.GetName().Name)
                         .MigrationsHistoryTable("__EFMigrationsHistory", schema.ToStringFast());
-                });
+                })
+            .UseExceptionProcessor();
 
         return builder;
     }
