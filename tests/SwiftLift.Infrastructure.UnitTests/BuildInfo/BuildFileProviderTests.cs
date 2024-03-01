@@ -28,10 +28,10 @@ public class BuildFileProviderTests
         var fileReaderService = Substitute.For<IFileReaderService>();
         fileReaderService.ReadAllTextAsync(Arg.Any<string>(), cancellation).Returns("test content");
 
-        var buildFileProvider = new BuildFileProvider(buildFilePathResolver, hostEnvironment, fileReaderService);
+        var sut = new BuildFileProvider(buildFilePathResolver, hostEnvironment, fileReaderService);
 
         // Act
-        var result = await buildFileProvider.GetContentAsync(cancellation)
+        var result = await sut.GetContentAsync(cancellation)
             .ConfigureAwait(true);
 
         // Assert

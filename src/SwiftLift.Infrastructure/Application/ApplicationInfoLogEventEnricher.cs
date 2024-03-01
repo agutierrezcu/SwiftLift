@@ -7,7 +7,7 @@ namespace SwiftLift.Infrastructure.Application;
 internal sealed class ApplicationInfoLogEventEnricher(ApplicationInfo applicationInfo)
     : ILogEventEnricher
 {
-    private List<LogEventProperty>? _cachedApplicationLogEventProperties;
+    private LogEventProperty[]? _cachedApplicationLogEventProperties;
 
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
@@ -19,7 +19,7 @@ internal sealed class ApplicationInfoLogEventEnricher(ApplicationInfo applicatio
         }
     }
 
-    private List<LogEventProperty> CreateApplicationLogEventProperties(
+    private LogEventProperty[] CreateApplicationLogEventProperties(
         ILogEventPropertyFactory propertyFactory)
     {
         return

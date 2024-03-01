@@ -10,7 +10,7 @@ internal static class DbContextWebApplicationBuilderExtensions
 {
     public static void AddIdentityServerDbContext<TDbContext>(this IHostApplicationBuilder builder,
         string connectionName,
-        Assembly identityServerAssembly,
+        Assembly assemblyMigration,
         IdentityServerSchema schema,
         Action<NpgsqlEntityFrameworkCorePostgreSQLSettings>? configureSettings = null,
         Action<DbContextOptionsBuilder>? configureDbContextOptions = null)
@@ -18,7 +18,7 @@ internal static class DbContextWebApplicationBuilderExtensions
     {
         Guard.Against.Null(builder);
         Guard.Against.NullOrWhiteSpace(connectionName);
-        Guard.Against.Null(identityServerAssembly);
+        Guard.Against.Null(assemblyMigration);
 
         var services = builder.Services;
 
@@ -29,7 +29,7 @@ internal static class DbContextWebApplicationBuilderExtensions
             configureSettings,
             builder =>
             {
-                builder.ConfigureDbContextOptions(identityServerAssembly, schema);
+                builder.ConfigureDbContextOptions(assemblyMigration, schema);
 
                 configureDbContextOptions?.Invoke(builder);
             });

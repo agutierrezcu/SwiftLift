@@ -29,7 +29,13 @@ internal sealed class CorrelationIdResolver(IHttpContextAccessor _httpContextAcc
             return s_correlationId.Value;
         }
 
-        s_correlationId.Value = new(Guid.Parse(correlationIdHeader.ToString()));
+        if (!Guid.TryParse(correlationIdHeader.ToString(), out var correlationIdGuid))
+        {
+            s_correlationId.Value = CorrelationId.New();
+            return s_correlationId.Value;
+        }
+
+        s_correlationId.Value = new(correlationIdGuid);
         return s_correlationId.Value;
     }
 }

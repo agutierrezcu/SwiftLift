@@ -7,14 +7,16 @@ namespace SwiftLift.IdentityServer.Api.Data;
 
 internal static class DbContextOptionsBuilderExtensions
 {
+    private const string MigrationsTableName = "__EFMigrationsHistory";
+
     internal static DbContextOptionsBuilder ConfigureDbContextOptions(
         this DbContextOptionsBuilder builder,
-        Assembly identityServerApiAssembly,
+        Assembly assemblyMigrations,
         IdentityServerSchema schema,
         string? identityServerConnectionString = null)
     {
         Guard.Against.Null(builder);
-        Guard.Against.Null(identityServerApiAssembly);
+        Guard.Against.Null(assemblyMigrations);
 
         builder
             .EnableDetailedErrors()
@@ -22,8 +24,8 @@ internal static class DbContextOptionsBuilderExtensions
                 builder =>
                 {
                     builder
-                        .MigrationsAssembly(identityServerApiAssembly.GetName().Name)
-                        .MigrationsHistoryTable("__EFMigrationsHistory", schema.ToStringFast());
+                        .MigrationsAssembly(assemblyMigrations.GetName().Name)
+                        .MigrationsHistoryTable(MigrationsTableName, schema.ToStringFast());
                 })
             .UseExceptionProcessor();
 
