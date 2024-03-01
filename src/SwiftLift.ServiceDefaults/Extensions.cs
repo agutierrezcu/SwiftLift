@@ -14,7 +14,6 @@ using SwiftLift.Infrastructure.ApplicationInsight;
 using SwiftLift.Infrastructure.BuildInfo;
 using SwiftLift.Infrastructure.Checks;
 using SwiftLift.Infrastructure.Correlation;
-using SwiftLift.Infrastructure.Environment;
 using SwiftLift.Infrastructure.HealthChecks;
 using SwiftLift.Infrastructure.HttpClient;
 using SwiftLift.Infrastructure.Logging;
@@ -74,7 +73,7 @@ public static partial class Extensions
         services.AddProblemDetails();
 
         services.AddSingleton<IApplicationInsightResource>(_ => ApplicationInsightResource.Instance);
-        services.AddSingleton<IEnvironmentService>(_ => environmentService);
+        services.AddSingleton(_ => environmentService);
         services.AddSingleton(_ => applicationInfo);
 
         services.AddBuildInfo();

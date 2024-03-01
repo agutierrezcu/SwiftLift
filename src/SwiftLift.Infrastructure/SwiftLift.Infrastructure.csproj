@@ -3,27 +3,13 @@
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Publisher.ApplicationInsights" />
     <PackageReference Include="AspNetCore.HealthChecks.Publisher.Seq" />
-    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" />
-    <PackageReference Include="Ardalis.GuardClauses" />
-    <PackageReference Include="Ardalis.SmartEnum.SystemTextJson" />
-    <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" />
-    <PackageReference Include="FastEndpoints" />
-    <PackageReference Include="FastEndpoints.Swagger" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="Microsoft.AspNetCore.HeaderPropagation" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
-    <PackageReference Include="Microsoft.Extensions.Http.Resilience" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" />
-    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" />
+    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" />
     <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers">
       <PrivateAssets>all</PrivateAssets>
@@ -31,7 +17,6 @@
     </PackageReference>
     <PackageReference Include="murmurhash" />
     <PackageReference Include="NetEscapades.EnumGenerators" />
-    <PackageReference Include="NewId" />
     <PackageReference Include="Oakton" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
@@ -56,8 +41,12 @@
     <PackageReference Include="SerilogAnalyzer" />
     <PackageReference Include="Scrutor" />
     <PackageReference Include="StronglyTypedId" />
-    <PackageReference Include="System.Net.Http" />
-    <PackageReference Include="System.Text.RegularExpressions" />
+    <PackageReference Include="System.Net.Http">
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
+    <PackageReference Include="System.Text.RegularExpressions">
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
