@@ -1,7 +1,6 @@
 using Serilog;
 using SwiftLift.IdentityServer.Api;
 using SwiftLift.Infrastructure.ApplicationInsight;
-using SwiftLift.Infrastructure.Environment;
 using SwiftLift.Infrastructure.Logging;
 using SwiftLift.ServiceDefaults;
 using SwiftLift.SharedKernel.Application;
@@ -12,11 +11,9 @@ var applicationInfo = new ApplicationInfo(
 var builder = WebApplication.CreateBuilder(args);
 
 var applicationInsightConnectionString = ApplicationInsightResource.Instance
-    .GetConnectionStringGuaranteed(EnvironmentService.Instance, builder.Configuration);
+    .GetConnectionStringGuaranteed(builder.Configuration);
 
-Log.Logger = builder.CreateBootstrapLogger(
-    applicationInsightConnectionString,
-    EnvironmentService.Instance);
+Log.Logger = builder.CreateBootstrapLogger(applicationInsightConnectionString);
 
 Log.Information("Starting {ApplicationId} service up", applicationInfo.Id);
 

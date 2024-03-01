@@ -2,7 +2,6 @@ using Microsoft.Extensions.Configuration;
 using NSubstitute.ExceptionExtensions;
 using SwiftLift.Infrastructure.ApplicationInsight;
 using SwiftLift.Infrastructure.ConnectionString;
-using SwiftLift.Infrastructure.Environment;
 
 using static SwiftLift.Infrastructure.ApplicationInsight.ApplicationInsightSettings;
 
@@ -18,8 +17,6 @@ public sealed class ApplicationInsightEnvironmentCheckTests
         public async Task When_Assert_Then_NotThrowException()
         {
             // Arrange
-            var environmentService = Substitute.For<IEnvironmentService>();
-
             var configuration = Substitute.For<IConfiguration>();
 
             var connectionStringResource = ConnectionStringParser.Parse(
@@ -28,16 +25,13 @@ public sealed class ApplicationInsightEnvironmentCheckTests
             var applicationInsightResource = Substitute.For<IApplicationInsightResource>();
 
             applicationInsightResource
-                .GetConnectionStringGuaranteed(environmentService, configuration)
+                .GetConnectionStringGuaranteed(configuration)
                 .Returns(connectionStringResource);
 
             var serviceProvider = Substitute.For<IServiceProvider>();
 
             serviceProvider.GetService(typeof(IApplicationInsightResource))
                 .Returns(applicationInsightResource);
-
-            serviceProvider.GetService(typeof(IEnvironmentService))
-                .Returns(environmentService);
 
             serviceProvider.GetService(typeof(IConfiguration))
                 .Returns(configuration);
@@ -53,15 +47,11 @@ public sealed class ApplicationInsightEnvironmentCheckTests
 
             serviceProvider
                 .Received(1)
-                .GetService(typeof(IEnvironmentService));
-
-            serviceProvider
-                .Received(1)
                 .GetService(typeof(IConfiguration));
 
             applicationInsightResource
                 .Received(1)
-                .GetConnectionStringGuaranteed(environmentService, configuration);
+                .GetConnectionStringGuaranteed(configuration);
         }
     }
 
@@ -71,8 +61,6 @@ public sealed class ApplicationInsightEnvironmentCheckTests
         public async Task When_DoesNotExistInConfiguration_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
-            var environmentService = Substitute.For<IEnvironmentService>();
-
             var configuration = Substitute.For<IConfiguration>();
 
             var applicationInsightResource = Substitute.For<IApplicationInsightResource>();
@@ -81,16 +69,13 @@ public sealed class ApplicationInsightEnvironmentCheckTests
                 new InvalidConnectionStringException(ResourceName, "Invalid Connection String exception error message");
 
             applicationInsightResource
-                .GetConnectionStringGuaranteed(environmentService, configuration)
+                .GetConnectionStringGuaranteed(configuration)
                 .Throws(invalidConnectionStringException);
 
             var serviceProvider = Substitute.For<IServiceProvider>();
 
             serviceProvider.GetService(typeof(IApplicationInsightResource))
                 .Returns(applicationInsightResource);
-
-            serviceProvider.GetService(typeof(IEnvironmentService))
-                .Returns(environmentService);
 
             serviceProvider.GetService(typeof(IConfiguration))
                 .Returns(configuration);
@@ -115,23 +100,17 @@ public sealed class ApplicationInsightEnvironmentCheckTests
 
             serviceProvider
                 .Received(1)
-                .GetService(typeof(IEnvironmentService));
-
-            serviceProvider
-                .Received(1)
                 .GetService(typeof(IConfiguration));
 
             applicationInsightResource
                 .Received(1)
-                .GetConnectionStringGuaranteed(environmentService, configuration);
+                .GetConnectionStringGuaranteed(configuration);
         }
 
         [Fact]
         public async Task When_ExistsInConfigurationWithNoInstrumentationKeySegment_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
-            var environmentService = Substitute.For<IEnvironmentService>();
-
             var configuration = Substitute.For<IConfiguration>();
 
             var applicationInsightResource = Substitute.For<IApplicationInsightResource>();
@@ -140,16 +119,13 @@ public sealed class ApplicationInsightEnvironmentCheckTests
                 ResourceName, "key=value");
 
             applicationInsightResource
-                .GetConnectionStringGuaranteed(environmentService, configuration)
+                .GetConnectionStringGuaranteed(configuration)
                 .Returns(connectionStringResource);
 
             var serviceProvider = Substitute.For<IServiceProvider>();
 
             serviceProvider.GetService(typeof(IApplicationInsightResource))
                 .Returns(applicationInsightResource);
-
-            serviceProvider.GetService(typeof(IEnvironmentService))
-                .Returns(environmentService);
 
             serviceProvider.GetService(typeof(IConfiguration))
                 .Returns(configuration);
@@ -174,15 +150,11 @@ public sealed class ApplicationInsightEnvironmentCheckTests
 
             serviceProvider
                 .Received(1)
-                .GetService(typeof(IEnvironmentService));
-
-            serviceProvider
-                .Received(1)
                 .GetService(typeof(IConfiguration));
 
             applicationInsightResource
                 .Received(1)
-                .GetConnectionStringGuaranteed(environmentService, configuration);
+                .GetConnectionStringGuaranteed(configuration);
         }
     }
 }

@@ -1,5 +1,4 @@
 using SwiftLift.Infrastructure.ConnectionString;
-using SwiftLift.Infrastructure.Environment;
 
 namespace SwiftLift.Infrastructure.ApplicationInsight;
 
@@ -11,12 +10,10 @@ internal sealed class ApplicationInsightEnvironmentCheck : IEnvironmentCheck
     public Task Assert(IServiceProvider services, CancellationToken cancellation)
     {
         var applicationInsightResource = services.GetRequiredService<IApplicationInsightResource>();
-        var environmentService = services.GetRequiredService<IEnvironmentService>();
         var configuration = services.GetRequiredService<IConfiguration>();
 
         var connectionStringResource = applicationInsightResource
-            .GetConnectionStringGuaranteed(
-                environmentService, configuration);
+            .GetConnectionStringGuaranteed(configuration);
 
         if (!connectionStringResource.TryGetSegmentValue("InstrumentationKey", out _))
         {

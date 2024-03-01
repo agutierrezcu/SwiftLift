@@ -6,8 +6,8 @@ using SwiftLift.Infrastructure.Application;
 using SwiftLift.Infrastructure.BuildInfo;
 using SwiftLift.Infrastructure.Correlation;
 using SwiftLift.Infrastructure.EventTypes;
-using SwiftLift.Infrastructure.Logging.Enrichers;
 using SwiftLift.Infrastructure.Serialization;
+using SwiftLift.Infrastructure.UserContext;
 
 namespace SwiftLift.Riders.Api.IntegrationTests;
 

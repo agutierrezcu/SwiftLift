@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using SwiftLift.Infrastructure.Configuration;
 using SwiftLift.Infrastructure.ConnectionString;
-using SwiftLift.Infrastructure.Environment;
 
 namespace SwiftLift.Infrastructure.HealthChecks;
 
@@ -9,12 +9,10 @@ public static class HealthChecksWebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder AddHealthChecks(this WebApplicationBuilder builder,
       ConnectionStringResource applicationInsightConnectionString,
-      IEnvironmentService environmentService,
       params Assembly[] applicationAssemblies)
     {
         Guard.Against.Null(builder);
         Guard.Against.Null(applicationInsightConnectionString);
-        Guard.Against.Null(environmentService);
         Guard.Against.Null(applicationAssemblies);
 
         var isDevelopment = builder.Environment.IsDevelopment();
@@ -32,7 +30,7 @@ public static class HealthChecksWebApplicationBuilderExtensions
 
         if (isDevelopment)
         {
-            var seqServerUrl = environmentService.GetRequiredVariable("SEQ_SERVER_URL")!;
+            var seqServerUrl = builder.Configuration.GetRequired("SEQ_SERVER_URL")!;
 
             healthChecksBuilder
                 .AddSeqPublisher(opts => opts.Endpoint = seqServerUrl);

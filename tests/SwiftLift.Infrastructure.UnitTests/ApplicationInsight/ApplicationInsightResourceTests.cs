@@ -1,8 +1,6 @@
 using Microsoft.Extensions.Configuration;
-using NSubstitute.ReturnsExtensions;
 using SwiftLift.Infrastructure.ApplicationInsight;
 using SwiftLift.Infrastructure.ConnectionString;
-using SwiftLift.Infrastructure.Environment;
 
 using static SwiftLift.Infrastructure.ApplicationInsight.ApplicationInsightSettings;
 
@@ -14,21 +12,15 @@ public sealed class ApplicationInsightResourceTests
 
     public class Given_InvalidConnectionString
     {
-        private static Action Act(IEnvironmentService environmentService, IConfiguration configuration)
+        private static Action Act(IConfiguration configuration)
         {
-            return () => s_sut.GetConnectionStringGuaranteed(environmentService, configuration);
+            return () => s_sut.GetConnectionStringGuaranteed(configuration);
         }
 
         [Fact]
         public void When_DoesNotExistInConfiguration_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
-            var environmentService = Substitute.For<IEnvironmentService>();
-
-            environmentService
-                .GetVariable(EnvironmentVariable)
-                .ReturnsNull();
-
             var configuration = Substitute.For<IConfiguration>();
 
             configuration[EnvironmentVariable] = null;
@@ -36,17 +28,13 @@ public sealed class ApplicationInsightResourceTests
             configuration[ConfigurationSectionKey] = null;
 
             // Act
-            var actAssertions = Act(environmentService, configuration).Should();
+            var actAssertions = Act(configuration).Should();
 
             // Assert
             actAssertions
                 .ThrowExactly<InvalidConnectionStringException>()
                 .WithMessage("Application Insight connection string can not be null or empty")
                 .Which.ResourceName.Should().Be(ResourceName);
-
-            environmentService
-                .Received(1)
-                .GetVariable(EnvironmentVariable);
 
             configuration
                 .Received(1)[EnvironmentVariable] = null;
@@ -59,16 +47,12 @@ public sealed class ApplicationInsightResourceTests
         public void When_ExistsInEnvironment_And_IsNotParseable_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
-            var environmentService = Substitute.For<IEnvironmentService>();
-
-            environmentService
-                .GetVariable(EnvironmentVariable)
-                .Returns("any other string", []);
-
             var configuration = Substitute.For<IConfiguration>();
 
+            configuration[EnvironmentVariable] = "any other string";
+
             // Act
-            var actAssertions = Act(environmentService, configuration).Should();
+            var actAssertions = Act(configuration).Should();
 
             // Assert
             actAssertions
@@ -77,12 +61,8 @@ public sealed class ApplicationInsightResourceTests
                 .Which.InnerException.Should().BeOfType<InvalidConnectionStringException>()
                 .Which.ResourceName.Should().Be(ResourceName);
 
-            environmentService
-                .Received(1)
-                .GetVariable(EnvironmentVariable);
-
             configuration
-               .DidNotReceive()[EnvironmentVariable] = null;
+               .Received(1)[EnvironmentVariable] = "any other string";
 
             configuration
                 .DidNotReceive()[ConfigurationSectionKey] = null;
@@ -92,12 +72,6 @@ public sealed class ApplicationInsightResourceTests
         public void When_ExistsInConfigurationSection_And_IsNotParseable_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
-            var environmentService = Substitute.For<IEnvironmentService>();
-
-            environmentService
-                .GetVariable(EnvironmentVariable)
-                .ReturnsNull();
-
             var configuration = Substitute.For<IConfiguration>();
 
             configuration[EnvironmentVariable] = null;
@@ -105,7 +79,7 @@ public sealed class ApplicationInsightResourceTests
             configuration[ConfigurationSectionKey] = "any other string";
 
             // Act
-            var actAssertions = Act(environmentService, configuration).Should();
+            var actAssertions = Act(configuration).Should();
 
             // Assert
             actAssertions
@@ -113,10 +87,6 @@ public sealed class ApplicationInsightResourceTests
                 .WithMessage("Application Insight connection string is invalid")
                 .Which.InnerException.Should().BeOfType<InvalidConnectionStringException>()
                 .Which.ResourceName.Should().Be(ResourceName);
-
-            environmentService
-                .Received(1)
-                .GetVariable(EnvironmentVariable);
 
             configuration
                .Received(1)[EnvironmentVariable] = null;
@@ -129,16 +99,14 @@ public sealed class ApplicationInsightResourceTests
         public void When_ExistsInEnvironment_And_HasNoInstrumentationKeySegment_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
-            var environmentService = Substitute.For<IEnvironmentService>();
-
             var configuration = Substitute.For<IConfiguration>();
 
-            environmentService
-                .GetVariable(EnvironmentVariable)
-                .Returns("key1=value1;key2=value2;key3=value3", []);
+            configuration[EnvironmentVariable] = "key1=value1;key2=value2;key3=value3";
+
+            configuration[ConfigurationSectionKey] = null;
 
             // Act
-            var actAssertions = Act(environmentService, configuration).Should();
+            var actAssertions = Act(configuration).Should();
 
             // Assert
             actAssertions
@@ -146,21 +114,13 @@ public sealed class ApplicationInsightResourceTests
                 .WithMessage("Application Insight connection string has no instrumentation key segment")
                 .Which.ResourceName.Should().Be(ResourceName);
 
-            environmentService
-                .Received(1)
-                .GetVariable(EnvironmentVariable);
+            configuration.Received(1)[EnvironmentVariable] = "key1=value1;key2=value2;key3=value3";
         }
 
         [Fact]
         public void When_ExistsInConfigurationSection_And_HasNoInstrumentationKeySegment_Then_ThrowInvalidConnectionStringException()
         {
             // Arrange
-            var environmentService = Substitute.For<IEnvironmentService>();
-
-            environmentService
-                .GetVariable(EnvironmentVariable)
-                .ReturnsNull();
-
             var configuration = Substitute.For<IConfiguration>();
 
             configuration[EnvironmentVariable] = null;
@@ -168,17 +128,13 @@ public sealed class ApplicationInsightResourceTests
             configuration[ConfigurationSectionKey] = "key1=value1;key2=value2;key3=value3";
 
             // Act
-            var actAssertions = Act(environmentService, configuration).Should();
+            var actAssertions = Act(configuration).Should();
 
             // Assert
             actAssertions
                 .ThrowExactly<InvalidConnectionStringException>()
                 .WithMessage("Application Insight connection string has no instrumentation key segment")
                 .Which.ResourceName.Should().Be(ResourceName);
-
-            environmentService
-                .Received(1)
-                .GetVariable(EnvironmentVariable);
 
             configuration
               .Received(1)[EnvironmentVariable] = null;
@@ -194,21 +150,15 @@ public sealed class ApplicationInsightResourceTests
 
         private readonly ConnectionStringResource _connectionStringResource;
 
-        private readonly IEnvironmentService _environmentService;
-
         public Given_ValidConnectionStringInEnvironment()
         {
             // Arrange
-            _environmentService = Substitute.For<IEnvironmentService>();
-
             var configuration = Substitute.For<IConfiguration>();
 
-            _environmentService
-                .GetVariable(EnvironmentVariable)
-                .Returns(ConnectionString, []);
+            configuration[EnvironmentVariable] = ConnectionString;
 
             // Act
-            _connectionStringResource = s_sut.GetConnectionStringGuaranteed(_environmentService, configuration);
+            _connectionStringResource = s_sut.GetConnectionStringGuaranteed(configuration);
         }
 
         [Fact]
@@ -227,14 +177,6 @@ public sealed class ApplicationInsightResourceTests
         public void When_Get_Then_ResourceValueIsOK()
         {
             _connectionStringResource.Value.Should().Be(ConnectionString);
-        }
-
-        [Fact]
-        public void When_Get_Then_EnvironmentVariableProviderIsCalledOnce()
-        {
-            _environmentService
-                .Received(1)
-                .GetVariable(EnvironmentVariable);
         }
     }
 }

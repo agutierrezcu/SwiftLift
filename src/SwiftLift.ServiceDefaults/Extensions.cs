@@ -43,13 +43,11 @@ public static partial class Extensions
         serviceDefaultsOptionsValidator.ValidateAndThrow(serviceDefaultsOptions);
 
         var applicationInsightConnectionString = serviceDefaultsOptions.ApplicationInsightConnectionString;
-        var environmentService = serviceDefaultsOptions.EnvironmentService;
         var applicationInfo = serviceDefaultsOptions.ApplicationInfo;
         var applicationAssemblies = serviceDefaultsOptions.ApplicationAssemblies;
 
         builder.AddLogging(
             applicationInsightConnectionString,
-            environmentService,
             serviceDefaultsOptions.AzureLogStreamOptionsSectionPath,
             applicationAssemblies);
 
@@ -64,8 +62,7 @@ public static partial class Extensions
 
         builder.AddEnvironmentChecks(applicationAssemblies);
 
-        builder.AddHealthChecks(applicationInsightConnectionString,
-            environmentService, applicationAssemblies);
+        builder.AddHealthChecks(applicationInsightConnectionString, applicationAssemblies);
 
         services.AddMemoryCache();
         services.AddHttpContextAccessor();
@@ -73,7 +70,6 @@ public static partial class Extensions
         services.AddProblemDetails();
 
         services.AddSingleton<IApplicationInsightResource>(_ => ApplicationInsightResource.Instance);
-        services.AddSingleton(_ => environmentService);
         services.AddSingleton(_ => applicationInfo);
 
         services.AddBuildInfo();

@@ -1,21 +1,29 @@
+using System.Net.Sockets;
 using SwiftLift.Infrastructure.ApplicationInsight;
-using SwiftLift.Infrastructure.Environment;
+using SwiftLift.Infrastructure.Configuration;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var applicationInsightConnectionString = ApplicationInsightResource.Instance
-    .GetConnectionStringGuaranteed(EnvironmentService.Instance, builder.Configuration);
+var configuration = builder.Configuration;
 
-var seqServerUrlEnvironmentVariable = "SEQ_SERVER_URL";
-var seqServerUrl = EnvironmentService.Instance
-    .GetRequiredVariable(seqServerUrlEnvironmentVariable);
+var applicationInsightConnectionString = ApplicationInsightResource.Instance
+    .GetConnectionStringGuaranteed(configuration);
+
+var seqServerUrlConfigKey = "SEQ_SERVER_URL";
+var seqServerUrl = configuration.GetRequired(seqServerUrlConfigKey);
+
+builder
+    .AddResource(new ContainerResource("seq"))
+    .WithAnnotation(new EndpointAnnotation(ProtocolType.Tcp, uriScheme: "http", name: "seq", port: 5341, containerPort: 80))
+    .WithEnvironment("ACCEPT_EULA", "Y")
+    .WithAnnotation(new ContainerImageAnnotation { Image = "datalust/seq", Tag = "latest" });
 
 builder
     .AddProject<Projects.SwiftLift_Riders_Api>("swiftlift.riders.api")
     .WithEnvironment(ApplicationInsightSettings.EnvironmentVariable, applicationInsightConnectionString.Value)
-    .WithEnvironment(seqServerUrlEnvironmentVariable, seqServerUrl);
+    .WithEnvironment(seqServerUrlConfigKey, seqServerUrl);
 
-var postgrespw = builder.Configuration["postgrespassword"];
+var postgrespw = configuration.GetRequired("postgrespassword");
 
 if (string.IsNullOrEmpty(postgrespw))
 {
@@ -36,7 +44,7 @@ builder
     .AddProject<Projects.SwiftLift_IdentityServer_Api>("swiftlift.identityserver.api")
     .WithReference(postgresDatabase)
     .WithEnvironment(ApplicationInsightSettings.EnvironmentVariable, applicationInsightConnectionString.Value)
-    .WithEnvironment(seqServerUrlEnvironmentVariable, seqServerUrl);
+    .WithEnvironment(seqServerUrlConfigKey, seqServerUrl);
 
 await builder.Build().RunAsync()
     .ConfigureAwait(false);

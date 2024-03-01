@@ -5,9 +5,10 @@
     <PackageReference Include="AspNetCore.HealthChecks.Publisher.Seq" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="Microsoft.AspNetCore.HeaderPropagation" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational">
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" />
     <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" />
     <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" />
@@ -30,13 +31,12 @@
     <PackageReference Include="Serilog.Enrichers.Span" />
     <PackageReference Include="Serilog.Enrichers.Thread" />
     <PackageReference Include="Serilog.ExceptionalLogContext" />
-    <PackageReference Include="Serilog.Exceptions" />
     <PackageReference Include="Serilog.Exceptions.EntityFrameworkCore" />
     <PackageReference Include="Serilog.Exceptions.Grpc" />
     <PackageReference Include="Serilog.Exceptions.Refit" />
-    <PackageReference Include="Serilog.Extensions.Logging" />
     <PackageReference Include="Serilog.Sinks.ApplicationInsights" />
     <PackageReference Include="Serilog.Sinks.Async" />
+    <PackageReference Include="Serilog.Sinks.OpenTelemetry" />
     <PackageReference Include="Serilog.Sinks.Seq" />
     <PackageReference Include="SerilogAnalyzer" />
     <PackageReference Include="Scrutor" />

@@ -6,8 +6,8 @@ using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
 using Serilog.Sinks.SystemConsole.Themes;
+using SwiftLift.Infrastructure.Configuration;
 using SwiftLift.Infrastructure.ConnectionString;
-using SwiftLift.Infrastructure.Environment;
 using SwiftLift.Infrastructure.Logging;
 
 using static SwiftLift.Infrastructure.Logging.SerilogWebApplicationBuilderExtensions;
@@ -17,12 +17,10 @@ namespace SwiftLift.Infrastructure.Logging;
 public static class SerilogWebApplicationBuilderBootstrapExtensions
 {
     public static ILogger CreateBootstrapLogger(this WebApplicationBuilder builder,
-        ConnectionStringResource applicationInsightConnectionString,
-        IEnvironmentService environmentService)
+        ConnectionStringResource applicationInsightConnectionString)
     {
         Guard.Against.Null(builder);
         Guard.Against.Null(applicationInsightConnectionString);
-        Guard.Against.Null(environmentService);
 
         var loggerConfiguration =
             new LoggerConfiguration()
@@ -43,21 +41,9 @@ public static class SerilogWebApplicationBuilderBootstrapExtensions
                     applicationInsightConnectionString.Value,
                     TelemetryConverter.Traces);
 
-        if (IsAzureLogStreamEnabled(environmentService))
-        {
-            var azureLogStreamOptions = AzureLogStreamOptions.CreateDefault(builder.Environment);
-            var azureFileLoggingOptionsValidator = new AzureLogStreamOptionsValidator();
-            azureFileLoggingOptionsValidator.ValidateAndThrow(azureLogStreamOptions);
-
-            loggerConfiguration
-                .WriteToLogStreamFile(
-                    azureLogStreamOptions,
-                    builder.Environment.ApplicationName);
-        }
-
         if (builder.Environment.IsDevelopment())
         {
-            var seqServerUrl = environmentService.GetRequiredVariable("SEQ_SERVER_URL")!;
+            var seqServerUrl = builder.Configuration.GetRequired("SEQ_SERVER_URL")!;
 
             loggerConfiguration
                 .WriteTo.Console(

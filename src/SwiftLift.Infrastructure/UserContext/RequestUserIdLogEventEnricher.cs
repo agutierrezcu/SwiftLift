@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Http;
 using Serilog.Core;
 using Serilog.Events;
-using SwiftLift.Infrastructure.UserContext;
 
-namespace SwiftLift.Infrastructure.Logging.Enrichers;
+namespace SwiftLift.Infrastructure.UserContext;
 
 internal sealed class RequestUserIdLogEventEnricher(
     IHttpContextAccessor _httpContextAccessor, IUserContext _userContext)

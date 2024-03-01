@@ -1,5 +1,4 @@
 using SwiftLift.Infrastructure.ConnectionString;
-using SwiftLift.Infrastructure.Environment;
 
 using static SwiftLift.Infrastructure.ApplicationInsight.ApplicationInsightSettings;
 
@@ -13,16 +12,13 @@ public sealed class ApplicationInsightResource : IApplicationInsightResource
     {
     }
 
-    public ConnectionStringResource GetConnectionStringGuaranteed(
-        IEnvironmentService environmentService, IConfiguration configuration)
+    public ConnectionStringResource GetConnectionStringGuaranteed(IConfiguration configuration)
     {
-        Guard.Against.Null(environmentService);
         Guard.Against.Null(configuration);
 
         var connectionStringValue =
-            environmentService.GetVariable(EnvironmentVariable)
-            ?? configuration[EnvironmentVariable]
-            ?? configuration[ConfigurationSectionKey];
+            configuration[EnvironmentVariable] ??
+                configuration[ConfigurationSectionKey];
 
         if (string.IsNullOrWhiteSpace(connectionStringValue))
         {
