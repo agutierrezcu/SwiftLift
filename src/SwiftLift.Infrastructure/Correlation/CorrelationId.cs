@@ -5,4 +5,7 @@ namespace SwiftLift.Infrastructure.Correlation;
     jsonConverter: StronglyTypedIdJsonConverter.SystemTextJson)]
 internal partial struct CorrelationId
 {
+    public const string HeaderName = "Correlation-Id";
+
+    public const string LogEventPropertyName = "CorrelationId";
 }

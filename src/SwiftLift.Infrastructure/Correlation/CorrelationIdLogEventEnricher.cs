@@ -11,7 +11,7 @@ internal sealed class CorrelationIdLogEventEnricher(ICorrelationIdResolver _corr
         var correlationId = _correlationIdResolver.Resolve();
 
         var correlationIdProperty = propertyFactory.CreateProperty(
-            "CorrelationId", correlationId);
+            CorrelationId.LogEventPropertyName, correlationId);
 
         logEvent.AddPropertyIfAbsent(correlationIdProperty!);
     }

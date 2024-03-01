@@ -13,7 +13,7 @@ public static class CorrelationIdServiceCollectionExtensions
         services.AddHeaderPropagation(options =>
         {
             options.Headers.Add(
-                CorrelationIdHeader.Name,
+                CorrelationId.HeaderName,
                 context =>
                 {
                     var correlationIdResolver = context.HttpContext

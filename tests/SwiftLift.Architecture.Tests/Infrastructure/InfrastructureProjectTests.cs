@@ -68,7 +68,8 @@ public sealed class InfrastructureProjectTests(ITestOutputHelper output)
                 "Oakton", "Serilog",
                 "FluentValidation", "Ardalis",
                 "MassTransit", "Murmur", "Scrutor",
-                "FastEndpoints", "Coverlet")
+                "FastEndpoints", "Coverlet",
+                "OpenTelemetry")
             .GetResult();
 
         PrintOutIfFail(output, result);

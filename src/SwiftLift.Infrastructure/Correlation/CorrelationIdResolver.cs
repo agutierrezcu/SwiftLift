@@ -22,7 +22,7 @@ internal sealed class CorrelationIdResolver(IHttpContextAccessor _httpContextAcc
 
         var request = _httpContextAccessor.HttpContext.Request;
 
-        if (!request.Headers.TryGetValue(CorrelationIdHeader.Name,
+        if (!request.Headers.TryGetValue(CorrelationId.HeaderName,
                 out var correlationIdHeader) || correlationIdHeader.Count != 1)
         {
             s_correlationId.Value = CorrelationId.New();

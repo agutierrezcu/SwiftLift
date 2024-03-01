@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
 using Microsoft.FeatureManagement;
+using Serilog.Context;
+
+using static SwiftLift.Infrastructure.Correlation.CorrelationId;
 
 namespace SwiftLift.Infrastructure.Correlation;
 
@@ -20,15 +22,15 @@ internal sealed class CorrelationIdResponseMiddleware
         {
             context.Response.OnStarting(() =>
             {
-                var headerValue = new StringValues(correlationId.ToString());
-
-                context.Response.Headers.TryAdd(CorrelationIdHeader.Name, headerValue);
+                context.Response.Headers.TryAdd(HeaderName, correlationId.ToString());
 
                 return Task.CompletedTask;
             });
         }
-
-        await next(context)
-            .ConfigureAwait(false);
+        using (LogContext.PushProperty(LogEventPropertyName, correlationId))
+        {
+            await next(context)
+                .ConfigureAwait(false);
+        }
     }
 }
