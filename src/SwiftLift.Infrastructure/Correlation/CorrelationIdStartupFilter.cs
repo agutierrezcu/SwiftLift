@@ -9,7 +9,7 @@ internal sealed class CorrelationIdStartupFilter : IStartupFilter
     {
         return app =>
         {
-            app.UseCorrelationIdResponseMiddleware();
+            app.UseCorrelationIdResponse();
 
             next(app);
         };

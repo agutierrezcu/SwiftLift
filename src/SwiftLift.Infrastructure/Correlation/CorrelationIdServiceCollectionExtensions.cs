@@ -16,8 +16,11 @@ public static class CorrelationIdServiceCollectionExtensions
                 CorrelationIdHeader.Name,
                 context =>
                 {
+                    var correlationIdResolver = context.HttpContext
+                        .RequestServices.GetRequiredService<ICorrelationIdResolver>();
+
                     return string.IsNullOrWhiteSpace(context.HeaderValue)
-                        ? CorrelationId.New().ToString()
+                        ? correlationIdResolver.Resolve().ToString()
                         : context.HeaderValue;
                 });
         });

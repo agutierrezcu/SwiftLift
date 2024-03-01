@@ -15,8 +15,7 @@ internal sealed class EventTypeLogEventEnricher : ILogEventEnricher
         var eventTypeProperty = _cachedMessageTemplateEventType.GetOrAdd(
             logEvent.MessageTemplate.Text,
             messageTemplate =>
-            {
-                return new Lazy<LogEventProperty>(
+                new Lazy<LogEventProperty>(
                     () =>
                     {
                         var murmur = MurmurHash.Create32();
@@ -26,8 +25,7 @@ internal sealed class EventTypeLogEventEnricher : ILogEventEnricher
                         var numericHash = BitConverter.ToUInt32(hash, 0);
 
                         return propertyFactory.CreateProperty("EventType", numericHash);
-                    });
-            });
+                    }));
 
         logEvent.AddPropertyIfAbsent(eventTypeProperty.Value);
     }

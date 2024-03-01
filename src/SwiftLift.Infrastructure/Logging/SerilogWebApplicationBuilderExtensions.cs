@@ -62,14 +62,21 @@ public static class SerilogWebApplicationBuilderExtensions
                     .ReadFrom.Configuration(context.Configuration)
                     .ReadFrom.Services(serviceProvider)
                     .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                    .Enrich.WithProperty("ApplicationName", context.HostingEnvironment.ApplicationName)
                     .Enrich.FromLogContext()
                     .Enrich.WithMachineName()
                     .Enrich.WithEnvironmentName()
                     .Enrich.WithThreadId()
-                    .Enrich.WithSpan()
-                    .Enrich.WithExceptionalLogContext()
-                    .Enrich.WithProperty("ApplicationName", context.HostingEnvironment.ApplicationName)
+                    .Enrich.WithSpan(
+                        new SpanOptions
+                        {
+                            IncludeBaggage = false,
+                            IncludeOperationName = true,
+                            IncludeTags = false,
+                            IncludeTraceFlags = false
+                        })
                     .Enrich.WithSensitiveDataMasking(opts => opts.Mode = MaskingMode.InArea)
+                    .Enrich.WithExceptionalLogContext()
                     .Enrich.WithExceptionDetails(
                         new DestructuringOptionsBuilder()
                             .WithDefaultDestructurers()

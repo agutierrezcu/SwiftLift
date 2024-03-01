@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Microsoft.FeatureManagement;
+using Serilog.Context;
 
 namespace SwiftLift.Infrastructure.Correlation;
 
@@ -10,19 +11,16 @@ internal sealed class CorrelationIdResponseMiddleware
 {
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
+        var correlationId = _correlationIdResolver.Resolve();
+
         var isAddCorrelationIdToResponseEnabled =
-               await _featureManager.IsEnabledAsync("AddCorrelationIdToResponse")
-                .ConfigureAwait(false);
+             await _featureManager.IsEnabledAsync("AddCorrelationIdToResponse")
+              .ConfigureAwait(false);
 
         if (isAddCorrelationIdToResponseEnabled)
         {
             context.Response.OnStarting(() =>
             {
-                if (!_correlationIdResolver.TryGet(out var correlationId))
-                {
-                    return Task.CompletedTask;
-                }
-
                 var headerValue = new StringValues(correlationId.ToString() ?? "No set");
 
                 context.Response.Headers.TryAdd(CorrelationIdHeader.Name, headerValue);
@@ -31,7 +29,10 @@ internal sealed class CorrelationIdResponseMiddleware
             });
         }
 
-        await next(context)
-          .ConfigureAwait(false);
+        using (LogContext.PushProperty("CorrelationId", correlationId))
+        {
+            await next(context)
+             .ConfigureAwait(false);
+        }
     }
 }

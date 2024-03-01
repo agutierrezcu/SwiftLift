@@ -1,22 +1,35 @@
-using Microsoft.AspNetCore.HeaderPropagation;
+using Microsoft.AspNetCore.Http;
 
 namespace SwiftLift.Infrastructure.Correlation;
 
-internal sealed class CorrelationIdResolver(HeaderPropagationValues _headerPropagationValues)
+internal sealed class CorrelationIdResolver(IHttpContextAccessor _httpContextAccessor)
     : ICorrelationIdResolver
 {
-    public bool TryGet([NotNullWhen(true)] out CorrelationId? correlationId)
-    {
-        if (_headerPropagationValues.Headers?.TryGetValue(
-                CorrelationIdHeader.Name, out var correlationIdHeader) ?? false)
-        {
-            var correlationIdValue = correlationIdHeader.FirstOrDefault() ?? "Not set";
+    private static readonly AsyncLocal<CorrelationId> s_correlationId = new();
 
-            correlationId = new(Guid.Parse(correlationIdValue));
-            return true;
+    public CorrelationId Resolve()
+    {
+        if (s_correlationId.Value != default)
+        {
+            return s_correlationId.Value;
         }
 
-        correlationId = null;
-        return false;
+        if (_httpContextAccessor.HttpContext is null)
+        {
+            s_correlationId.Value = CorrelationId.New();
+            return s_correlationId.Value;
+        }
+
+        var request = _httpContextAccessor.HttpContext.Request;
+
+        if (!request.Headers.TryGetValue(CorrelationIdHeader.Name,
+                out var correlationIdHeader) || correlationIdHeader.Count != 1)
+        {
+            s_correlationId.Value = CorrelationId.New();
+            return s_correlationId.Value;
+        }
+
+        s_correlationId.Value = new(Guid.Parse(correlationIdHeader.ToString()));
+        return s_correlationId.Value;
     }
 }

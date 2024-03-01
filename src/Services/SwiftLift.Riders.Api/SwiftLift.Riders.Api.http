@@ -21,5 +21,7 @@ Accept: application/json
 
 GET {{SwiftLift.Riders.Api_HostAddress}}/dummy
 Accept: application/json
+#Correlation-Id: 3FCE1EE6-2184-4B91-9EBA-BFE98C7F5339
+
 
 ###

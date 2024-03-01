@@ -58,11 +58,12 @@ try
     }
 
     app.UseHttpsRedirection();
-    app.UseHeaderPropagation();
 
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
+
+    app.UseHeaderPropagation();
 
     app.UseFastEndpoints();
 

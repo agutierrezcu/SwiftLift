@@ -122,7 +122,6 @@ internal static class HostingExtensions
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
-        app.UseHeaderPropagation();
 
         app.UseRouting();
         app.UseIdentityServer();

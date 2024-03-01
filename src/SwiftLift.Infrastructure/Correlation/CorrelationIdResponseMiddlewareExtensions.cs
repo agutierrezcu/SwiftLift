@@ -4,7 +4,7 @@ namespace SwiftLift.Infrastructure.Correlation;
 
 internal static class CorrelationIdResponseMiddlewareExtensions
 {
-    public static IApplicationBuilder UseCorrelationIdResponseMiddleware(this IApplicationBuilder app)
+    public static IApplicationBuilder UseCorrelationIdResponse(this IApplicationBuilder app)
     {
         Guard.Against.Null(app);
 
