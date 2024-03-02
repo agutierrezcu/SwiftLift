@@ -2,6 +2,7 @@ using System.Reflection;
 using Ardalis.GuardClauses;
 using Aspire.Npgsql.EntityFrameworkCore.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Trace;
 using SwiftLift.Infrastructure.EfDbContext;
 
 namespace SwiftLift.IdentityServer.Api.Data;
@@ -41,10 +42,11 @@ internal static class DbContextWebApplicationBuilderExtensions
 
         var dbContextName = typeof(TDbContext).Name;
 
-        services.AddOpenTelemetry()
-            .WithTracing(
-                tracing => tracing.AddSource(
-                    $"{dbContextName}{DbContextInitializerActivity.MigrationsSourceNameSuffix}"));
+        var dbContextInitializerSourceName =
+            $"{dbContextName}{DbContextInitializerActivity.MigrationsSourceNameSuffix}";
+
+        services.ConfigureOpenTelemetryTracerProvider(
+            tracing => tracing.AddSource(dbContextInitializerSourceName));
 
         services.AddHealthChecks()
             .AddCheck<DbContextInitializerHealthCheck<TDbContext>>($"{dbContextName}Initializer");

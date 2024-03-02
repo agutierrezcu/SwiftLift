@@ -11,11 +11,7 @@ public sealed class DbContextInitializer<TDbContext>
         : BackgroundService
             where TDbContext : DbContext
 {
-
-    private readonly ActivitySource _activitySource =
-        new($"{typeof(TDbContext).FullName}{DbContextInitializerActivity.MigrationsSourceNameSuffix}");
-
-    private static readonly string? s_dbContextName = typeof(TDbContext).FullName;
+    private static readonly string? s_dbContextName = typeof(TDbContext).Name;
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -33,13 +29,17 @@ public sealed class DbContextInitializer<TDbContext>
             .ConfigureAwait(false);
     }
 
+    private readonly ActivitySource _activitySource =
+        new($"{s_dbContextName}{DbContextInitializerActivity.MigrationsSourceNameSuffix}");
+
     private async Task RunPendingMigrationsAsync(TDbContext dbContext, CancellationToken cancellationToken)
     {
         Guard.Against.Null(dbContext);
 
         try
         {
-            using var activity = _activitySource.StartActivity("Initializing catalog database", ActivityKind.Client);
+            using var activity = _activitySource.StartActivity("Initializing catalog database {DbContext}",
+                ActivityKind.Client);
 
             activity?.AddTag(nameof(DbContext), s_dbContextName);
 

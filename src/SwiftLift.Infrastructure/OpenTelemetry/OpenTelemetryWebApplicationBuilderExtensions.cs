@@ -1,7 +1,9 @@
 using Microsoft.Extensions.Logging;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using SwiftLift.Infrastructure.Configuration;
 using SwiftLift.SharedKernel.Application;
 
 namespace SwiftLift.Infrastructure.OpenTelemetry;
@@ -68,6 +70,11 @@ public static partial class OpenTelemetryWebApplicationBuilderExtensions
                 .Configure<OpenTelemetryLoggerOptions>(logging => logging.AddOtlpExporter())
                 .ConfigureOpenTelemetryMeterProvider(metrics => metrics.AddOtlpExporter())
                 .ConfigureOpenTelemetryTracerProvider(tracing => tracing.AddOtlpExporter());
+
+            if (builder.Environment.IsDevelopment())
+            {
+                builder.AddExportToSeq(); 
+            }
         }
 
         // Uncomment the following lines to enable the Prometheus exporter (requires the OpenTelemetry.Exporter.Prometheus.AspNetCore package)
@@ -75,6 +82,35 @@ public static partial class OpenTelemetryWebApplicationBuilderExtensions
         //    .WithMetrics(metrics => metrics.AddPrometheusExporter());
 
         //services.AddOpenTelemetry().UseAzureMonitor();
+
+        return builder;
+    }
+
+    private static IHostApplicationBuilder AddExportToSeq(this IHostApplicationBuilder builder)
+    {
+        Guard.Against.Null(builder);
+
+        var services = builder.Services;
+
+        var seqServerUrl = builder.Configuration.GetRequired("SEQ_SERVER_URL")!;
+
+        services.Configure<OpenTelemetryLoggerOptions>(
+            logging =>
+                logging.AddOtlpExporter(opt =>
+                {
+                    opt.Endpoint = new($"{seqServerUrl}ingest/otlp/v1/logs");
+                    opt.Protocol = OtlpExportProtocol.HttpProtobuf;
+                }));
+
+        services.ConfigureOpenTelemetryTracerProvider(
+            tracing =>
+                tracing
+                    .AddSource("SwiftLift.Api.Dummy")
+                    .AddOtlpExporter(opt =>
+                    {
+                        opt.Endpoint = new($"{seqServerUrl}ingest/otlp/v1/traces");
+                        opt.Protocol = OtlpExportProtocol.HttpProtobuf;
+                    }));
 
         return builder;
     }
