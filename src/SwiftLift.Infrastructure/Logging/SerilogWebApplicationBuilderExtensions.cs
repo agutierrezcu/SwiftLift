@@ -14,7 +14,6 @@ using Serilog.Exceptions.Grpc.Destructurers;
 using Serilog.Exceptions.Refit.Destructurers;
 using Serilog.Sinks.SystemConsole.Themes;
 using SwiftLift.Infrastructure.Configuration;
-using SwiftLift.Infrastructure.ConnectionString;
 
 namespace SwiftLift.Infrastructure.Logging;
 
@@ -24,13 +23,9 @@ public static class SerilogWebApplicationBuilderExtensions
         "[{Timestamp:yyyy-MM-dd HH:mm:ss}] [{BuildId} {BuildNumber} {BuildCommit}] [{EventId}] [{EventName}] [{EventType:x8} {Level:u3}] {Message:lj}{NewLine}{Exception}";
 
     public static void AddLogging(this WebApplicationBuilder builder,
-        ConnectionStringResource applicationInsightConnectionString,
-        string azureLogStreamOptionsSectionPath,
         params Assembly[] applicationAssemblies)
     {
         Guard.Against.Null(builder);
-        Guard.Against.Null(applicationInsightConnectionString);
-        Guard.Against.NullOrWhiteSpace(azureLogStreamOptionsSectionPath);
         Guard.Against.NullOrEmpty(applicationAssemblies);
 
         var services = builder.Services;
@@ -78,10 +73,7 @@ public static class SerilogWebApplicationBuilderExtensions
                                         destructureHttpContent: true
                                     )
                                 ])
-                            .WithIgnoreStackTraceAndTargetSiteExceptionFilter())
-                    .WriteTo.ApplicationInsights(
-                        applicationInsightConnectionString.Value,
-                        TelemetryConverter.Traces);
+                            .WithIgnoreStackTraceAndTargetSiteExceptionFilter());
 
                 var otlpExporterEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
 
@@ -99,7 +91,7 @@ public static class SerilogWebApplicationBuilderExtensions
 
                 if (context.HostingEnvironment.IsDevelopment())
                 {
-                    var seqServerUrl = context.Configuration.GetRequired("SEQ_SERVER_URL")!;
+                    var seqServerUrl = context.Configuration.GetRequiredValue("SEQ_SERVER_URL")!;
 
                     loggerConfiguration
                         .WriteTo.Console(
@@ -110,15 +102,5 @@ public static class SerilogWebApplicationBuilderExtensions
             });
 
         builder.Logging.ClearProviders();
-    }
-
-    internal static bool IsAzureLogStreamEnabled(IConfiguration configuration)
-    {
-        Guard.Against.Null(configuration);
-
-        var azureLogStreamEnabledValue = configuration.GetRequired("AZURE_LOG_STREAM_ENABLED");
-
-        return bool.TryParse(azureLogStreamEnabledValue, out var azureLogStreamEnabled)
-                    && azureLogStreamEnabled;
     }
 }

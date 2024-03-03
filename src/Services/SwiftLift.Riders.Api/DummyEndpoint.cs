@@ -1,9 +1,9 @@
-using System.Diagnostics;
 using FastEndpoints;
+using SwiftLift.Infrastructure.Activity;
 
 namespace SwiftLift.Riders.Api;
 
-internal sealed class DummyEndpoint(ILogger<DummyEndpoint> _logger)
+internal sealed class DummyEndpoint(IActivitySourceProvider<DummyEndpoint> _activitySourceProvider)
     : EndpointWithoutRequest
 {
     public override void Configure()
@@ -12,16 +12,12 @@ internal sealed class DummyEndpoint(ILogger<DummyEndpoint> _logger)
         AllowAnonymous();
     }
 
-    private readonly ActivitySource _source = new("SwiftLift.Api.Dummy");
-
-    public override Task HandleAsync(CancellationToken c)
+    public override Task HandleAsync(CancellationToken cancellationToken)
     {
-        using var activity = _source.StartActivity("Executing dummy endpoint");
+        using var activity = _activitySourceProvider.ActivitySource
+            .StartActivity("Handle Dummy Endpoint");
 
-        activity?.SetTag("tag1", "tag1");
-        activity?.SetTag("tag2", "tag2");
-
-        _logger.LogInformation("Executing Dummy endpoint");
+        Logger.LogInformation("Executing Dummy endpoint");
 
         return Task.CompletedTask;
     }

@@ -1,5 +1,4 @@
 using System.Reflection;
-using SwiftLift.Infrastructure.ConnectionString;
 using SwiftLift.SharedKernel.Application;
 
 namespace SwiftLift.ServiceDefaults;
@@ -10,9 +9,5 @@ public sealed class ServiceDefaultsOptions
 
     public bool UseFastEndpoints { get; init; } = true;
 
-    public required ConnectionStringResource ApplicationInsightConnectionString { get; init; }
-
     public required Assembly[] ApplicationAssemblies { get; init; }
-
-    public string AzureLogStreamOptionsSectionPath { get; init; } = "AzureLogStream";
 }

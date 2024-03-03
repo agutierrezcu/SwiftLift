@@ -1,16 +1,12 @@
 using System.Net.Sockets;
-using SwiftLift.Infrastructure.ApplicationInsight;
 using SwiftLift.Infrastructure.Configuration;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
 var configuration = builder.Configuration;
 
-var applicationInsightConnectionString = ApplicationInsightResource.Instance
-    .GetConnectionStringGuaranteed(configuration);
-
 var seqServerUrlConfigKey = "SEQ_SERVER_URL";
-var seqServerUrl = configuration.GetRequired(seqServerUrlConfigKey);
+var seqServerUrl = configuration.GetRequiredValue(seqServerUrlConfigKey);
 
 builder
     .AddResource(new ContainerResource("seq"))
@@ -20,10 +16,9 @@ builder
 
 builder
     .AddProject<Projects.SwiftLift_Riders_Api>("swiftlift.riders.api")
-    .WithEnvironment(ApplicationInsightSettings.EnvironmentVariable, applicationInsightConnectionString.Value)
     .WithEnvironment(seqServerUrlConfigKey, seqServerUrl);
 
-var postgrespw = configuration.GetRequired("postgrespassword");
+var postgrespw = configuration.GetRequiredValue("postgrespassword");
 
 if (string.IsNullOrEmpty(postgrespw))
 {
@@ -43,7 +38,6 @@ var postgresDatabase = builder
 builder
     .AddProject<Projects.SwiftLift_IdentityServer_Api>("swiftlift.identityserver.api")
     .WithReference(postgresDatabase)
-    .WithEnvironment(ApplicationInsightSettings.EnvironmentVariable, applicationInsightConnectionString.Value)
     .WithEnvironment(seqServerUrlConfigKey, seqServerUrl);
 
 await builder.Build().RunAsync()

@@ -6,7 +6,6 @@ using Serilog;
 using SwiftLift.IdentityServer.Api.Data;
 using SwiftLift.IdentityServer.Api.Models;
 using SwiftLift.Infrastructure;
-using SwiftLift.Infrastructure.ConnectionString;
 using SwiftLift.Infrastructure.Logging;
 using SwiftLift.ServiceDefaults;
 using SwiftLift.SharedKernel.Application;
@@ -16,12 +15,10 @@ namespace SwiftLift.IdentityServer.Api;
 internal static class HostingExtensions
 {
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder,
-        ApplicationInfo applicationInfo,
-        ConnectionStringResource applicationInsightConnectionString)
+        ApplicationInfo applicationInfo)
     {
         Guard.Against.Null(builder);
         Guard.Against.Null(applicationInfo);
-        Guard.Against.Null(applicationInsightConnectionString);
 
         var applicationAssemblies = AppDomain.CurrentDomain
             .GetApplicationAssemblies(applicationInfo.Namespace);
@@ -29,7 +26,6 @@ internal static class HostingExtensions
         ServiceDefaultsOptions serviceDefaultsOptions = new()
         {
             ApplicationInfo = applicationInfo,
-            ApplicationInsightConnectionString = applicationInsightConnectionString,
             ApplicationAssemblies = applicationAssemblies,
             UseFastEndpoints = false
         };

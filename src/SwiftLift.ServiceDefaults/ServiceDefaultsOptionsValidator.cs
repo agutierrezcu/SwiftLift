@@ -11,12 +11,7 @@ public class ServiceDefaultsOptionsValidator : AbstractValidator<ServiceDefaults
         RuleFor(o => o.ApplicationInfo)
             .SetValidator(new ApplicationInfoValidator());
 
-        RuleFor(o => o.ApplicationInsightConnectionString)
-            .SetValidator(new ConnectionStringResourceValidator());
-
         RuleFor(o => o.ApplicationAssemblies).NotEmpty();
-
-        RuleFor(o => o.AzureLogStreamOptionsSectionPath).NotEmpty();
     }
 
     private sealed class ApplicationInfoValidator : AbstractValidator<ApplicationInfo>

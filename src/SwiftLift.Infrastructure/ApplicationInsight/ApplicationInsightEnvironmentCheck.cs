@@ -1,7 +1,9 @@
+using SwiftLift.Infrastructure.Checks;
 using SwiftLift.Infrastructure.ConnectionString;
 
 namespace SwiftLift.Infrastructure.ApplicationInsight;
 
+[SkipCheck]
 internal sealed class ApplicationInsightEnvironmentCheck : IEnvironmentCheck
 {
     public string Description

@@ -7,7 +7,6 @@ using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
 using Serilog.Sinks.SystemConsole.Themes;
 using SwiftLift.Infrastructure.Configuration;
-using SwiftLift.Infrastructure.ConnectionString;
 using SwiftLift.Infrastructure.Logging;
 
 using static SwiftLift.Infrastructure.Logging.SerilogWebApplicationBuilderExtensions;
@@ -16,11 +15,9 @@ namespace SwiftLift.Infrastructure.Logging;
 
 public static class SerilogWebApplicationBuilderBootstrapExtensions
 {
-    public static ILogger CreateBootstrapLogger(this WebApplicationBuilder builder,
-        ConnectionStringResource applicationInsightConnectionString)
+    public static ILogger CreateBootstrapLogger(this WebApplicationBuilder builder)
     {
         Guard.Against.Null(builder);
-        Guard.Against.Null(applicationInsightConnectionString);
 
         var loggerConfiguration =
             new LoggerConfiguration()
@@ -36,14 +33,11 @@ public static class SerilogWebApplicationBuilderBootstrapExtensions
                 .Enrich.WithProperty("ApplicationName", builder.Environment.ApplicationName)
                 .Enrich.WithExceptionDetails(
                     new DestructuringOptionsBuilder()
-                        .WithDefaultDestructurers())
-                .WriteTo.ApplicationInsights(
-                    applicationInsightConnectionString.Value,
-                    TelemetryConverter.Traces);
+                        .WithDefaultDestructurers());
 
         if (builder.Environment.IsDevelopment())
         {
-            var seqServerUrl = builder.Configuration.GetRequired("SEQ_SERVER_URL")!;
+            var seqServerUrl = builder.Configuration.GetRequiredValue("SEQ_SERVER_URL")!;
 
             loggerConfiguration
                 .WriteTo.Console(

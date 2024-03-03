@@ -11,9 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.UI.Client" />
-    <PackageReference Include="FastEndpoints" />
-    <PackageReference Include="FastEndpoints.Swagger" />
-    <PackageReference Include="Swashbuckle.AspNetCore" />
+
   </ItemGroup>
 
   <ItemGroup>

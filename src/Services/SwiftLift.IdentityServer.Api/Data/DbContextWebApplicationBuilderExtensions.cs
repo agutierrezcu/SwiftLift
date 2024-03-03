@@ -43,7 +43,7 @@ internal static class DbContextWebApplicationBuilderExtensions
         var dbContextName = typeof(TDbContext).Name;
 
         var dbContextInitializerSourceName =
-            $"{dbContextName}{DbContextInitializerActivity.MigrationsSourceNameSuffix}";
+            DbContextInitializerActivity<TDbContext>.GetActivitySourceName();
 
         services.ConfigureOpenTelemetryTracerProvider(
             tracing => tracing.AddSource(dbContextInitializerSourceName));

@@ -1,6 +1,5 @@
 using Serilog;
 using SwiftLift.IdentityServer.Api;
-using SwiftLift.Infrastructure.ApplicationInsight;
 using SwiftLift.Infrastructure.Logging;
 using SwiftLift.ServiceDefaults;
 using SwiftLift.SharedKernel.Application;
@@ -10,10 +9,7 @@ var applicationInfo = new ApplicationInfo(
 
 var builder = WebApplication.CreateBuilder(args);
 
-var applicationInsightConnectionString = ApplicationInsightResource.Instance
-    .GetConnectionStringGuaranteed(builder.Configuration);
-
-Log.Logger = builder.CreateBootstrapLogger(applicationInsightConnectionString);
+Log.Logger = builder.CreateBootstrapLogger();
 
 Log.Information("Starting {ApplicationId} service up", applicationInfo.Id);
 
@@ -25,7 +21,7 @@ try
         .ReadFrom.Configuration(ctx.Configuration));
 
     var app = builder
-        .ConfigureServices(applicationInfo, applicationInsightConnectionString)
+        .ConfigureServices(applicationInfo)
         .ConfigurePipeline();
 
     // this seeding is only for the template to bootstrap the DB and users.

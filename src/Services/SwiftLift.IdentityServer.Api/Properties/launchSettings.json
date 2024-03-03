@@ -2,13 +2,12 @@
   "profiles": {
     "SelfHost": {
       "commandName": "Project",
+      "dotnetRunMessages": true,
       "launchBrowser": true,
+      "applicationUrl": "https://localhost:5001",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "APPLICATIONINSIGHTS_CONNECTION_STRING": "InstrumentationKey=00000000-0000-0000-0000-000000000000",
-        "SEQ_SERVER_URL": "http://localhost:5341/"
-      },
-      "applicationUrl": "https://localhost:5001"
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     }
   }
 }

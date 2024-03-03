@@ -2,7 +2,7 @@ namespace SwiftLift.Infrastructure.Configuration;
 
 public static class ConfigurationCollectionExtensions
 {
-    public static string GetRequired(this IConfiguration configuration,
+    public static string GetRequiredValue(this IConfiguration configuration,
         string configKey)
     {
         Guard.Against.Null(configuration);

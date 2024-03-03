@@ -1,7 +1,6 @@
 using System.Net.Mime;
 using Ardalis.GuardClauses;
 using FastEndpoints;
-using FastEndpoints.Swagger;
 using FluentValidation;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
@@ -10,10 +9,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.FeatureManagement;
-using SwiftLift.Infrastructure.ApplicationInsight;
+using SwiftLift.Infrastructure.Activity;
 using SwiftLift.Infrastructure.BuildInfo;
 using SwiftLift.Infrastructure.Checks;
 using SwiftLift.Infrastructure.Correlation;
+using SwiftLift.Infrastructure.FastEndpoints;
 using SwiftLift.Infrastructure.HealthChecks;
 using SwiftLift.Infrastructure.HttpClient;
 using SwiftLift.Infrastructure.Logging;
@@ -42,35 +42,28 @@ public static partial class Extensions
         var serviceDefaultsOptionsValidator = new ServiceDefaultsOptionsValidator();
         serviceDefaultsOptionsValidator.ValidateAndThrow(serviceDefaultsOptions);
 
-        var applicationInsightConnectionString = serviceDefaultsOptions.ApplicationInsightConnectionString;
         var applicationInfo = serviceDefaultsOptions.ApplicationInfo;
         var applicationAssemblies = serviceDefaultsOptions.ApplicationAssemblies;
 
-        builder.AddLogging(
-            applicationInsightConnectionString,
-            serviceDefaultsOptions.AzureLogStreamOptionsSectionPath,
-            applicationAssemblies);
-
-        var services = builder.Services;
+        builder.AddLogging(applicationAssemblies);
 
         if (serviceDefaultsOptions.UseFastEndpoints)
         {
-            services.AddFastEndpoints();
+            builder.AddFastEndpoints(applicationAssemblies);
         }
 
-        builder.ConfigureOpenTelemetry(applicationInfo);
+        builder.ConfigureOpenTelemetry(applicationAssemblies);
 
         builder.AddEnvironmentChecks(applicationAssemblies);
 
-        builder.AddHealthChecks(applicationInsightConnectionString, applicationAssemblies);
+        builder.AddHealthChecks(applicationAssemblies);
+
+        var services = builder.Services;
 
         services.AddMemoryCache();
         services.AddHttpContextAccessor();
         services.AddFeatureManagement();
         services.AddProblemDetails();
-
-        services.AddSingleton<IApplicationInsightResource>(_ => ApplicationInsightResource.Instance);
-        services.AddSingleton(_ => applicationInfo);
 
         services.AddBuildInfo();
 
@@ -82,27 +75,13 @@ public static partial class Extensions
 
         services.AddValidators(applicationAssemblies);
 
+        services.AddActivitySourceProvider();
+
         services.AddSnakeSerialization();
 
+        services.AddSingleton(_ => applicationInfo);
+
         return builder;
-    }
-
-    private static IServiceCollection AddFastEndpoints(this IServiceCollection services)
-    {
-        Guard.Against.Null(services);
-
-        services
-            .AddFastEndpoints(
-                opts =>
-                {
-                    //opts.
-                })
-            .SwaggerDocument();
-
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
-
-        return services;
     }
 
     public static WebApplication MapDefaultEndpoints(this WebApplication app)

@@ -18,7 +18,9 @@ public static class EnvironmentCheckWebApplicationBuilderExtensions
         services
             .Scan(scan => scan
                 .FromAssemblies(applicationAssemblies)
-                .AddClasses(s => s.AssignableTo<IEnvironmentCheck>(), false)
+                .AddClasses(
+                    s => s.AssignableTo<IEnvironmentCheck>()
+                            .WithoutAttribute<SkipCheckAttribute>(), false)
                 .As<IEnvironmentCheck>()
                 .WithTransientLifetime());
 

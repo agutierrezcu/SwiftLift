@@ -4,17 +4,16 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using SwiftLift.Infrastructure.Configuration;
-using SwiftLift.SharedKernel.Application;
 
 namespace SwiftLift.Infrastructure.OpenTelemetry;
 
 public static partial class OpenTelemetryWebApplicationBuilderExtensions
 {
     public static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder,
-        ApplicationInfo applicationInfo)
+        params Assembly[] applicationAssemblies)
     {
         Guard.Against.Null(builder);
-        Guard.Against.Null(applicationInfo);
+        Guard.Against.NullOrEmpty(applicationAssemblies);
 
         builder.Logging.AddOpenTelemetry(logging =>
         {
@@ -44,10 +43,11 @@ public static partial class OpenTelemetryWebApplicationBuilderExtensions
                     .AddHttpClientInstrumentation();
             });
 
-        builder.AddOpenTelemetryExporters();
+        builder.AddOpenTelemetryExporters(applicationAssemblies);
 
         return builder;
     }
+
     private static MeterProviderBuilder AddBuiltInMeters(this MeterProviderBuilder meterProviderBuilder)
     {
         return meterProviderBuilder.AddMeter(
@@ -56,9 +56,13 @@ public static partial class OpenTelemetryWebApplicationBuilderExtensions
             "System.Net.Http");
     }
 
-    private static IHostApplicationBuilder AddOpenTelemetryExporters(this IHostApplicationBuilder builder)
+    private static IHostApplicationBuilder AddOpenTelemetryExporters(this IHostApplicationBuilder builder,
+        params Assembly[] applicationAssemblies)
     {
         Guard.Against.Null(builder);
+        Guard.Against.NullOrEmpty(applicationAssemblies);
+
+        var services = builder.Services;
 
         var otlpExporterEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
 
@@ -66,14 +70,14 @@ public static partial class OpenTelemetryWebApplicationBuilderExtensions
 
         if (useOtlpExporter)
         {
-            builder.Services
-                .Configure<OpenTelemetryLoggerOptions>(logging => logging.AddOtlpExporter())
+            services
+                .Configure((Action<OpenTelemetryLoggerOptions>)(logging => logging.AddOtlpExporter()))
                 .ConfigureOpenTelemetryMeterProvider(metrics => metrics.AddOtlpExporter())
                 .ConfigureOpenTelemetryTracerProvider(tracing => tracing.AddOtlpExporter());
 
             if (builder.Environment.IsDevelopment())
             {
-                builder.AddExportToSeq(); 
+                builder.AddExportToSeq();
             }
         }
 
@@ -92,7 +96,7 @@ public static partial class OpenTelemetryWebApplicationBuilderExtensions
 
         var services = builder.Services;
 
-        var seqServerUrl = builder.Configuration.GetRequired("SEQ_SERVER_URL")!;
+        var seqServerUrl = builder.Configuration.GetRequiredValue("SEQ_SERVER_URL")!;
 
         services.Configure<OpenTelemetryLoggerOptions>(
             logging =>
@@ -104,13 +108,11 @@ public static partial class OpenTelemetryWebApplicationBuilderExtensions
 
         services.ConfigureOpenTelemetryTracerProvider(
             tracing =>
-                tracing
-                    .AddSource("SwiftLift.Api.Dummy")
-                    .AddOtlpExporter(opt =>
-                    {
-                        opt.Endpoint = new($"{seqServerUrl}ingest/otlp/v1/traces");
-                        opt.Protocol = OtlpExportProtocol.HttpProtobuf;
-                    }));
+                tracing.AddOtlpExporter(opt =>
+                {
+                    opt.Endpoint = new($"{seqServerUrl}ingest/otlp/v1/traces");
+                    opt.Protocol = OtlpExportProtocol.HttpProtobuf;
+                }));
 
         return builder;
     }

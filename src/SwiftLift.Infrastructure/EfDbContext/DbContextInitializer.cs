@@ -13,7 +13,7 @@ public sealed class DbContextInitializer<TDbContext>
 {
     private static readonly string? s_dbContextName = typeof(TDbContext).Name;
 
-    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         if (_hostEnvironment.IsProduction())
         {
@@ -25,12 +25,12 @@ public sealed class DbContextInitializer<TDbContext>
         using var scope = _serviceScopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TDbContext>();
 
-        await RunPendingMigrationsAsync(dbContext, cancellationToken)
+        await RunPendingMigrationsAsync(dbContext, stoppingToken)
             .ConfigureAwait(false);
     }
 
     private readonly ActivitySource _activitySource =
-        new($"{s_dbContextName}{DbContextInitializerActivity.MigrationsSourceNameSuffix}");
+        new(DbContextInitializerActivity<TDbContext>.GetActivitySourceName());
 
     private async Task RunPendingMigrationsAsync(TDbContext dbContext, CancellationToken cancellationToken)
     {
@@ -38,8 +38,9 @@ public sealed class DbContextInitializer<TDbContext>
 
         try
         {
-            using var activity = _activitySource.StartActivity("Initializing catalog database {DbContext}",
-                ActivityKind.Client);
+            using var activity =
+                _activitySource.StartActivity(
+                    "Initializing catalog database {DbContext}", ActivityKind.Client);
 
             activity?.AddTag(nameof(DbContext), s_dbContextName);
 

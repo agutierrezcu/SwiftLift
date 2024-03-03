@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="FastEndpoints" />
+    <PackageReference Include="FastEndpoints.Swagger" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
     <PackageReference Include="AspNetCore.HealthChecks.Publisher.ApplicationInsights" />
     <PackageReference Include="AspNetCore.HealthChecks.Publisher.Seq" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
