@@ -6,7 +6,7 @@ public static class ActivityServiceCollectionExtensions
     {
         Guard.Against.Null(services);
 
-        services.TryAddSingleton(typeof(IActivitySourceProvider<>), typeof(ActivitySourceProvider<>));
+        services.TryAddSingleton(typeof(IActivitySourceProvider<>), typeof(ActivitySourceDefaultProvider<>));
 
         return services;
     }

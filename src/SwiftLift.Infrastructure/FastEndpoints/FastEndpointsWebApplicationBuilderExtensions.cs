@@ -28,8 +28,8 @@ public static class FastEndpointsWebApplicationBuilderExtensions
 
         services.AddActivitySourceProvider();
 
-        var registrationStrategy =
-            new EndpointActivitySourceRegistrationStrategy(builder.Environment);
+        var activitySourceSubscriber =
+            new EndpointActivitySourceSubscriber(builder.Environment);
 
         services
             .Scan(scan =>
@@ -37,7 +37,7 @@ public static class FastEndpointsWebApplicationBuilderExtensions
                 scan
                     .FromAssemblies(applicationAssemblies)
                     .AddClasses(s => s.AssignableTo<IEndpoint>(), false)
-                    .UsingRegistrationStrategy(registrationStrategy);
+                    .UsingRegistrationStrategy(activitySourceSubscriber);
             });
 
         return builder;

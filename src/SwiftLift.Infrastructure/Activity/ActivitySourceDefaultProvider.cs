@@ -2,10 +2,10 @@ using System.Diagnostics;
 
 namespace SwiftLift.Infrastructure.Activity;
 
-internal sealed class ActivitySourceProvider<TActivityStarter> : IActivitySourceProvider<TActivityStarter>
+internal sealed class ActivitySourceDefaultProvider<TActivityStarter> : IActivitySourceProvider<TActivityStarter>
         where TActivityStarter : class
 {
-    public ActivitySourceProvider(IHostEnvironment hostEnvironment)
+    public ActivitySourceDefaultProvider(IHostEnvironment hostEnvironment)
     {
         Guard.Against.Null(hostEnvironment);
 

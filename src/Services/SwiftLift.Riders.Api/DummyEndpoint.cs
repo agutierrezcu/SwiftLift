@@ -1,9 +1,11 @@
 using FastEndpoints;
 using SwiftLift.Infrastructure.Activity;
+using SwiftLift.Infrastructure.FastEndpoints;
 
 namespace SwiftLift.Riders.Api;
 
-internal sealed class DummyEndpoint(IActivitySourceProvider<DummyEndpoint> _activitySourceProvider)
+[ActivitySource]
+internal sealed partial class DummyEndpoint(IActivitySourceProvider<DummyEndpoint> _activitySourceProvider)
     : EndpointWithoutRequest
 {
     public override void Configure()

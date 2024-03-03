@@ -4,7 +4,7 @@ using SwiftLift.Infrastructure.Activity;
 
 namespace SwiftLift.Infrastructure.FastEndpoints;
 
-internal class EndpointActivitySourceRegistrationStrategy(IHostEnvironment _environment)
+internal class EndpointActivitySourceSubscriber(IHostEnvironment _environment)
     : RegistrationStrategy
 {
     public override void Apply(IServiceCollection services, ServiceDescriptor descriptor)
@@ -12,8 +12,10 @@ internal class EndpointActivitySourceRegistrationStrategy(IHostEnvironment _envi
         Guard.Against.Null(services);
         Guard.Against.Null(descriptor);
 
+        var endpointType = descriptor.ServiceType;
+
         var activitySourceProviderType =
-            typeof(ActivitySourceProvider<>).MakeGenericType(descriptor.ServiceType);
+            typeof(ActivitySourceDefaultProvider<>).MakeGenericType(endpointType);
 
         var activitySourceProvider =
             Activator.CreateInstance(activitySourceProviderType, _environment)
