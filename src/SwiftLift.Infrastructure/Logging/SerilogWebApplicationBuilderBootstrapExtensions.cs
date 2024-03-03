@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Serilog;
 using Serilog.Enrichers.Span;
 using Serilog.Events;
@@ -7,8 +6,6 @@ using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
 using Serilog.Sinks.SystemConsole.Themes;
 using SwiftLift.Infrastructure.Configuration;
-using SwiftLift.Infrastructure.Logging;
-
 using static SwiftLift.Infrastructure.Logging.SerilogWebApplicationBuilderExtensions;
 
 namespace SwiftLift.Infrastructure.Logging;

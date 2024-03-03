@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
   <ItemGroup>

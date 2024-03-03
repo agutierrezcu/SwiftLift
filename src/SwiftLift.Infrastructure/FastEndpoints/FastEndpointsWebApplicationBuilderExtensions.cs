@@ -1,6 +1,7 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Builder;
+using OpenTelemetry.Trace;
 using SwiftLift.Infrastructure.Activity;
 
 namespace SwiftLift.Infrastructure.FastEndpoints;
@@ -28,17 +29,20 @@ public static class FastEndpointsWebApplicationBuilderExtensions
 
         services.AddActivitySourceProvider();
 
-        var activitySourceSubscriber =
-            new EndpointActivitySourceSubscriber(builder.Environment);
+        services.ConfigureOpenTelemetryTracerProvider(
+            tracing => tracing.AddSource("SwiftLift.Riders.Api.DummyEndpoint"));
 
-        services
-            .Scan(scan =>
-            {
-                scan
-                    .FromAssemblies(applicationAssemblies)
-                    .AddClasses(s => s.AssignableTo<IEndpoint>(), false)
-                    .UsingRegistrationStrategy(activitySourceSubscriber);
-            });
+        //var activitySourceSubscriber =
+        //    new EndpointActivitySourceSubscriber(builder.Environment);
+
+        //services
+        //    .Scan(scan =>
+        //    {
+        //        scan
+        //            .FromAssemblies(applicationAssemblies)
+        //            .AddClasses(s => s.AssignableTo<IEndpoint>(), false)
+        //            .UsingRegistrationStrategy(activitySourceSubscriber);
+        //    });
 
         return builder;
     }

@@ -1,6 +1,5 @@
 using System.Net.Mime;
 using Ardalis.GuardClauses;
-using FastEndpoints;
 using FluentValidation;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;

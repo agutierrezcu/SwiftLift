@@ -1,5 +1,4 @@
 using Ardalis.GuardClauses;
-using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
