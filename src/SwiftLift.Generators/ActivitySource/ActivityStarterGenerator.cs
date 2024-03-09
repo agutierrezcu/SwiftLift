@@ -1,8 +1,9 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-
+using Scriban;
 using static SwiftLift.Generators.ActivitySource.SourceGenerationHelper;
 
 namespace SwiftLift.Generators.ActivitySource;
@@ -10,10 +11,6 @@ namespace SwiftLift.Generators.ActivitySource;
 [Generator(LanguageNames.CSharp)]
 public class ActivityStarterGenerator : IIncrementalGenerator
 {
-    private const string AttributeName = "ActivityStarterAttribute";
-
-    private const string FullyQualifiedAttributeName = "SwiftLift.Generators.ActivitySource.ActivityStarterAttribute";
-
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         context.RegisterPostInitializationOutput(
@@ -25,7 +22,7 @@ public class ActivityStarterGenerator : IIncrementalGenerator
         var activityStartersToGenerate =
             context.SyntaxProvider
                 .ForAttributeWithMetadataName(
-                    FullyQualifiedAttributeName,
+                    ActivityStarterAttributeFullyQualifiedName,
                     predicate: static (s, _) => true,
                     transform: static (ctx, ct) =>
                         GetActivityStarterToGenerate(ctx, ct))
@@ -33,7 +30,7 @@ public class ActivityStarterGenerator : IIncrementalGenerator
                 .Collect();
 
         context.RegisterSourceOutput(activityStartersToGenerate,
-            static (spc, source) => Execute(spc, source));
+            static (spc, source) => ExecuteActivityStarterCode(spc, source));
     }
 
     private static ActivityStarterToGenerate? GetActivityStarterToGenerate(
@@ -54,14 +51,14 @@ public class ActivityStarterGenerator : IIncrementalGenerator
 
         var name = typeSymbol.Name;
 
-        var sourceName = $"{typeSymbol.ContainingAssembly.Name}.{typeSymbol.Name}";
+        var sourceName = typeSymbol.ToString();
 
         foreach (var attributeData in typeSymbol.GetAttributes())
         {
             var attributeClass = attributeData.AttributeClass;
 
-            if (attributeClass?.Name != AttributeName ||
-                    attributeClass?.ToDisplayString() != FullyQualifiedAttributeName)
+            if (attributeClass?.Name != ActivityStarterAttributeName ||
+                    attributeClass?.ToDisplayString() != ActivityStarterAttributeFullyQualifiedName)
             {
                 continue;
             }
@@ -86,24 +83,49 @@ public class ActivityStarterGenerator : IIncrementalGenerator
         return new(nameSpace, name, sourceName);
     }
 
-    private static void Execute(SourceProductionContext context,
+    private static void ExecuteActivityStarterCode(SourceProductionContext context,
         ImmutableArray<ActivityStarterToGenerate?> activityStartersToGenerate)
     {
+        var sourceNames = new HashSet<string>();
+
         foreach (var activityStarterToGenerate in activityStartersToGenerate)
         {
             if (activityStarterToGenerate is not { } activityStarter)
             {
-                return;
+                continue;
             }
 
-            var partialActivityStarter = GeneratePartialClassWithActivitySource(activityStarter);
+            var partialActivityStarterCode = GeneratePartialClassWithActivitySource(activityStarter);
+
+            sourceNames.Add(activityStarter.SourceName);
 
             context.AddSource($"{activityStarter.Namespace}.{activityStarter.TypeName}.g.cs",
-                SourceText.From(partialActivityStarter, Encoding.UTF8));
+                SourceText.From(partialActivityStarterCode, Encoding.UTF8));
         }
 
-        GenerateActivityStarterSourceNameRegister(activityStartersToGenerate);
-        //context.AddSource($"{value.Namespace}.{value.TypeName}.g.cs",
-        //    SourceText.From(activityStarterRegistrations, Encoding.UTF8));
+        var templateText = GetEmbededResource(
+            "SwiftLift.Generators.ActivitySource.Templates.AddSourceNamesTemplate.scriban");
+
+        var template = Template.Parse(templateText);
+
+        var sourceCode = template.Render(new
+        {
+            Sources = sourceNames.ToArray()
+        });
+
+        context.AddSource(
+            "OpenTelemetryTracerSourceNamesServiceCollectionExtensions.g.cs",
+            SourceText.From(sourceCode, Encoding.UTF8)
+        );
+    }
+
+    private static string GetEmbededResource(string path)
+    {
+        using var stream = typeof(ActivityStarterGenerator).Assembly
+            .GetManifestResourceStream(path);
+
+        using var streamReader = new StreamReader(stream);
+
+        return streamReader.ReadToEnd();
     }
 }

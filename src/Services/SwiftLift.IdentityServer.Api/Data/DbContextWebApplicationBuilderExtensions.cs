@@ -2,7 +2,6 @@ using System.Reflection;
 using Ardalis.GuardClauses;
 using Aspire.Npgsql.EntityFrameworkCore.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
-using OpenTelemetry.Trace;
 using SwiftLift.Infrastructure.EfDbContext;
 
 namespace SwiftLift.IdentityServer.Api.Data;
@@ -28,11 +27,11 @@ internal static class DbContextWebApplicationBuilderExtensions
         builder.AddNpgsqlDbContext<TDbContext>(
             connectionName,
             configureSettings,
-            builder =>
+            opts =>
             {
-                builder.ConfigureDbContextOptions(assemblyMigration, schema);
+                opts.ConfigureDbContextOptions(assemblyMigration, schema);
 
-                configureDbContextOptions?.Invoke(builder);
+                configureDbContextOptions?.Invoke(opts);
             });
 
         if (builder.Environment.IsDevelopment())
@@ -41,12 +40,6 @@ internal static class DbContextWebApplicationBuilderExtensions
         }
 
         var dbContextName = typeof(TDbContext).Name;
-
-        var dbContextInitializerSourceName =
-            DbContextInitializerActivity<TDbContext>.GetActivitySourceName();
-
-        services.ConfigureOpenTelemetryTracerProvider(
-            tracing => tracing.AddSource(dbContextInitializerSourceName));
 
         services.AddHealthChecks()
             .AddCheck<DbContextInitializerHealthCheck<TDbContext>>($"{dbContextName}Initializer");

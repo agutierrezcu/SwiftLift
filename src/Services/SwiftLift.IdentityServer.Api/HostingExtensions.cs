@@ -26,8 +26,7 @@ internal static class HostingExtensions
         ServiceDefaultsOptions serviceDefaultsOptions = new()
         {
             ApplicationInfo = applicationInfo,
-            ApplicationAssemblies = applicationAssemblies,
-            UseFastEndpoints = false
+            ApplicationAssemblies = applicationAssemblies
         };
 
         builder.AddServiceDefaults(serviceDefaultsOptions);

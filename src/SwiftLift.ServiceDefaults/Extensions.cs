@@ -12,7 +12,6 @@ using SwiftLift.Infrastructure.Activity;
 using SwiftLift.Infrastructure.BuildInfo;
 using SwiftLift.Infrastructure.Checks;
 using SwiftLift.Infrastructure.Correlation;
-using SwiftLift.Infrastructure.FastEndpoints;
 using SwiftLift.Infrastructure.HealthChecks;
 using SwiftLift.Infrastructure.HttpClient;
 using SwiftLift.Infrastructure.Logging;
@@ -45,11 +44,6 @@ public static partial class Extensions
         var applicationAssemblies = serviceDefaultsOptions.ApplicationAssemblies;
 
         builder.AddLogging(applicationAssemblies);
-
-        if (serviceDefaultsOptions.UseFastEndpoints)
-        {
-            builder.AddFastEndpoints(applicationAssemblies);
-        }
 
         builder.ConfigureOpenTelemetry(applicationAssemblies);
 

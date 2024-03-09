@@ -4,6 +4,9 @@
     <ProjectReference Include="..\..\SwiftLift.Generators\SwiftLift.Generators.csproj"
       OutputItemType="Analyzer"
       ReferenceOutputAssembly="false"/>
+  </ItemGroup>
+    
+  <ItemGroup>
     <ProjectReference Include="..\..\SwiftLift.ServiceDefaults\SwiftLift.ServiceDefaults.csproj" />
   </ItemGroup>
 

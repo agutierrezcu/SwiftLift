@@ -29,8 +29,10 @@ public sealed class DbContextInitializer<TDbContext>
             .ConfigureAwait(false);
     }
 
-    private readonly ActivitySource _activitySource =
-        new(DbContextInitializerActivity<TDbContext>.GetActivitySourceName());
+    internal static readonly string s_activitySourceName =
+        $"{typeof(TDbContext).Name}Initializer";
+
+    private static ActivitySource _activitySource = new(s_activitySourceName);
 
     private async Task RunPendingMigrationsAsync(TDbContext dbContext, CancellationToken cancellationToken)
     {

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Trace;
 
 namespace SwiftLift.Infrastructure.EfDbContext;
 
@@ -11,6 +12,10 @@ public static class DbContextServiceCollectionExtensions
 
         services.TryAddSingleton<DbContextInitializer<TDbContext>>();
         services.AddHostedService(sp => sp.GetRequiredService<DbContextInitializer<TDbContext>>());
+
+        services.ConfigureOpenTelemetryTracerProvider(
+            tracing =>
+                tracing.AddSource(DbContextInitializer<TDbContext>.s_activitySourceName));
 
         return services;
     }

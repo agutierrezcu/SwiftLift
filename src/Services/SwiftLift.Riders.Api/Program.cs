@@ -2,6 +2,7 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using Serilog;
 using SwiftLift.Infrastructure;
+using SwiftLift.Infrastructure.FastEndpoints;
 using SwiftLift.Infrastructure.Logging;
 using SwiftLift.ServiceDefaults;
 using SwiftLift.SharedKernel.Application;
@@ -20,6 +21,8 @@ try
     var applicationAssemblies = AppDomain.CurrentDomain
         .GetApplicationAssemblies(applicationInfo.Namespace);
 
+    builder.AddFastEndpoints(applicationAssemblies);
+
     ServiceDefaultsOptions serviceDefaultsOptions = new()
     {
         ApplicationInfo = applicationInfo,
@@ -29,6 +32,8 @@ try
     builder.AddServiceDefaults(serviceDefaultsOptions);
 
     var services = builder.Services;
+
+    services.AddTracingSourceNames();
 
     services.AddAuthentication();
     services.AddAuthorization();

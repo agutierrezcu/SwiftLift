@@ -7,7 +7,5 @@ public sealed class ServiceDefaultsOptions
 {
     public required ApplicationInfo ApplicationInfo { get; init; }
 
-    public bool UseFastEndpoints { get; init; } = true;
-
     public required Assembly[] ApplicationAssemblies { get; init; }
 }

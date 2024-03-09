@@ -71,14 +71,15 @@ public static partial class OpenTelemetryWebApplicationBuilderExtensions
         if (useOtlpExporter)
         {
             services
-                .Configure((Action<OpenTelemetryLoggerOptions>)(logging => logging.AddOtlpExporter()))
+                .Configure<OpenTelemetryLoggerOptions>(logging => logging.AddOtlpExporter())
                 .ConfigureOpenTelemetryMeterProvider(metrics => metrics.AddOtlpExporter())
                 .ConfigureOpenTelemetryTracerProvider(tracing => tracing.AddOtlpExporter());
 
-            if (builder.Environment.IsDevelopment())
-            {
-                builder.AddExportToSeq();
-            }
+        }
+
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.AddExportToSeq();
         }
 
         // Uncomment the following lines to enable the Prometheus exporter (requires the OpenTelemetry.Exporter.Prometheus.AspNetCore package)

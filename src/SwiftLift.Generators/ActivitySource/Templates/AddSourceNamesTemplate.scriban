@@ -1,0 +1,27 @@
+using Ardalis.GuardClauses;
+using System.Runtime.CompilerServices;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using OpenTelemetry.Trace;
+
+namespace Microsoft.Extensions.DependencyInjection;
+
+[ExcludeFromCodeCoverage]
+[CompilerGenerated]
+public static class OpenTelemetryTracerSourceNamesServiceCollectionExtensions
+{
+    public static IServiceCollection AddTracingSourceNames(this IServiceCollection services)
+    {
+        Guard.Against.Null(services);
+
+        services.ConfigureOpenTelemetryTracerProvider(
+            tracing =>
+            {
+{{for source in sources}}
+                tracing.AddSource("{{source}}");
+{{end}}
+            });
+
+        return services;
+    }
+}
